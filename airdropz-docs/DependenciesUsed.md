@@ -5,6 +5,12 @@ Dependencies (for production)
 1.react(19.0.0) --> 
 2.react-dom(19.0.0) -->
 3.next(15.3.1) -->
+4.@radix-ui/react-slot(1.2.0) -->
+5.class-variance-authority(0.7.1) -->
+6.clsx(2.1.1) -->
+7.lucide-react(0.503.0) -->
+8.next(15.3.1) -->
+9.tailwind-merge(3.2.0) -->
 ```
 devDependencies (for development use only, not needed in production)
 ```bash
@@ -17,6 +23,7 @@ devDependencies (for development use only, not needed in production)
 7.eslint(9) -->
 8.eslint-config-next(15.3.1) -->
 9.@eslint/eslintrc(3) -->
+10.tw-animate-css(1.2.8) -->
 ```
 ## Backend
 Dependencies (for production)
