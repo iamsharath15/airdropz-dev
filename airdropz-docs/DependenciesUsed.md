@@ -11,6 +11,7 @@ Dependencies (for production)
 7.lucide-react(0.503.0) -->
 8.next(15.3.1) -->
 9.tailwind-merge(3.2.0) -->
+10.react-markdown(10.1.0) -->
 ```
 devDependencies (for development use only, not needed in production)
 ```bash

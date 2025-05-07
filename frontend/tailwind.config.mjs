@@ -8,6 +8,12 @@ export default defineConfig({
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'custom-gradient': 'linear-gradient(314deg, #1a1d32, rgba(26, 29, 50, 0))',
+      },
+      backgroundClip: {
+        padding: 'padding-box',
+      },
       animation: {
         rotateEyes: "rotateEyes 4s linear infinite",
         wonderFace: "wonderFace 2s cubic-bezier(0.075, 0.82, 0.165, 1) infinite",
