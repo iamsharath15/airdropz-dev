@@ -85,3 +85,15 @@ export const partnersData = [
   
 ]
 
+
+export const adminNavItems = [
+  { label: "Dashboard", href: "/admin/dashboard" },
+  { label: "Users", href: "/admin/users" },
+  { label: "Settings", href: "/admin/settings" },
+];
+
+export const userNavItems = [
+  { label: "Dashboard", href: "/user/dashboard" },
+  { label: "Airdrops", href: "/user/airdrops" },
+  { label: "Settings", href: "/user/settings" },
+];

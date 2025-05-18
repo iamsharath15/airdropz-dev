@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
-
+import authRoutes from "./routes/authRoutes.js"
 dotenv.config();
 
 const app = express();
@@ -12,6 +12,8 @@ app.use(corsMiddleware)
 app.use(express.json());
 
 // Routes
+app.use("/api/auth/v1", authRoutes);
+
 // Error handling middleware
 // Create table before starting server
 // Testing POSTGRES Connections
