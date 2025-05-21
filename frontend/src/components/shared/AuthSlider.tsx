@@ -33,7 +33,7 @@ export default function AuthSlider() {
   }, [])
 
   return (
-    <div className="hidden md:flex w-1/2 relative items-center justify-center bg-black text-white overflow-hidden">
+    <div className="hidden lg:flex w-1/2 relative items-center justify-center bg-black text-white overflow-hidden">
       {slides.map((slide, i) => (
         <div
           key={i}

@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import corsMiddleware from "./middlewares/corsMiddleware.js";
-import authRoutes from "./routes/authRoutes.js"
+import authRoutes from "./routes/auth.route.js"
 dotenv.config();
 
 const app = express();
