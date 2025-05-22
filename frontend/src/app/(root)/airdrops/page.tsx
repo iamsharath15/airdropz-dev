@@ -1,9 +1,9 @@
 import React from 'react'
 
-const Homepage = () => {
+const page = () => {
   return (
     <div className='min-h-screen h-full'>page</div>
   )
 }
 
-export default Homepage
+export default page
