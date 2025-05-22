@@ -1,23 +1,39 @@
-import express from "express";
-import dotenv from "dotenv";
-import corsMiddleware from "./middlewares/corsMiddleware.js";
-import authRoutes from "./routes/auth.route.js"
+import express from 'express';
+import dotenv from 'dotenv';
+import corsMiddleware from './middlewares/corsMiddleware.js';
+import authRoutes from './routes/auth.route.js';
+import pool from './config/db.js';
+import { initDB } from './models/initDB.js';
+
 dotenv.config();
 
 const app = express();
-const PORT = process.env.API_PORT || 8080
+const PORT = process.env.API_PORT || 8080;
 
 // Middlewares
-app.use(corsMiddleware)
+app.use(corsMiddleware);
 app.use(express.json());
 
 // Routes
-app.use("/api/auth/v1", authRoutes);
+app.use('/api/auth/v1', authRoutes);
+
+// Test DB connection
+pool
+  .query('SELECT NOW()')
+  .then((res) => console.log('🟢 PostgreSQL connected at:', res.rows[0].now))
+  .catch((err) => console.error('🔴 DB connection error:', err));
 
 // Error handling middleware
 // Create table before starting server
 // Testing POSTGRES Connections
-// Server running 
-app.listen(PORT, () => {
-  console.log(`Server is running on http:localhost:${PORT}`)
-})
+// Server running
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('DB initialization failed:', err);
+    process.exit(1); // stop app if DB setup fails
+  });
