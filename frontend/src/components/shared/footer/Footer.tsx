@@ -31,11 +31,11 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Quick Link</h3>
             <ul className="space-y-2">
-              <li><Link href="/" className="hover:text-yellow-400">Home</Link></li>
-              <li><Link href="/airdrops" className="hover:text-yellow-400">Airdropz</Link></li>
-              <li><Link href="/plans" className="hover:text-yellow-400">Pricing</Link></li>
-              <li><Link href="/partners" className="hover:text-yellow-400">Partners</Link></li>
-              <li><Link href="/faq" className="hover:text-yellow-400">Faq</Link></li>
+              <li><Link href="/" className="hover:text-[#8373EE]">Home</Link></li>
+              <li><Link href="/airdrops" className="hover:text-[#8373EE]">Airdropz</Link></li>
+              <li><Link href="/plans" className="hover:text-[#8373EE]">Pricing</Link></li>
+              <li><Link href="/partners" className="hover:text-[#8373EE]">Partners</Link></li>
+              <li><Link href="/faq" className="hover:text-[#8373EE]">Faq</Link></li>
             </ul>
           </div>
 
@@ -43,8 +43,8 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Resources</h3>
             <ul className="space-y-2">
-              <li><Link href="/privacy-policy" className="hover:text-yellow-400">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-yellow-400">Terms & Conditions</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-[#8373EE]">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-[#8373EE]">Terms & Conditions</Link></li>
             </ul>
           </div>
 
@@ -55,7 +55,7 @@ const Footer = () => {
               For any kind of help & support, please write us at:
             </p>
             <div className="inline-block bg-zinc-800 rounded-full px-4 py-2">
-              <a href="mailto:info@airdropz.app" className="hover:text-yellow-400 transition-colors">
+              <a href="mailto:info@airdropz.app" className="hover:text-[#8373EE] transition-colors">
                 info@airdropz.app
               </a>
             </div>
@@ -69,16 +69,16 @@ const Footer = () => {
             <div className="flex space-x-4">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400">
+                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#8373EE]">
                     <Instagram size={20} />
                   </a>
                 </TooltipTrigger>
-                <TooltipContent>Instagram</TooltipContent>
+                <TooltipContent >Instagram</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400">
+                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#8373EE]">
                     <Youtube size={20} />
                   </a>
                 </TooltipTrigger>
@@ -87,7 +87,7 @@ const Footer = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400">
+                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#8373EE]">
                     <Twitter size={20} />
                   </a>
                 </TooltipTrigger>
@@ -96,7 +96,7 @@ const Footer = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-yellow-400">
+                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#8373EE]">
                     <Linkedin size={20} />
                   </a>
                 </TooltipTrigger>
