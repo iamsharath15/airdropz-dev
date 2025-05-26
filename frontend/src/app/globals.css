@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+/* Slide-in from bottom */
+.origin-bottom {
+  transform-origin: bottom;
+}
+
+/* Slide-out from top */
+.origin-top {
+  transform-origin: top;
+}

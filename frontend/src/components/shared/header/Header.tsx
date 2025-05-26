@@ -47,7 +47,7 @@ export default function Header() {
                 key={label}
                 href={href}
                 className={`transition font-medium hover:text-black ${
-                  isActive ? 'text-purple-600 font-semibold' : 'text-gray-700'
+                  isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
                 }`}
               >
                 {label}
@@ -58,12 +58,12 @@ export default function Header() {
 
         {/* Desktop Auth */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link href="/signin" className="text-gray-800 font-medium">
+          <Link href="/signin" className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 px-5 rounded-full transition">
             Sign In
           </Link>
           <Link
             href="/signup"
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-full transition"
+            className="bg-[#8373EE] hover:bg-black  text-white font-semibold py-2 px-5 rounded-full transition"
           >
             Sign Up
           </Link>
@@ -71,7 +71,7 @@ export default function Header() {
 
         {/* Mobile Hamburger */}
         <button
-          className="md:hidden text-2xl text-gray-800"
+          className="md:hidden text-2xl text-gray-800 cursor-pointer"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <HiX /> : <HiMenu />}
@@ -87,8 +87,8 @@ export default function Header() {
               <button
                 key={label}
                 onClick={() => handleNavClick(href)}
-                className={`block w-full text-left font-medium transition ${
-                  isActive ? 'text-purple-600 font-semibold' : 'text-gray-700'
+                className={`block w-full text-left font-medium transition cursor-pointer ${
+                  isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
                 } hover:text-black`}
               >
                 {label}

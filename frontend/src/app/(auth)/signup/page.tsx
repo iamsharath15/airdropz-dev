@@ -8,7 +8,7 @@ export default function SignUpPage() {
   return (
     <div className="flex h-screen w-full">
       {/* Left - Sign Up */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#7B3AED] text-white px-6">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
         <div className="max-w-sm w-full space-y-6">
           <h1 className="text-3xl font-semibold text-center">Create Account</h1>
           <p className="text-center text-sm">Join Airdropz and start earning rewards</p>

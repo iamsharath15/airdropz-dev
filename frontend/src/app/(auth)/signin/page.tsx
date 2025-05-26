@@ -8,7 +8,7 @@ export default function SignInPage() {
   return (
     <div className="flex w-full h-screen">
       {/* Left - Sign In */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#7B3AED] text-white px-6">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
         <div className="max-w-sm w-full space-y-6">
           <h1 className="text-3xl font-semibold text-center">Welcome Airdropz</h1>
           <p className="text-center text-sm">Enter your email and password to access your account</p>
