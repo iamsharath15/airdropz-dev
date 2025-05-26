@@ -4,6 +4,7 @@ import corsMiddleware from './middlewares/corsMiddleware.js';
 import authRoutes from './routes/auth.route.js';
 import pool from './config/db.js';
 import { initDB } from './models/initDB.js';
+import referralRoutes from "./routes/referral.routes.js";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth/v1', authRoutes);
+app.use("/api/referral/v1", referralRoutes); // ← Add this
+
 
 // Test DB connection
 pool

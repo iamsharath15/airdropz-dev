@@ -1,56 +1,74 @@
 import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
+import crypto from "crypto";
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
-import { sendVerificationEmail, sendWelcomeEmail } from '../utils/email.js';
+import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from '../utils/email.js';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
 
 // @desc Register a new user
 // @route POST /api/auth/signup
 // @access Public
+import { generateReferralCode } from '../utils/generateReferralCode.js';
+
 export const signup = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, referralCode } = req.body;
   try {
-    // Check for missing fields
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    // Check if user already exists
-    const existing = await pool.query('SELECT * FROM users WHERE email = $1', [
-      email,
-    ]);
-    if (existing.rows.length > 0)
+
+    const existing = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existing.rows.length > 0) {
       return res.status(409).json({ error: 'User already exists' });
-    // Hash password
+    }
 
     const hashed = await bcrypt.hash(password, 10);
-    // Generate email verification token
-
     const verificationToken = generateVerificationToken();
-    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-    // Insert user into database
+    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const result = await pool.query(
-      `INSERT INTO users (username, email, password, verification_token, verification_token_expires_at)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, username, email`,
-      [username, email, hashed, verificationToken, tokenExpiresAt]
+    const referral_code = generateReferralCode(username);
+
+    // Insert user first
+    const userInsert = await pool.query(
+      `INSERT INTO users (username, email, password, referral_code, verification_token, verification_token_expires_at)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, username, email, referral_code`,
+      [username, email, hashed, referral_code, verificationToken, tokenExpiresAt]
     );
-    // Send email verification link
+
+    const newUser = userInsert.rows[0];
+
+    // If referralCode was used, reward both users
+    if (referralCode) {
+      const referrer = await pool.query('SELECT id FROM users WHERE referral_code = $1', [referralCode]);
+      if (referrer.rows.length > 0) {
+        const referrerId = referrer.rows[0].id;
+
+        // 1. Add points
+        await pool.query(`UPDATE users SET points = points + 50 WHERE id = $1`, [referrerId]);
+        await pool.query(`UPDATE users SET points = points + 25 WHERE id = $1`, [newUser.id]);
+
+        // 2. Insert into referrals table
+        await pool.query(
+          `INSERT INTO referrals (referrer_id, referred_id) VALUES ($1, $2)`,
+          [referrerId, newUser.id]
+        );
+      }
+    }
 
     await sendVerificationEmail(email, verificationToken);
-    // Optionally set auth cookie
+    generateTokenAndSetCookie(res, newUser.id);
 
-    generateTokenAndSetCookie(res, result.rows[0].id);
-    // Respond with created user info
-
-    res
-      .status(201)
-      .json({ message: 'User created', user: { ...result.rows[0] } });
+    res.status(201).json({
+      message: 'User created',
+      user: newUser,
+    });
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ error: 'Signup failed' });
   }
 };
+
 
 // @desc Log in a user
 // @route POST /api/auth/login
@@ -83,20 +101,19 @@ export const login = async (req, res) => {
 
     // 3. Generate token and set cookie
     generateTokenAndSetCookie(res, user.id); // use user.id for PostgreSQL
-    sendVerificationEmail(user.email, verificationToken);
 
     // 4. Update last_login timestamp
     await pool.query('UPDATE users SET last_login = NOW() WHERE id = $1', [
       user.id,
     ]);
 
-    // 5. Remove password before sending user data back
+    // 6. Remove password before sending user data back
     delete user.password;
 
     res.status(200).json({
       success: true,
       message: 'Logged in successfully',
-      user,
+      user
     });
   } catch (error) {
     console.error('Error in login:', error);

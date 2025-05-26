@@ -8,6 +8,8 @@ export async function createUsersTable() {
       email VARCHAR(100) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
       username VARCHAR(100) NOT NULL,
+      referral_code VARCHAR(20) UNIQUE,
+      points INT DEFAULT 0,
       last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       is_verified BOOLEAN DEFAULT false,
       reset_password_token TEXT,
