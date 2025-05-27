@@ -16,7 +16,9 @@ export default function LandingRootLayout({
       {showChildren && (
         <>
           <Header />
-          <main>{children}</main>
+          <main>
+           {children}
+          </main>
           <Footer />
         </>
       )}

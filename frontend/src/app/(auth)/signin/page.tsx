@@ -1,38 +1,111 @@
-'use client'
+'use client';
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import AuthSlider from '@/components/shared/AuthSlider'
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import AuthSlider from '@/components/shared/AuthSlider';
+import { Toaster, toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 
 export default function SignInPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const loginMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axios.post('http://localhost:8080/api/auth/v1/signin', {
+        email,
+        password,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success('Logged in successfully!');
+      router.push('/dashboard'); // Change this route to your dashboard/home
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Login failed';
+      toast.error(message);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    loginMutation.mutate();
+  };
+
   return (
-    <div className="flex w-full h-screen">
-      {/* Left - Sign In */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
-        <div className="max-w-sm w-full space-y-6">
-          <h1 className="text-3xl font-semibold text-center">Welcome Airdropz</h1>
-          <p className="text-center text-sm">Enter your email and password to access your account</p>
+    <>
+      <Toaster position="top-right" richColors />
+      <div className="flex w-full h-screen">
+        {/* Left - Sign In */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
+          <div className="max-w-sm w-full space-y-2">
+            <h1 className="text-3xl font-semibold text-center">
+              Welcome to Airdropz
+            </h1>
+            <p className="text-center text-sm pb-4">
+              Enter your email and password to access your account
+            </p>
 
-          <form className="space-y-4">
-            <Input type="email" placeholder="Enter your email" className="bg-white text-black" />
-            <Input type="password" placeholder="Enter your password" className="bg-white text-black" />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <label htmlFor="email" className="block text-sm font-bold mb-1 pb-2">
+                Email
+              </label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                className="bg-white text-black placeholder:text-black py-5"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-            <div className="flex items-center justify-between text-sm">
-           
-              <a href="#" className="underline">Forgot Password?</a>
-            </div>
+              <label htmlFor="password" className="block text-sm font-bold mb-1 pb-2">
+                Password
+              </label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                className="bg-white text-black placeholder:text-black py-5"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
 
-            <Button className="w-full">Sign In</Button>
-            <Button variant="outline" className="w-full bg-white text-black">Sign in with Google</Button>
-          </form>
+              <div className="flex items-center justify-between text-sm">
+                <a href="/forgot-password" className="underline">
+                  Forgot Password?
+                </a>
+              </div>
 
-          <p className="text-center text-sm">
-            Don’t have an account? <a href="/signup" className="underline">Sign Up</a>
-          </p>
+              <Button type="submit" className="w-full py-6 text-sm font-semibold">
+                {loginMutation.isLoading ? 'Signing In...' : 'Sign In'}
+              </Button>
+            </form>
+
+            <p className="text-center text-sm">
+              Don’t have an account?{' '}
+              <a href="/signup" className="underline">
+                Sign Up
+              </a>
+            </p>
+          </div>
         </div>
+
+        {/* Right - Slider */}
+        <AuthSlider />
       </div>
-      {/* Right - Slider */}
-      <AuthSlider />
-    </div>
-  )
+    </>
+  );
 }

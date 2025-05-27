@@ -1,74 +1,129 @@
 import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
-import crypto from "crypto";
+import crypto from 'crypto';
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
-import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from '../utils/email.js';
+import {
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from '../utils/email.js';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
+import { generateReferralCode } from '../utils/generateReferralCode.js';
 
 // @desc Register a new user
 // @route POST /api/auth/signup
 // @access Public
-import { generateReferralCode } from '../utils/generateReferralCode.js';
-
-export const signup = async (req, res) => {
+export const registerUser = async (req, res) => {
   const { username, email, password, referralCode } = req.body;
+
   try {
+    // Validate required fields
     if (!username || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Username, email, and password are required.',
+      });
     }
 
-    const existing = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (existing.rows.length > 0) {
-      return res.status(409).json({ error: 'User already exists' });
+    // Check if user with this email already exists
+    const existingUserResult = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+    if (existingUserResult.rows.length > 0) {
+      return res.status(409).json({
+        error: 'Conflict Error',
+        message: 'A user with this email already exists.',
+      });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    // Check referral code validity if provided
+    let referrerId = null;
+    if (referralCode) {
+      const referrerResult = await pool.query('SELECT id FROM users WHERE referral_code = $1', [referralCode]);
+      if (referrerResult.rows.length === 0) {
+        return res.status(400).json({
+          error: 'Invalid Referral Code',
+          message: 'Referral code is invalid. Please enter a valid referral code or continue without one.',
+          referralCodeInvalid: true,
+        });
+      }
+      referrerId = referrerResult.rows[0].id;
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate verification token and expiry time (15 min)
     const verificationToken = generateVerificationToken();
-    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+const verificationTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); 
 
-    const referral_code = generateReferralCode(username);
+    // Generate referral code for the new user
+    const generatedReferralCode = generateReferralCode(username);
 
-    // Insert user first
-    const userInsert = await pool.query(
-      `INSERT INTO users (username, email, password, referral_code, verification_token, verification_token_expires_at)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, username, email, referral_code`,
-      [username, email, hashed, referral_code, verificationToken, tokenExpiresAt]
+    // Default role for new user
+    const defaultUserRole = 'user';
+
+    // Insert new user into DB
+    const insertUserResult = await pool.query(
+      `INSERT INTO users (username, email, password, referral_code, verification_token, verification_token_expires_at, role)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, username, email, referral_code, role`,
+      [
+        username,
+        email,
+        hashedPassword,
+        generatedReferralCode,
+        verificationToken,
+        verificationTokenExpiry,
+        defaultUserRole,
+      ]
     );
 
-    const newUser = userInsert.rows[0];
+    const newUser = insertUserResult.rows[0];
 
-    // If referralCode was used, reward both users
-    if (referralCode) {
-      const referrer = await pool.query('SELECT id FROM users WHERE referral_code = $1', [referralCode]);
-      if (referrer.rows.length > 0) {
-        const referrerId = referrer.rows[0].id;
-
-        // 1. Add points
-        await pool.query(`UPDATE users SET points = points + 50 WHERE id = $1`, [referrerId]);
-        await pool.query(`UPDATE users SET points = points + 25 WHERE id = $1`, [newUser.id]);
-
-        // 2. Insert into referrals table
-        await pool.query(
-          `INSERT INTO referrals (referrer_id, referred_id) VALUES ($1, $2)`,
-          [referrerId, newUser.id]
-        );
-      }
+    // If valid referral code provided, handle referral rewards
+    if (referrerId) {
+      await pool.query(`UPDATE users SET points = points + 50 WHERE id = $1`, [referrerId]);
+      await pool.query(`UPDATE users SET points = points + 25 WHERE id = $1`, [newUser.id]);
+      await pool.query(`INSERT INTO referrals (referrer_id, referred_id) VALUES ($1, $2)`, [referrerId, newUser.id]);
     }
 
+    // Send verification email
     await sendVerificationEmail(email, verificationToken);
+
+    // Generate JWT token and set it in cookie
     generateTokenAndSetCookie(res, newUser.id);
 
+    // Respond with success and new user data
     res.status(201).json({
-      message: 'User created',
+      message: 'User successfully created.',
       user: newUser,
     });
-  } catch (err) {
-    console.error('Signup error:', err);
-    res.status(500).json({ error: 'Signup failed' });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred during signup. Please try again later.',
+    });
   }
 };
 
+
+// export const registerUser = async (req, res) => { /* your signup code */ };
+
+// export const loginUser = async (req, res) => { /* your login code */ };
+
+// export const logoutUser = async (req, res) => { /* your logout code */ };
+
+// export const verifyUserEmail = async (req, res) => { /* your email verification code */ };
+
+// export const getAuthenticatedUser = async (req, res) => { /* your check auth code */ };
+
+// export const requestPasswordReset = async (req, res) => { /* your forgot password code */ };
+
+// export const resetUserPassword = async (req, res) => { /* your reset password code */ };
 
 // @desc Log in a user
 // @route POST /api/auth/login
@@ -113,7 +168,7 @@ export const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Logged in successfully',
-      user
+      user,
     });
   } catch (error) {
     console.error('Error in login:', error);

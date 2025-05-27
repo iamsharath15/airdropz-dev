@@ -16,6 +16,7 @@ export async function createUsersTable() {
       reset_password_expires_at TIMESTAMP,
       verification_token TEXT,
       verification_token_expires_at TIMESTAMP,
+      role VARCHAR(20) DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
