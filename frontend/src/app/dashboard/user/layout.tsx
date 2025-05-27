@@ -12,15 +12,20 @@
 //     </div>
 //   );
 // }
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Sidebar } from "@/components/shared/Sidebar";
-import { Navbar } from "@/components/shared/Navbar";
+import { useState } from 'react';
+import { Sidebar } from '@/components/shared/Sidebar';
+import { Navbar } from '@/components/shared/Navbar';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false); // controls sidebar on mobile
   const [isCollapsed, setIsCollapsed] = useState(false); // controls desktop collapse
+  // const role = session?.user?.role || 'user'
 
   return (
     <div className="flex min-h-screen bg-black w-full text-white">
@@ -30,11 +35,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setIsCollapsed={setIsCollapsed}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        role="user"
       />
 
       <div className="flex flex-col flex-1 overflow-hidden">
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          role="user"
         />
         <main className="w-full p-6">{children}</main>
       </div>

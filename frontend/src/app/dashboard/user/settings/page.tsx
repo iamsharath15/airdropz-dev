@@ -25,12 +25,7 @@ const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => (
   </section>
 );
 
-const TABS = [
-  'Account',
-  'Notification',
-  'Display',
-  'Wallet',
-] as const;
+const TABS = ['Account', 'Notification', 'Display', 'Wallet'] as const;
 
 type Tab = (typeof TABS)[number];
 
@@ -48,7 +43,7 @@ const Settings: React.FC = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`whitespace-nowrap p-4 font-semibold border-b-4 cursor-pointer ${
+            className={`whitespace-nowrap p-3 font-semibold border-b-4 cursor-pointer ${
               activeTab === tab
                 ? 'border-[#8373EE] text-white'
                 : 'border-transparent text-gray-400 hover:text-white'
@@ -72,7 +67,7 @@ const Settings: React.FC = () => {
                 <Input
                   id="username"
                   placeholder="user1"
-                  className=" border-0 text-white placeholder:text-black bg-white"
+                  className=" border-0 text-black placeholder:text-black bg-white"
                 />
               </div>
               <div>
@@ -83,13 +78,13 @@ const Settings: React.FC = () => {
                   id="email"
                   type="email"
                   placeholder="user@example.com"
-                  className=" border-0 text-white placeholder:text-black bg-white"
+                  className=" border-0 text-black placeholder:text-black bg-white"
                 />
               </div>
               <div className="flex justify-start">
                 <Button
                   variant="default"
-                  className="bg-[#8373EE] hover:bg-purple-700"
+                  className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
                 >
                   Save Changes
                 </Button>
@@ -123,13 +118,13 @@ const Settings: React.FC = () => {
           <SettingSection title="Display Settings">
             <div className="space-y-6 max-w-md">
               <div>
-                <Label htmlFor="theme" className="text-gray-400 mb-2 block">
+                <Label htmlFor="theme" className="text-white/80 pb-4 block">
                   Theme
                 </Label>
-                <Select defaultValue="dark">
+                <Select defaultValue="light">
                   <SelectTrigger
                     id="theme"
-                    className="bg-[#111] border-gray-800 text-white"
+                    className="bg-white border-gray-800 text-black w-full"
                   >
                     <SelectValue placeholder="Select a theme" />
                   </SelectTrigger>
@@ -141,13 +136,13 @@ const Settings: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="language" className="text-gray-400 mb-2 block">
+                <Label htmlFor="language" className="text-white/80 pb-4 block">
                   Language
                 </Label>
                 <Select defaultValue="en">
                   <SelectTrigger
                     id="language"
-                    className="bg-[#111] border-gray-800 text-white"
+                    className="bg-white border-gray-800 text-black w-full"
                   >
                     <SelectValue placeholder="Select a language" />
                   </SelectTrigger>
@@ -166,25 +161,22 @@ const Settings: React.FC = () => {
           <SettingSection title="Wallet Settings">
             <div className="space-y-6 max-w-md">
               <div>
-                <Label className="text-gray-400 mb-2 block">
+                <Label className="text-white/80 pb-4 block">
                   Connected Wallet
                 </Label>
-                <div className="flex items-center justify-between bg-[#111] border border-gray-800 rounded-lg py-2.5 px-4 text-white">
-                  <span>0x1a2...3b4c</span>
-                  <Button
-                    variant="link"
-                    className="text-red-500 hover:text-red-400 p-0"
-                  >
-                    Disconnect
-                  </Button>
-                </div>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="0x1a2...3b4c"
+                  className=" border-0 text-black placeholder:text-black bg-white py-4"
+                />
               </div>
               <div>
                 <Button
                   variant="default"
-                  className="bg-[#8373EE] hover:bg-purple-700"
+                  className="bg-red-500 hover:bg-red-400 cursor-pointer"
                 >
-                  Connect Another Wallet
+                  Disconnect
                 </Button>
               </div>
             </div>
@@ -209,14 +201,14 @@ const NotificationToggle: React.FC<NotificationToggleProps> = ({
   const [checked, setChecked] = React.useState(defaultChecked);
   return (
     <div className="flex justify-between items-center max-w-md">
-      <div className='pr-4'>
-        <h3 className="text-white font-semibold">{title}</h3>
-        <p className="text-gray-400 text-sm">{description}</p>
+      <div className="pr-4">
+        <h3 className="text-white font-semibold pb-2">{title}</h3>
+        <p className="text-white/80 text-sm">{description}</p>
       </div>
       <Switch
         checked={checked}
         onCheckedChange={setChecked}
-        className="peer bg-gray-700 peer-checked:bg-[#8373EE]"
+        className="peer bg-gray-700 peer-checked:bg-[#8373EE] cursor-pointer"
       />
     </div>
   );
