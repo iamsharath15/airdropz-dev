@@ -1,38 +1,47 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
 import { Toaster, toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
-export default function SignInPage() {
+interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+    role: string;
+  };
+}
+
+export default function Login() {
   const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const loginMutation = useMutation({
+  const loginMutation = useMutation<LoginResponse, AxiosError>({
     mutationFn: async () => {
-      const res = await axios.post('http://localhost:8080/api/auth/v1/signin', {
-        email,
-        password,
-      });
-      return res.data;
+      const response = await axios.post<LoginResponse>(
+        'http://localhost:8080/api/auth/v1/login',
+        { email, password }
+      );
+      return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('Logged in successfully!');
-      router.push('/dashboard'); // Change this route to your dashboard/home
+      router.push('/dashboard/user');
     },
-    onError: (error: any) => {
+
+    onError: (error) => {
+      const data = error.response?.data as { message?: string; error?: string };
       const message =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        'Login failed';
+        data?.message || data?.error || error?.message || 'Login failed';
       toast.error(message);
     },
   });
@@ -41,6 +50,7 @@ export default function SignInPage() {
     e.preventDefault();
     loginMutation.mutate();
   };
+  const isLogin = loginMutation.status === 'pending';
 
   return (
     <>
@@ -57,7 +67,10 @@ export default function SignInPage() {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <label htmlFor="email" className="block text-sm font-bold mb-1 pb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-bold mb-1 pb-2"
+              >
                 Email
               </label>
               <Input
@@ -70,7 +83,10 @@ export default function SignInPage() {
                 required
               />
 
-              <label htmlFor="password" className="block text-sm font-bold mb-1 pb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-bold mb-1 pb-2"
+              >
                 Password
               </label>
               <Input
@@ -84,21 +100,24 @@ export default function SignInPage() {
               />
 
               <div className="flex items-center justify-between text-sm">
-                <a href="/forgot-password" className="underline">
+                <Link href="/forgot-password" className="underline">
                   Forgot Password?
-                </a>
+                </Link>
               </div>
 
-              <Button type="submit" className="w-full py-6 text-sm font-semibold">
-                {loginMutation.isLoading ? 'Signing In...' : 'Sign In'}
+              <Button
+                type="submit"
+                className="w-full py-6 text-sm font-semibold cursor-pointer"
+              >
+                {isLogin ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
 
             <p className="text-center text-sm">
               Don’t have an account?{' '}
-              <a href="/signup" className="underline">
+              <Link href="/signup" className="underline">
                 Sign Up
-              </a>
+              </Link>
             </p>
           </div>
         </div>

@@ -263,12 +263,14 @@ export const logoutUser = async (req, res) => {
 export const resetUserPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
+  console.log('Received token:', token);
 
   try {
     // 1. Verify the reset token and expiration
     const result = await pool.query(
       `SELECT * FROM users 
-       WHERE reset_password_token = $1 AND reset_password_expires_at > NOW()`,
+       WHERE reset_password_token = $1
+      AND reset_password_expires_at > NOW()`,
       [token]
     );
 

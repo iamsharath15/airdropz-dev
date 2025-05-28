@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 type PricingPlanProps = {
   title: string;
@@ -12,6 +13,7 @@ type PricingPlanProps = {
   features: string[];
   highlighted?: boolean;
 };
+const MotionCard = motion(Card);
 
 const PricingPlan: React.FC<PricingPlanProps> = ({
   title,
@@ -21,7 +23,8 @@ const PricingPlan: React.FC<PricingPlanProps> = ({
   highlighted = false,
 }) => {
   return (
-    <Card
+    <MotionCard
+      whileHover={{ y: -10, transition: { duration: 0.3 } }}
       className={`w-full h-full flex flex-col justify-between overflow-hidden border-0 ${
         highlighted ? 'bg-[#6F2BE4] text-white' : 'bg-white'
       }`}
@@ -56,7 +59,7 @@ const PricingPlan: React.FC<PricingPlanProps> = ({
 
         <Button
           variant={highlighted ? 'outline' : 'default'}
-          className={`w-full mt-6 rounded-md ${
+          className={`w-full mt-6 rounded-md cursor-pointer p-5 ${
             highlighted
               ? 'bg-white text-purple-600 hover:bg-gray-100'
               : 'bg-[#6F2BE4] text-white hover:bg-purple-700'
@@ -77,7 +80,7 @@ const PricingPlan: React.FC<PricingPlanProps> = ({
           </ul>
         </div>
       </CardContent>
-    </Card>
+    </MotionCard>
   );
 };
 
@@ -85,14 +88,11 @@ const Pricing: NextPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center px-4 py-1 bg-purple-900/30 text-purple-300 text-sm font-medium rounded-full mb-4">
-              OUR PLANS
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  flex items-center justify-center flex-col ">
+          <div className="md:w-6/12 w-8/12 text-center space-y-6 py-[10%]">
+            <h2 className="text-white font-semibold lg:text-5xl md:text-3xl sm:text-xl">
               Plans for Your Need
-            </h1>
+            </h2>
             <p className="text-gray-300 max-w-3xl mx-auto">
               Upgrade to Premium for an unparalleled airdrop experience. Gain
               access to a private Telegram channel, exclusive airdrops, and
@@ -101,7 +101,7 @@ const Pricing: NextPage = () => {
           </div>
 
           {/* FLEX Layout Instead of Grid */}
-          <div className="flex flex-col md:flex-row gap-y-8 md:gap-y-0 md:gap-x-8">
+          <div className="flex flex-col md:flex-row gap-y-8 md:gap-y-0 md:gap-x-8 pb-[10%]">
             <div className="flex-1 h-full">
               <PricingPlan
                 title="Free"

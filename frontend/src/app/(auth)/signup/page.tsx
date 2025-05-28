@@ -2,23 +2,28 @@
 
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
 
-interface FormData {
+interface SignUpFormData {
   username: string;
   email: string;
   password: string;
   referralCode?: string;
 }
 
+interface ApiResponse {
+  message: string;
+}
+
 export default function SignUp() {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+
+  const [formData, setFormData] = useState<SignUpFormData>({
     username: '',
     email: '',
     password: '',
@@ -27,75 +32,86 @@ export default function SignUp() {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState('');
 
-  // Signup mutation
-  const signupMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const res = await axios.post(
-        'http://localhost:8080/api/auth/v1/signup',
-        data
+  // Register user mutation
+  const registerMutation = useMutation<ApiResponse, AxiosError, SignUpFormData>(
+    {
+      mutationFn: async (data) => {
+        const response = await axios.post<ApiResponse>(
+          'http://localhost:8080/api/auth/v1/signup',
+          data
+        );
+        return response.data;
+      },
+      onSuccess: () => {
+        toast.success(
+          'User registered successfully! Please enter the OTP sent to your email.'
+        );
+        setShowOtpInput(true);
+      },
+      onError: (error) => {
+        const data = error.response?.data as {
+          message?: string;
+          error?: string;
+        };
+        const message =
+          data?.message ||
+          data?.error ||
+          error.message ||
+          'Signup failed, please try again';
+        toast.error(message);
+      },
+    }
+  );
+
+  // Verify OTP mutation
+  const verifyOtpMutation = useMutation<ApiResponse, AxiosError, string>({
+    mutationFn: async (code) => {
+      const response = await axios.post(
+        'http://localhost:8080/api/auth/v1/verify-email',
+        { code }
       );
-      return res.data;
+      return response.data;
     },
     onSuccess: () => {
-      toast.success(
-        'User registered successfully! Please enter the OTP sent to your email.'
-      );
-      setShowOtpInput(true);
+      toast.success('Email verified successfully!');
+      router.push('/login');
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      const data = error.response?.data as { message?: string; error?: string };
       const message =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        error?.message ||
-        'Signup failed, please try again';
-
+        data?.message ||
+        data?.error ||
+        error.message ||
+        'OTP verification failed';
       toast.error(message);
     },
   });
 
-  // OTP verification mutation
-const otpMutation = useMutation({
-  mutationFn: async (otpCode: string) => {
-    const res = await axios.post(
-      'http://localhost:8080/api/auth/v1/verify-email',
-      {
-        code: otpCode,
-      }
-    );
-    return res.data;
-  },
-  onSuccess: () => {
-    toast.success('Email verified successfully!');
-    router.push('/signin'); // or wherever you want to redirect
-  },
-  onError: (error: any) => {
-    const message =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      'OTP verification failed';
-    toast.error(message);
-  },
-});
-
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  // Handle input change for signup form fields
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle signup form submit
+  const handleSignUpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    signupMutation.mutate(formData);
+    registerMutation.mutate(formData);
   };
 
+  // Handle OTP form submit
   const handleOtpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) {
       toast.error('Please enter a 6-digit OTP code');
       return;
     }
-    otpMutation.mutate(otp);
+    verifyOtpMutation.mutate(otp);
   };
+
+  // Helper to check loading status
+  const isRegistering = registerMutation.status === 'pending';
+  const isVerifyingOtp = verifyOtpMutation.status === 'pending';
 
   return (
     <>
@@ -113,7 +129,7 @@ const otpMutation = useMutation({
                   Join Airdropz and start earning rewards
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSignUpSubmit} className="space-y-4">
                   <div>
                     <label
                       htmlFor="username"
@@ -127,7 +143,7 @@ const otpMutation = useMutation({
                       placeholder="Enter your full name"
                       className="bg-white text-black placeholder:text-black py-5"
                       value={formData.username}
-                      onChange={handleChange}
+                      onChange={handleInputChange}
                       required
                     />
                   </div>
@@ -145,7 +161,7 @@ const otpMutation = useMutation({
                       placeholder="Enter your email"
                       className="bg-white text-black placeholder:text-black py-5"
                       value={formData.email}
-                      onChange={handleChange}
+                      onChange={handleInputChange}
                       required
                     />
                   </div>
@@ -163,7 +179,7 @@ const otpMutation = useMutation({
                       placeholder="Enter your password"
                       className="bg-white text-black placeholder:text-black py-5"
                       value={formData.password}
-                      onChange={handleChange}
+                      onChange={handleInputChange}
                       required
                     />
                   </div>
@@ -181,16 +197,16 @@ const otpMutation = useMutation({
                       placeholder="Enter Code"
                       className="bg-white text-black placeholder:text-black py-5"
                       value={formData.referralCode}
-                      onChange={handleChange}
+                      onChange={handleInputChange}
                     />
                   </div>
 
                   <Button
                     type="submit"
                     className="w-full py-6 font-semibold text-sm cursor-pointer"
-                    disabled={signupMutation.isLoading}
+                    disabled={isRegistering}
                   >
-                    {signupMutation.isLoading ? 'Signing Up...' : 'Sign Up'}
+                    {isRegistering ? 'Signing Up...' : 'Sign Up'}
                   </Button>
                 </form>
 
@@ -203,7 +219,9 @@ const otpMutation = useMutation({
               </>
             ) : (
               <>
-                <h1 className="text-3xl font-semibold text-center">Verify OTP</h1>
+                <h1 className="text-3xl font-semibold text-center">
+                  Verify OTP
+                </h1>
                 <p className="text-center text-sm font-semibold">
                   Enter the 6-digit OTP sent to your email
                 </p>
@@ -223,9 +241,9 @@ const otpMutation = useMutation({
                   <Button
                     type="submit"
                     className="w-full py-6 font-semibold text-sm cursor-pointer"
-                    disabled={otpMutation.isLoading}
+                    disabled={isVerifyingOtp}
                   >
-                    {otpMutation.isLoading ? 'Verifying...' : 'Verify OTP'}
+                    {isVerifyingOtp ? 'Verifying...' : 'Verify OTP'}
                   </Button>
                 </form>
               </>

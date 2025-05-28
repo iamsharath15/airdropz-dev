@@ -33,7 +33,7 @@ router.post('/login', loginUser);
 // @route POST /api/auth/v1/request-password-reset
 // @desc Request password reset by sending reset token to user's email
 // @access Public
-router.post("/forgot-password", requestPasswordReset)
+router.post("/request-password-reset", requestPasswordReset)
 
 // @route POST /api/auth/v1/reset-password/:token
 // @desc Reset user password using a valid reset token

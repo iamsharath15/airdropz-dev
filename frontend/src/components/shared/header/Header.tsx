@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { HiMenu, HiX } from 'react-icons/hi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -14,19 +15,26 @@ const navLinks = [
   { label: 'Faq', href: '/faq' },
 ];
 
+const MotionLink = motion(Link);
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
-    const pathname = usePathname();
-
+  const pathname = usePathname();
 
   const handleNavClick = (href: string) => {
-    setMenuOpen(false);         // Close the mobile menu
-    router.push(href);          // Navigate to selected page
+    setMenuOpen(false); // Close menu with animation
+    router.push(href);
   };
 
   return (
-    <header className="bg-white shadow-md rounded-2xl my-6 px-6 py-3 w-11/12 max-w-6xl mx-auto z-50">
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      layout
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="bg-white shadow-md rounded-2xl my-6 px-6 py-3 w-11/12 max-w-6xl mx-auto z-50"
+    >
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -39,31 +47,37 @@ export default function Header() {
         </Link>
 
         {/* Desktop Nav */}
-         <nav className="hidden md:flex items-center space-x-6 pl-6">
+        <nav className="hidden md:flex items-center space-x-6 pl-6">
           {navLinks.map(({ label, href }) => {
             const isActive = pathname === href;
+
             return (
-              <Link
+              <MotionLink
                 key={label}
                 href={href}
-                className={`transition font-medium hover:text-black ${
+                className={`transition font-medium ${
                   isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
                 }`}
+                whileHover={{ scale: 1.1, y: -2 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
               >
                 {label}
-              </Link>
+              </MotionLink>
             );
           })}
         </nav>
 
         {/* Desktop Auth */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link href="/signin" className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 px-5 rounded-full transition">
-            Sign In
+          <Link
+            href="/login"
+            className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 px-5 rounded-full transition"
+          >
+            Login
           </Link>
           <Link
             href="/signup"
-            className="bg-[#8373EE] hover:bg-black  text-white font-semibold py-2 px-5 rounded-full transition"
+            className="bg-[#8373EE] hover:bg-black text-white font-semibold py-2 px-5 rounded-full transition"
           >
             Sign Up
           </Link>
@@ -72,44 +86,64 @@ export default function Header() {
         {/* Mobile Hamburger */}
         <button
           className="md:hidden text-2xl text-gray-800 cursor-pointer"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => setMenuOpen((prev) => !prev)}
         >
-          {menuOpen ? <HiX /> : <HiMenu />}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={menuOpen ? 'close' : 'menu'}
+              initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              exit={{ opacity: 0, rotate: 90, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+              className="inline-block"
+            >
+              {menuOpen ? <HiX /> : <HiMenu />}
+            </motion.span>
+          </AnimatePresence>
         </button>
       </div>
 
-      {/* Mobile Menu */}
-       {menuOpen && (
-        <div className="md:hidden mt-4 space-y-4">
-          {navLinks.map(({ label, href }) => {
-            const isActive = pathname === href;
-            return (
-              <button
-                key={label}
-                onClick={() => handleNavClick(href)}
-                className={`block w-full text-left font-medium transition cursor-pointer ${
-                  isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
-                } hover:text-black`}
-              >
-                {label}
-              </button>
-            );
-          })}
-          <hr className="border-gray-300" />
-          <button
-            onClick={() => handleNavClick('/signin')}
-            className="block text-gray-800 font-medium"
+      {/* Mobile Menu with animation */}
+      <AnimatePresence mode="wait" initial={false}>
+        {menuOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="md:hidden mt-4 space-y-4"
           >
-            Sign In
-          </button>
-          <button
-            onClick={() => handleNavClick('/signup')}
-            className="block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-full transition w-max"
-          >
-            Sign Up
-          </button>
-        </div>
-      )}
-    </header>
+            {navLinks.map(({ label, href }) => {
+              const isActive = pathname === href;
+              return (
+                <button
+                  key={label}
+                  onClick={() => handleNavClick(href)}
+                  className={`block w-full text-left font-medium transition cursor-pointer ${
+                    isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
+                  } hover:text-black`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+            <hr className="border-gray-300" />
+            <button
+              onClick={() => handleNavClick('/signin')}
+              className="block text-gray-800 font-medium"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => handleNavClick('/signup')}
+              className="block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-full transition w-max"
+            >
+              Sign Up
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }
