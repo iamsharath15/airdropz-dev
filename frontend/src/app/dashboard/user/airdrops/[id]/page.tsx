@@ -15,7 +15,7 @@ const AirdropDetail = ({ params }: Props) => {
 
   return (
     <div className="mb-4">
-      <Link href="/dashboard/airdrops" className="flex items-center text-gray-400 hover:text-white mb-6">
+      <Link href="/dashboard/user/airdrops" className="flex items-center text-gray-400 hover:text-white mb-6">
         <ArrowLeft size={20} className="mr-2" />
         Back to airdrops
       </Link>

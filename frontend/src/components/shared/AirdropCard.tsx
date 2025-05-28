@@ -9,7 +9,7 @@ interface AirdropCardProps {
 
 const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   return (
-    <Link href={`/dashboard/airdrops/${airdrop.id}`}>
+    <Link href={`/dashboard/user/airdrops/${airdrop.id}`}>
       <div className="airdrop-card bg-gray-900 rounded-lg overflow-hidden cursor-pointer border border-gray-800">
         <div className={`w-full h-36 flex items-center justify-center airdrop-logo-${airdrop.logoColor}`}>
           <span className="text-4xl font-bold text-black">{airdrop.logo}</span>

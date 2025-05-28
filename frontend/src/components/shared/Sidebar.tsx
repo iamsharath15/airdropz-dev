@@ -42,10 +42,10 @@ const userNavItems = [
 // Navigation items for Admin
 const adminNavItems = [
   { label: 'Dashboard', icon: Home, href: '/dashboard/admin' },
-  { label: 'Users', icon: Users, href: '/admin/users' },
-  { label: 'Airdrops', icon: Gift, href: '/admin/airdrops' },
-  { label: 'Weekly Stats', icon: ClipboardCheck, href: '/admin/weekly' },
-  { label: 'Settings', icon: Settings, href: '/admin/settings' },
+  { label: 'Users', icon: Users, href: '/dashboard/admin/users' },
+  { label: 'Airdrops', icon: Gift, href: '/dashboard/admin/airdrops' },
+  { label: 'Weekly Stats', icon: ClipboardCheck, href: '/dashboard/admin/weekly' },
+  { label: 'Settings', icon: Settings, href: '/dashboard/admin/settings' },
 ];
 
 export function Sidebar({
