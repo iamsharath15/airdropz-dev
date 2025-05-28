@@ -33,9 +33,9 @@ export default function Header() {
       animate={{ y: 0 }}
       layout
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="bg-white shadow-md rounded-2xl my-6 px-6 py-3 w-11/12 max-w-6xl mx-auto z-50"
+      className="bg-white shadow-md rounded-2xl my-6 md:px-6 px-3 md:py-3 py-2 md:w-10/12 w-11/12  max-w-10/12 mx-auto z-50 absolute top-0 flex items-center justify-around flex-col"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between w-full">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
@@ -56,9 +56,9 @@ export default function Header() {
                 key={label}
                 href={href}
                 className={`transition font-medium ${
-                  isActive ? 'text-[#8373EE] font-semibold' : 'text-gray-700'
+                  isActive ? 'text-[#8373EE] font-semibold' : 'text-black'
                 }`}
-                whileHover={{ scale: 1.1, y: -2 }}
+                whileHover={{ scale: 1, y: -2 }}
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
               >
                 {label}
@@ -68,16 +68,16 @@ export default function Header() {
         </nav>
 
         {/* Desktop Auth */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-2">
           <Link
             href="/login"
-            className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 px-5 rounded-full transition"
+            className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 md:px-5 px-3 rounded-full transition text-sm"
           >
             Login
           </Link>
           <Link
             href="/signup"
-            className="bg-[#8373EE] hover:bg-black text-white font-semibold py-2 px-5 rounded-full transition"
+            className="bg-[#8373EE] hover:bg-black text-white font-semibold py-2 md:px-5 px-3 rounded-full transition text-sm"
           >
             Sign Up
           </Link>
@@ -111,8 +111,8 @@ export default function Header() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-            className="md:hidden mt-4 space-y-4"
+            transition={{ duration: 0.3 }}
+            className="md:hidden mt-4 space-y-4 w-full px-4"
           >
             {navLinks.map(({ label, href }) => {
               const isActive = pathname === href;
@@ -131,7 +131,7 @@ export default function Header() {
             <hr className="border-gray-300" />
             <button
               onClick={() => handleNavClick('/signin')}
-              className="block text-gray-800 font-medium"
+              className="block text-gray-800 font-medium e="
             >
               Sign In
             </button>

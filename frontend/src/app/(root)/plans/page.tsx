@@ -1,10 +1,13 @@
 'use client';
+
 import { NextPage } from 'next';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import React, { memo, useMemo } from 'react';
+
 
 type PricingPlanProps = {
   title: string;
@@ -13,6 +16,7 @@ type PricingPlanProps = {
   features: string[];
   highlighted?: boolean;
 };
+
 const MotionCard = motion(Card);
 
 const PricingPlan: React.FC<PricingPlanProps> = ({

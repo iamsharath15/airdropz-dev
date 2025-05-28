@@ -11,12 +11,12 @@ export default function LandingRootLayout({
   const [showChildren, setShowChildren] = useState(false);
 
   return (
-    <div className="flex flex-col bg-black w-full min-h-screen h-full">
+    <div className="flex flex-col items-center justify-center bg-black w-full min-h-screen h-full relative">
       {!showChildren && <AppLoader onFinish={() => setShowChildren(true)} />}
       {showChildren && (
         <>
           <Header />
-          <main>
+          <main className='flex items-center justify-center flex-col w-full py-[10%]'>
            {children}
           </main>
           <Footer />
