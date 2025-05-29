@@ -5,12 +5,15 @@ import authRoutes from './routes/auth.route.js';
 import pool from './config/db.js';
 import { initDB } from './models/initDB.js';
 import referralRoutes from "./routes/referral.routes.js";
+import cookieParser from 'cookie-parser';
+
 //import onboardingRoutes from "./routes/onboardingRoutes.js";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.API_PORT || 8080;
+app.use(cookieParser()); 
 
 // Middlewares
 app.use(corsMiddleware);

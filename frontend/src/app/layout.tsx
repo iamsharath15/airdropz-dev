@@ -35,7 +35,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <main className="flex items-center justify-center ">
-           <Providers>{children}</Providers></main>
+          <Providers>{children}</Providers>
+        </main>
         <Toaster richColors position="top-right" />
       </body>
     </html>

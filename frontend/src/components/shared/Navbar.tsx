@@ -1,6 +1,10 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '@/store';  // update path to your store
+import { logout as logoutAction } from '@/store/authSlice'; // your auth slice logout action
+
 import { Bell, Menu } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
@@ -11,15 +15,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '../ui/dropdown-menu';
-import { logout } from '@/app/(auth)/logout/page'; // your logout function
 
 interface NavbarProps {
   toggleSidebar: () => void;
   role: 'admin' | 'user';
-  user: {
-    name: string;
-    email: string;
-  };
 }
 
 const pageTitles: Record<string, Record<string, string>> = {
@@ -41,22 +40,29 @@ const pageTitles: Record<string, Record<string, string>> = {
   },
 };
 
-export function Navbar({ toggleSidebar, role, user }: NavbarProps) {
+export function Navbar({ toggleSidebar, role }: NavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  // Get user info from redux store
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const pageTitle =
     pageTitles[role]?.[pathname] ||
     (role === 'admin' ? 'Admin Dashboard' : 'Dashboard');
 
   const handleLogout = async () => {
-    await logout();
-    router.push('/');
+    dispatch(logoutAction()); // clear redux auth state
+    router.push('/'); // redirect to login/home
   };
 
   const handleAccountSettings = () => {
     router.push('/dashboard/user/settings'); // or admin settings path
   };
+
+  const userName = user?.username || 'User';
+  const userEmail = user?.email || 'user@example.com';
 
   return (
     <header className="h-16 border-b border-[#272727] px-6 flex items-center justify-between bg-black">
@@ -85,8 +91,7 @@ export function Navbar({ toggleSidebar, role, user }: NavbarProps) {
               aria-label="User menu"
               className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
             >
-              {/* {user.name.charAt(0).toUpperCase()} */}
-              hi
+              {userName.charAt(0).toUpperCase()}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -96,10 +101,8 @@ export function Navbar({ toggleSidebar, role, user }: NavbarProps) {
           >
             <DropdownMenuLabel className="px-4 py-2 border-b border-gray-200">
               Profile
-              {/* <div className="mt-1 text-sm font-medium">{user.name}</div> */}
-              <div className="mt-1 text-sm font-medium">hi</div>
-              {/* <div className="text-xs text-gray-600 truncate">{user.email}</div> */}
-              <div className="text-xs text-gray-600 truncate">hi@gmail.com</div>
+              <div className="mt-1 text-sm font-medium">{userName}</div>
+              <div className="text-xs text-gray-600 truncate">{userEmail}</div>
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />

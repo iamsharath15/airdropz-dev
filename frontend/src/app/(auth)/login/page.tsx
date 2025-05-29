@@ -9,7 +9,8 @@ import { Toaster, toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
-
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '@/store/authSlice';
 interface LoginResponse {
   token: string;
   user: {
@@ -22,6 +23,7 @@ interface LoginResponse {
 
 export default function Login() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -33,9 +35,16 @@ export default function Login() {
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data);
+
+      dispatch(setCredentials({ token: data.token, user: data.user }));
       toast.success('Logged in successfully!');
-      router.push('/dashboard/user');
+      if (data.user.role === 'admin') {
+        router.push('/dashboard/admin');
+      } else {
+        router.push('/dashboard/user');
+      }
     },
 
     onError: (error) => {
