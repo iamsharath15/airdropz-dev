@@ -76,14 +76,15 @@
 //   }
 // }
 
-import { createLoginStreaksTable } from './createLoginStreaksTable.js';
+import { createDailyLoginStreaksTable } from './createDailyLoginStreaksTable.js';
+import { createLeaderboardTable } from './createLeaderboardTable.js';
 import { createReferralsTable } from './referral.model.js';
 import { createUsersTable } from './user.model.js';
 
 export async function initDB() {
   await createUsersTable();
   await createReferralsTable();
-  await createLoginStreaksTable();
-
+  await createLeaderboardTable();
+  await createDailyLoginStreaksTable();
   // You can call other create table functions here if you have more tables
 }

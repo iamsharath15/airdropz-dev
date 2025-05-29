@@ -75,19 +75,24 @@ class UserController {
       );
 
       const newUser = insertUserResult.rows[0];
-
+        await pool.query(
+      `INSERT INTO leaderboard (user_id, points)
+       VALUES ($1, 0)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [newUser.id]
+    );
       if (referrerId) {
         await pool.query(
-          `UPDATE users SET points = points + 50 WHERE id = $1`,
+        `UPDATE leaderboard SET points = points + 50 WHERE user_id = $1`,
           [referrerId]
         );
         await pool.query(
-          `UPDATE users SET points = points + 25 WHERE id = $1`,
+        `UPDATE leaderboard SET points = points + 25 WHERE user_id = $1`,
           [newUser.id]
         );
         await pool.query(
-          `INSERT INTO referrals (referrer_id, referred_id) VALUES ($1, $2)`,
-          [referrerId, newUser.id]
+          `INSERT INTO referrals (referrer_id, referred_id, referral_code_used) VALUES ($1, $2, $3)`,
+          [referrerId, newUser.id, referralCode]
         );
       }
 
@@ -114,9 +119,8 @@ class UserController {
     try {
       const result = await pool.query(
         `SELECT * FROM users
-       WHERE verification_token = $1
-       AND verification_token_expires_at > NOW()
-       `,
+         WHERE verification_token = $1
+         AND verification_token_expires_at > NOW()`,
         [code]
       );
 
@@ -141,7 +145,6 @@ class UserController {
       `,
         [user.id]
       );
-
       try {
         await sendWelcomeEmail(user.email, user.username);
       } catch (emailError) {
@@ -312,13 +315,15 @@ class UserController {
       );
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: 'User not found' });
       }
 
       return res.status(200).json({ success: true, user: result.rows[0] });
     } catch (error) {
-      console.error("checkAuth error:", error);
-      return res.status(500).json({ success: false, message: "Server error" });
+      console.error('checkAuth error:', error);
+      return res.status(500).json({ success: false, message: 'Server error' });
     }
   }
 }

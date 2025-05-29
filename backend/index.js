@@ -6,6 +6,8 @@ import pool from './config/db.js';
 import { initDB } from './models/initDB.js';
 import referralRoutes from "./routes/referral.routes.js";
 import cookieParser from 'cookie-parser';
+import leaderboardRoutes from './routes/leaderboard.routes.js';
+// import  streakRoutes from './routes/streak.routes.js';
 
 //import onboardingRoutes from "./routes/onboardingRoutes.js";
 
@@ -22,6 +24,9 @@ app.use(express.json());
 // Routes
 app.use('/api/auth/v1', authRoutes);
 app.use("/api/referral/v1", referralRoutes); 
+app.use('/api/leaderboard/v1', leaderboardRoutes)
+// app.use('/api/streak/v1', streakRoutes);
+
 //app.use("/api/onboarding/v1", onboardingRoutes);
 // app.use("/api/login", loginStreakRoutes);
 
