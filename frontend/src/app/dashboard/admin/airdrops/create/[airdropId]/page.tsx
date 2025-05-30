@@ -19,8 +19,35 @@ import {
 } from '@/components/ui/tooltip';
 import StepProgress from '@/components/shared/StepProgress';
 import Image from 'next/image';
+import axios from 'axios';
+import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
+
 
 const CreateAirdropPage = () => {
+
+    const params = useParams();
+  const router = useRouter();
+  const { airdropId } = params; 
+  const handleDelete = async () => {
+    if (!airdropId) {
+      toast.error('Airdrop ID not found in URL.');
+      return;
+    }
+
+    try {
+      await axios.delete(`http://localhost:8080/api/airdrop/v1/${airdropId}`, {
+        withCredentials: true,
+      });
+      toast.success('Airdrop deleted successfully!');
+      router.push('/dashboard/admin/airdrops/');
+    } catch (error) {
+      console.error('Failed to delete airdrop:', error);
+      toast.error('Failed to delete airdrop. Please try again.');
+    }
+  };
+
   const [step, setStep] = useState(1);
   const totalSteps = 2;
   const progress = (step / totalSteps) * 100;
@@ -84,8 +111,8 @@ const CreateAirdropPage = () => {
         <div className="flex gap-3">
           <Button
             variant="destructive"
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
+            className="bg-red-600 hover:bg-red-700 text-white" onClick={handleDelete}>
+          
             Delete Airdrop
           </Button>
           <Button className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white">

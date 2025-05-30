@@ -31,7 +31,9 @@ export default function Login() {
     mutationFn: async () => {
       const response = await axios.post<LoginResponse>(
         'http://localhost:8080/api/auth/v1/login',
-        { email, password }
+        { email, password },
+          { withCredentials: true } 
+
       );
       return response.data;
     },

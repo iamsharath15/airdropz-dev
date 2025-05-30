@@ -1,30 +1,48 @@
 'use client';
 
-import Link from "next/link";
-import { Airdrop } from "@/types/airdrop";
+import Link from 'next/link';
+import Image from 'next/image';
 
-interface AirdropCardProps {
-  airdrop: Airdrop;
-}
+type AirdropCardProps = {
+  airdrop: {
+    id: string;
+    title: string;
+    category: string | null;
+    banner_image_url: string;
+    type:string
+  };
+};
 
 const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   return (
-    <Link href={`/dashboard/user/airdrops/${airdrop.id}`}>
-      <div className="airdrop-card bg-gray-900 rounded-lg overflow-hidden cursor-pointer border border-gray-800">
-        <div className={`w-full h-36 flex items-center justify-center airdrop-logo-${airdrop.logoColor}`}>
-          <span className="text-4xl font-bold text-black">{airdrop.logo}</span>
-        </div>
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-medium text-white">{airdrop.name}</h3>
+    <Link
+      href={`/dashboard/user/airdrops/${airdrop.id}`}
+      className="p-[1%] lg:w-3/12 md:w-4/12 sm:w-6/12 w-full"
+    >
+      <div className="flex items-center justify-center w-full">
+        <div className="bg-[#151313] w-full rounded-lg overflow-hidden cursor-pointer h-full">
+          <div className="w-full flex items-center justify-center">
+            <Image
+              className="object-cover w-full h-full rounded-3xl p-[4%]"
+              // src={airdrop.banner_image_url || ''}
+              src={"https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/demo/airdropzimage.png"}
+              alt="airdrop image"
+              width={1920}
+              height={1080}
+            />
           </div>
-          <div className="flex gap-2">
-            <span className={`badge-${airdrop.network.toLowerCase()} text-xs px-2 py-1 rounded-full text-white`}>
-              #{airdrop.network}
-            </span>
-            <span className={`badge-${airdrop.status.toLowerCase()} text-xs px-2 py-1 rounded-full text-white`}>
-              {airdrop.status}
-            </span>
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-medium text-white">{airdrop.title}</h3>
+            </div>
+            <div className="flex gap-2">
+              <div className="bg-[#8373EE] py-1 px-3 rounded-full">
+                <p className="text-sm text-white"># {airdrop.category ?? 'Unknown'}</p>
+              </div>
+               <div className="bg-[#8373EE] py-1 px-3 rounded-full">
+                <p className="text-sm text-white"># {airdrop.type ?? 'Unknown'}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

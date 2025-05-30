@@ -37,12 +37,12 @@
 //     return res.status(403).json({ success: false, message: "Invalid token" });
 //   }
 // };
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 /**
  * Generate JWT token and set as HTTP-only cookie
  */
-export const generateTokenAndSetCookie = (res, user, expiresIn = "7d") => {
+export const generateTokenAndSetCookie = (res, user, expiresIn = '7d') => {
   const token = jwt.sign(
     {
       userId: user.id,
@@ -55,12 +55,12 @@ export const generateTokenAndSetCookie = (res, user, expiresIn = "7d") => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ✅ change from "strict"
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 
-  res.cookie("token", token, cookieOptions);
+  res.cookie('token', token, cookieOptions);
   return token;
 };
 
@@ -71,7 +71,7 @@ export const authenticateUser = (req, res, next) => {
   const token = req.cookies?.token;
 
   if (!token) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
 
   try {
@@ -79,6 +79,6 @@ export const authenticateUser = (req, res, next) => {
     req.user = decoded; // ✅ contains userId, role, email
     next();
   } catch (error) {
-    return res.status(403).json({ success: false, message: "Invalid token" });
+    return res.status(403).json({ success: false, message: 'Invalid token' });
   }
 };

@@ -21,6 +21,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+
+// TEMP REDUX SLICE HANDLER — will move to its own file later
+const setCreatedAirdrop = (payload: any) => ({
+  type: 'airdrop/setCreatedAirdrop',
+  payload,
+});
 
 const defaultCategories = ['Solana', 'Ethereum', 'Polygon'];
 
@@ -33,27 +42,53 @@ const AirdropFormModal = () => {
   const [customCategory, setCustomCategory] = useState('');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-    }
-  };
-const router = useRouter();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const finalCategory = isAddingCategory ? customCategory : category;
 
-  const handleCreate = () => {
-    console.log({
-      name,
-      type,
-      category: finalCategory,
-      imageFile,
-    });
-    // setOpen(false);
-    const newAirdropId = "234"
-    router.push(`/dashboard/admin/airdrops/create/${newAirdropId}`);
+  const createAirdropMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        title: name,
+        category: finalCategory,
+        banner_image_url: 'https://example.com/banner.png', // Replace with real image upload URL later
+        type: type,
+      };
 
+      const response = await axios.post(
+        'http://localhost:8080/api/airdrop/v1/',
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      const newAirdropId = data?.airdrop?.id;
+      if (newAirdropId) {
+        dispatch(setCreatedAirdrop(data.airdrop));
+        router.push(`/dashboard/admin/airdrops/create/${newAirdropId}`);
+      }
+    },
+    onError: (error) => {
+      console.error('Airdrop creation failed:', error);
+      alert('Failed to create airdrop.');
+    },
+  });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setImageFile(file);
+  };
+
+  const handleCreate = () => {
+    if (!name || !finalCategory) {
+      alert('Please fill in all fields');
+      return;
+    }
+    createAirdropMutation.mutate();
   };
 
   return (
@@ -184,9 +219,12 @@ const router = useRouter();
               {/* Submit */}
               <Button
                 onClick={handleCreate}
+                disabled={createAirdropMutation.status === "pending"}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white mt-4 cursor-pointer"
               >
-                Create Airdrop
+                {createAirdropMutation.status === "pending"
+                  ? 'Creating...'
+                  : 'Create Airdrop'}
               </Button>
             </div>
           </div>
