@@ -2,12 +2,12 @@ import pool from '../config/db.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js';
-import {
-  sendPasswordResetEmail,
-  sendResetSuccessEmail,
-  sendVerificationEmail,
-  sendWelcomeEmail,
-} from '../utils/email.js';
+// import {
+//   sendPasswordResetEmail,
+//   sendResetSuccessEmail,
+//   sendVerificationEmail,
+//   sendWelcomeEmail,
+// } from '../utils/email.js';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
 import { generateReferralCode } from '../utils/generateReferralCode.js';
 
@@ -96,7 +96,7 @@ class UserController {
         );
       }
 
-      await sendVerificationEmail(email, verificationToken);
+      // await sendVerificationEmail(email, verificationToken);
 
       generateTokenAndSetCookie(res, newUser.id);
 
@@ -146,7 +146,7 @@ class UserController {
         [user.id]
       );
       try {
-        await sendWelcomeEmail(user.email, user.username);
+        // await sendWelcomeEmail(user.email, user.username);
       } catch (emailError) {
         console.error('Failed to send welcome email:', emailError);
       }
@@ -259,7 +259,7 @@ class UserController {
       );
 
       const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-      await sendPasswordResetEmail(email, resetURL);
+      // await sendPasswordResetEmail(email, resetURL);
 
       res.status(200).json({
         success: true,
@@ -297,7 +297,7 @@ class UserController {
         [hashedPassword, user.id]
       );
 
-      await sendResetSuccessEmail(user.email);
+      // await sendResetSuccessEmail(user.email);
       res
         .status(200)
         .json({ success: true, message: 'Password reset successfully' });

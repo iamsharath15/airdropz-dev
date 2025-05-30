@@ -8,6 +8,7 @@ import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
+import OtpInput from '@/components/shared/OtpInput';
 
 interface SignUpFormData {
   username: string;
@@ -227,16 +228,8 @@ export default function SignUp() {
                 </p>
 
                 <form onSubmit={handleOtpSubmit} className="space-y-4">
-                  <Input
-                    id="otp"
-                    type="text"
-                    maxLength={6}
-                    placeholder="Enter OTP"
-                    className="bg-white text-black placeholder:text-black py-5 text-center tracking-widest text-xl"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
+<OtpInput length={6} onChange={(val) => setOtp(val)} />
+
 
                   <Button
                     type="submit"

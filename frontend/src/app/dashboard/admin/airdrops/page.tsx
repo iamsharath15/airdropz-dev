@@ -5,7 +5,7 @@ import { airdrops } from '@/app/data/airdrops';
 import AirdropCard from '@/components/shared/AirdropCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, LayoutGrid, SlidersHorizontal, Plus } from 'lucide-react';
+import { Search, LayoutGrid, SlidersHorizontal } from 'lucide-react';
 import AirdropFormModal from '@/components/shared/admin/AirdropFormModal';
 
 const AirdropsListing = () => {
@@ -32,8 +32,7 @@ const AirdropsListing = () => {
           />
         </div>
         <div className="flex gap-4">
-           <AirdropFormModal />
-
+          <AirdropFormModal />
 
           <Button
             variant="outline"
