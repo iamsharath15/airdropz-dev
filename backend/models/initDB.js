@@ -76,6 +76,7 @@
 //   }
 // }
 
+import { createAirdropsTables } from './airdrops.model.js';
 import { createDailyLoginStreaksTable } from './createDailyLoginStreaksTable.js';
 import { createLeaderboardTable } from './createLeaderboardTable.js';
 import { createReferralsTable } from './referral.model.js';
@@ -86,5 +87,6 @@ export async function initDB() {
   await createReferralsTable();
   await createLeaderboardTable();
   await createDailyLoginStreaksTable();
+  await createAirdropsTables();
   // You can call other create table functions here if you have more tables
 }

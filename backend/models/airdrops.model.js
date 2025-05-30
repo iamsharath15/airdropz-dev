@@ -1,0 +1,49 @@
+// models/airdropModel.js
+import pool from "../config/db.js";
+
+export async function createAirdropsTables() {
+  await pool.query(`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
+
+  const query = `
+    CREATE TABLE IF NOT EXISTS airdrops (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title TEXT NOT NULL,
+      short_description TEXT,
+      category TEXT,
+      banner_image_url TEXT,
+      type TEXT,
+      created_by UUID REFERENCES users(id),
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS content_blocks (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      airdrop_id UUID REFERENCES airdrops(id) ON DELETE CASCADE,
+      type TEXT CHECK (type IN ('description', 'image', 'checklist', 'link')),
+      value TEXT,
+      link TEXT
+    );
+  `;
+
+  await pool.query(query);
+
+  await pool.query(`
+    CREATE OR REPLACE FUNCTION update_airdrop_updated_at_column()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE 'plpgsql';
+
+    DROP TRIGGER IF EXISTS set_airdrop_timestamp ON airdrops;
+
+    CREATE TRIGGER set_airdrop_timestamp
+    BEFORE UPDATE ON airdrops
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_airdrop_updated_at_column();
+  `);
+
+  console.log("✅ airdrops and content_blocks tables created");
+}

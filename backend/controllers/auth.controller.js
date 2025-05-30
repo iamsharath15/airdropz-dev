@@ -193,7 +193,7 @@ class UserController {
         });
       }
 
-      generateTokenAndSetCookie(res, user.id);
+      generateTokenAndSetCookie(res, user);
       await pool.query('UPDATE users SET last_login = NOW() WHERE id = $1', [
         user.id,
       ]);
