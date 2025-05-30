@@ -23,19 +23,15 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-
-
 const CreateAirdropPage = () => {
-
-    const params = useParams();
+  const params = useParams();
   const router = useRouter();
-  const { airdropId } = params; 
+  const { airdropId } = params;
   const handleDelete = async () => {
     if (!airdropId) {
       toast.error('Airdrop ID not found in URL.');
       return;
     }
-
     try {
       await axios.delete(`http://localhost:8080/api/airdrop/v1/${airdropId}`, {
         withCredentials: true,
@@ -52,16 +48,16 @@ const CreateAirdropPage = () => {
   const totalSteps = 2;
   const progress = (step / totalSteps) * 100;
   const [airdropData, setAirdropData] = useState({
-    title: 'How to Join the 3DOS Airdrop',
-    shortDescription:
+    airdrop_title: 'How to Join the 3DOS Airdrop',
+    airdrop_description:
       '3DOS Network is building a more efficient, accessible, and globally distributed system...',
-    category: 'Guides',
-    date: new Date().toLocaleDateString('en-US', {
+    airdrop_category: 'Guides',
+    airdrop_date: new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     }),
-    bannerImageUrl: '',
+    airdrop_banner_image: '',
     type: 'Free',
   });
 
@@ -111,8 +107,9 @@ const CreateAirdropPage = () => {
         <div className="flex gap-3">
           <Button
             variant="destructive"
-            className="bg-red-600 hover:bg-red-700 text-white" onClick={handleDelete}>
-          
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={handleDelete}
+          >
             Delete Airdrop
           </Button>
           <Button className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white">
@@ -134,66 +131,118 @@ const CreateAirdropPage = () => {
               <h2 className="text-lg font-bold mb-4">
                 Step 1: Airdrop Details
               </h2>
-              <Input
-                className="bg-zinc-800 text-white"
-                placeholder="Title"
-                value={airdropData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
-              <Textarea
-                placeholder="Short banner description"
-                value={airdropData.shortDescription}
-                onChange={(e) =>
-                  handleChange('shortDescription', e.target.value)
-                }
-                className="bg-zinc-900 border-zinc-700 text-white"
-              />
-              <Input
-                className="bg-zinc-800 text-white"
-                placeholder="Date"
-                value={airdropData.date}
-                readOnly
-              />
-              <Input
-                className="bg-zinc-800 text-white"
-                placeholder="Category (e.g., Guides)"
-                value={airdropData.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-              />
-              <label
-                htmlFor="banner-upload"
-                className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition"
-              >
-                {airdropData.bannerImageUrl ? (
-                  <Image
-                    src={airdropData.bannerImageUrl}
-                    alt="Banner preview"
-                    className="absolute inset-0 w-full h-full object-cover"
-                    width={1920}
-                    height={1080}
-                  />
-                ) : (
-                  <span className="text-white z-10 pointer-events-none select-none px-4 text-center">
-                    Click here to upload banner image
-                  </span>
-                )}
-                <input
-                  id="banner-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        handleChange('bannerImageUrl', reader.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+
+              <div>
+                <label
+                  htmlFor="airdrop-title"
+                  className="block text-sm text-white mb-1"
+                >
+                  Airdrop Title
+                </label>
+                <Input
+                  id="airdrop-title"
+                  className="bg-zinc-800 text-white"
+                  placeholder="airdrop Title"
+                  value={airdropData.airdrop_title}
+                  onChange={(e) =>
+                    handleChange('airdrop_title', e.target.value)
+                  }
                 />
-              </label>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="airdrop-short-description"
+                  className="block text-sm text-white mb-1"
+                >
+                  Short Banner Description
+                </label>
+                <Textarea
+                  id="airdrop-short-description"
+                  placeholder="Short banner description"
+                  value={airdropData.airdrop_description}
+                  onChange={(e) =>
+                    handleChange('airdrop_description', e.target.value)
+                  }
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="airdrop-date"
+                  className="block text-sm text-white mb-1"
+                >
+                  Date
+                </label>
+                <Input
+                  id="airdrop-date"
+                  className="bg-zinc-800 text-white"
+                  placeholder="Date"
+                  value={airdropData.airdrop_date}
+                  readOnly
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="airdrop-category"
+                  className="block text-sm text-white mb-1"
+                >
+                  Category
+                </label>
+                <Input
+                  id="airdrop-category"
+                  className="bg-zinc-800 text-white"
+                  placeholder="Category (e.g., Guides)"
+                  value={airdropData.airdrop_category}
+                  onChange={(e) => handleChange('airdrop_category', e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="banner-upload"
+                  className="block text-sm text-white mb-1"
+                >
+                  Banner Image
+                </label>
+                <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
+                  {airdropData.airdrop_banner_image ? (
+                    <Image
+                      src={airdropData.airdrop_banner_image}
+                      alt="Banner preview"
+                      className="absolute inset-0 w-full h-full object-cover"
+                      width={1920}
+                      height={1080}
+                    />
+                  ) : (
+                    <span className="text-white z-10 pointer-events-none select-none px-4 text-center">
+                      Click here to upload banner image
+                    </span>
+                  )}
+                  <input
+                    id="banner-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          handleChange(
+                            'airdrop_banner_image',
+                            reader.result as string
+                          );
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end mt-6">
                 <Button
                   onClick={nextStep}
@@ -398,20 +447,22 @@ const CreateAirdropPage = () => {
           <div className="w-full max-w-2xl">
             <div className="flex items-center justify-center space-x-2">
               <h2 className="bg-zinc-800 px-2 py-1 rounded-full">
-                {airdropData.category}
+                {airdropData.airdrop_category}
               </h2>
-              <h2>{airdropData.date}</h2>
+              <h2>{airdropData.airdrop_date}</h2>
             </div>
             <div className="text-center py-4">
-              <h1 className="text-2xl font-semibold">{airdropData.title}</h1>
+              <h1 className="text-2xl font-semibold">
+                {airdropData.airdrop_title}
+              </h1>
               <p className="text-sm text-zinc-400 mt-2">
-                {airdropData.shortDescription}
+                {airdropData.airdrop_description}
               </p>
             </div>
             <div className="rounded-2xl overflow-hidden mb-6">
-              {airdropData.bannerImageUrl ? (
+              {airdropData.airdrop_banner_image ? (
                 <Image
-                  src={airdropData.bannerImageUrl}
+                  src={airdropData.airdrop_banner_image}
                   alt="Banner"
                   className="w-full  object-cover rounded-2xl"
                   width={1920}

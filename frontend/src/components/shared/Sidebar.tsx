@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Home,
+  LayoutDashboard,
   Gift,
   ClipboardCheck,
   Star,
@@ -23,7 +23,7 @@ interface SidebarProps {
 
 // Navigation items for User
 const userNavItems = [
-  { label: 'Dashboard', icon: Home, href: '/dashboard/user' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/user' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/user/airdrops' },
   {
     label: 'Weekly Task',
@@ -41,7 +41,7 @@ const userNavItems = [
 
 // Navigation items for Admin
 const adminNavItems = [
-  { label: 'Dashboard', icon: Home, href: '/dashboard/admin' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/admin' },
   { label: 'Users', icon: Users, href: '/dashboard/admin/users' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/admin/airdrops' },
   { label: 'Weekly Stats', icon: ClipboardCheck, href: '/dashboard/admin/weekly' },

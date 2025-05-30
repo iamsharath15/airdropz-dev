@@ -16,7 +16,7 @@ type AirdropCardProps = {
 const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   return (
     <Link
-      href={`/dashboard/user/airdrops/${airdrop.id}`}
+      href={`/dashboard/admin/airdrops/create/${airdrop.id}`}
       className="p-[1%] lg:w-3/12 md:w-4/12 sm:w-6/12 w-full"
     >
       <div className="flex items-center justify-center w-full">
