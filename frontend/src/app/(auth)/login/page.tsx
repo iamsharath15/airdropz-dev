@@ -18,6 +18,8 @@ interface LoginResponse {
     email: string;
     username: string;
     role: string;
+      is_new_user?: boolean;
+
   };
 }
 
@@ -32,17 +34,17 @@ export default function Login() {
       const response = await axios.post<LoginResponse>(
         'http://localhost:8080/api/auth/v1/login',
         { email, password },
-          { withCredentials: true } 
-
+        { withCredentials: true }
       );
       return response.data;
     },
     onSuccess: (data) => {
-      console.log(data);
-
       dispatch(setCredentials({ token: data.token, user: data.user }));
       toast.success('Logged in successfully!');
-      if (data.user.role === 'admin') {
+
+      if (data.user.is_new_user === true) {
+        router.push('/onboarding');
+      } else if (data.user.role === 'admin') {
         router.push('/dashboard/admin');
       } else {
         router.push('/dashboard/user');

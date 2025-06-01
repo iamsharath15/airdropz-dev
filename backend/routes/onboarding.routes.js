@@ -1,9 +1,10 @@
 import express from "express";
-import { submitOnboarding } from "../controllers/onboardingController.js";
-import { authenticateUser } from "../middleware/authMiddleware.js";
+import OnboardingController from "../controllers/onboarding.controller.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/", authenticateUser, submitOnboarding);
+router.post("/", verifyToken, OnboardingController.submitOnboarding);
+router.get("/", verifyToken, OnboardingController.getOnboarding);
 
 export default router;

@@ -14,11 +14,16 @@ export async function createUsersTable() {
       points INT DEFAULT 0,
       last_login TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
       is_verified BOOLEAN DEFAULT false,
+      is_new_user BOOLEAN DEFAULT true,
       reset_password_token TEXT,
       reset_password_expires_at TIMESTAMPTZ,
       verification_token TEXT,
       verification_token_expires_at TIMESTAMPTZ,
       role VARCHAR(20) DEFAULT 'user',
+      heard_from VARCHAR(100),
+      interests TEXT,
+      experience_level VARCHAR(50),
+      wallet_address VARCHAR(100),
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
     );
