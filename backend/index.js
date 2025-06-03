@@ -30,6 +30,7 @@ app.use("/api/referral/v1", referralRoutes);
 app.use('/api/leaderboard/v1', leaderboardRoutes)
 app.use('/api/airdrop/v1', airdropRoutes)
 app.use('/api/onboarding/v1', onboardingRoutes)
+//app.use('/api/weeklytask/v1', weeklyTaskRoutes);
 
 
 // app.use('/api/streak/v1', streakRoutes);

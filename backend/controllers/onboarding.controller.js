@@ -14,6 +14,7 @@ class OnboardingController {
           interests = $3,
           experience_level = $4,
           wallet_address = $5,
+          is_new_user = false,
           updated_at = NOW()
         WHERE id = $6
         RETURNING id, username, email`,
