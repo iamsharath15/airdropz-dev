@@ -1,5 +1,5 @@
 import express from "express";
-import WeeklyTaskController from "../controllers/WeeklyTaskController.js";
+import WeeklyTaskController from "../controllers/weeklyTask.controller.js";
 
 const router = express.Router();
 
