@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store'; // update path to your store
 
 interface SettingSectionProps {
   title: string;
@@ -31,7 +33,12 @@ type Tab = (typeof TABS)[number];
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('Account');
+  const user = useSelector((state: RootState) => state.auth.user);
+  console.log(user)
+    const userName = user?.username || 'user1';
 
+  const userEmail = user?.email || 'user@example.com';
+  const walletAddress = user?.wallet_address || "add your wallet";
   return (
     <div className="text-white flex flex-col items-start  rounded-2xl bg-[#151313] p-6 shadow-sm">
       {/* Tabs navigation */}
@@ -66,7 +73,7 @@ const Settings: React.FC = () => {
                 </Label>
                 <Input
                   id="username"
-                  placeholder="user1"
+                  placeholder={userName}
                   className=" border-0 text-black placeholder:text-black bg-white"
                 />
               </div>
@@ -77,8 +84,9 @@ const Settings: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="user@example.com"
-                  className=" border-0 text-black placeholder:text-black bg-white"
+                  disabled // or readOnly
+                  placeholder={userEmail}
+                  className="border-0 text-black placeholder:text-black bg-white opacity-70 cursor-not-allowed"
                 />
               </div>
               <div className="flex justify-start">
@@ -114,48 +122,50 @@ const Settings: React.FC = () => {
           </SettingSection>
         )}
 
-        {activeTab === 'Display' && (
-          <SettingSection title="Display Settings">
-            <div className="space-y-6 max-w-md">
-              <div>
-                <Label htmlFor="theme" className="text-white/80 pb-4 block">
-                  Theme
-                </Label>
-                <Select defaultValue="light">
-                  <SelectTrigger
-                    id="theme"
-                    className="bg-white border-gray-800 text-black w-full"
-                  >
-                    <SelectValue placeholder="Select a theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dark">Dark Mode</SelectItem>
-                    <SelectItem value="light">Light Mode</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+       {activeTab === 'Display' && (
+  <SettingSection title="Display Settings">
+    <div className="space-y-6 max-w-md">
+      
+      {/* Theme (Dark Mode Only) */}
+      <div>
+        <Label htmlFor="theme" className="text-white/80 pb-4 block">
+          Theme
+        </Label>
+        <Select defaultValue="dark" disabled>
+          <SelectTrigger
+            id="theme"
+            className="bg-white border-gray-800 text-black w-full"
+          >
+            <SelectValue placeholder="Dark Mode" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="dark">Dark Mode</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-              <div>
-                <Label htmlFor="language" className="text-white/80 pb-4 block">
-                  Language
-                </Label>
-                <Select defaultValue="en">
-                  <SelectTrigger
-                    id="language"
-                    className="bg-white border-gray-800 text-black w-full"
-                  >
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </SettingSection>
-        )}
+      {/* Language (English Only) */}
+      <div>
+        <Label htmlFor="language" className="text-white/80 pb-4 block">
+          Language
+        </Label>
+        <Select defaultValue="en" disabled>
+          <SelectTrigger
+            id="language"
+            className="bg-white border-gray-800 text-black w-full"
+          >
+            <SelectValue placeholder="English" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">English</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+    </div>
+  </SettingSection>
+)}
+
 
         {activeTab === 'Wallet' && (
           <SettingSection title="Wallet Settings">
@@ -167,7 +177,7 @@ const Settings: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="0x1a2...3b4c"
+                  placeholder={walletAddress}
                   className=" border-0 text-black placeholder:text-black bg-white py-4"
                 />
               </div>
