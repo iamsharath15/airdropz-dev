@@ -6,6 +6,9 @@ interface User {
   username: string;
   role: string;
   wallet_address: string;
+  daily_login_streak_count: number;
+  airdrops_remaining: number;
+  airdrops_earned: number;
 }
 
 interface AuthState {

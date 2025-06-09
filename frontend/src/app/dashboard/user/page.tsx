@@ -6,15 +6,18 @@ import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
 import TasksSection from '@/components/shared/dashboard/TaskSection';
 import WeeklyTask from '@/components/shared/dashboard/WeeklyTask';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
-import type { RootState } from '@/store'; 
+import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import Calendar from '@/components/shared/Calendar';
-
 
 const Dashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.username || 'User';
+  const checkIn = user?.daily_login_streak_count || 1;
+  const airdropsEarned = user?.airdrops_earned || 1;
+  const airdropsRemaining = user?.airdrops_remaining || 1;
 
+  console.log(user);
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
       {/* Main content */}
@@ -23,14 +26,14 @@ const Dashboard: React.FC = () => {
           <WelcomeCard
             name={userName}
             stats={[
-              { label: 'Check Ins', value: 4 },
+              { label: 'Check Ins', value: checkIn },
               {
                 label: 'Airdrops Earned',
-                value: 400,
+                value: airdropsEarned,
               },
               {
                 label: 'Airdrops Remaining',
-                value: 400,
+                value: airdropsRemaining,
               },
             ]}
             color="#8373EE"

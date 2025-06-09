@@ -1,5 +1,5 @@
 import { createAirdropsTables } from './airdrops.model.js';
-import { createDailyLoginStreaksTable } from './createDailyLoginStreaksTable.js';
+import { createStreaksTables } from './streak.model.js';
 import { createLeaderboardTable } from './leaderboard.model.js';
 import { createWeeklyTasksTables } from './weeklyTasks.model.js';
 import { createReferralsTable } from './referrals.model.js';
@@ -13,7 +13,7 @@ export async function initDB() {
     createUsersTable,
     createReferralsTable,
     createLeaderboardTable,
-    createDailyLoginStreaksTable,
+    createStreaksTables,
     createAirdropsTables,
     createWeeklyTasksTables,
     createUserTasksTable,
