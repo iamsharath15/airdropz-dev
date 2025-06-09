@@ -22,7 +22,7 @@ export const getReferralStats = async (req, res) => {
 
     res.status(200).json({
       referralCode: referral_code,
-      referralLink: `https://yourdomain.com/signup?ref=${referral_code}`,
+      referralLink: `${referral_code}`,
       totalReferrals: referrals.rows.length,
       points,
       history: referrals.rows.map(r => ({

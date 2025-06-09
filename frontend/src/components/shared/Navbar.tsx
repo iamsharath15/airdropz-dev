@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '@/store';  // update path to your store
+import type { RootState } from '@/store'; // update path to your store
 import { logout as logoutAction } from '@/store/authSlice'; // your auth slice logout action
 
 import { Bell, Menu } from 'lucide-react';
@@ -99,10 +99,21 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
             sideOffset={5}
             className="text-black"
           >
-            <DropdownMenuLabel className="px-4 py-2 border-b border-gray-200">
+            <DropdownMenuLabel className="px-4 py-2 ">
               Profile
-              <div className="mt-1 text-sm font-medium">{userName}</div>
-              <div className="text-xs text-gray-600 truncate">{userEmail}</div>
+              <div className="flex">
+                <div className="flex items-center justify-center pr-3">
+                  <div className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold">
+                    {userName.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                <div className=" flex flex-col items-start justify-center">
+                  <div className="mt-1 text-sm font-medium">{userName}</div>
+                  <div className="text-xs text-gray-600 truncate">
+                    {userEmail}
+                  </div>
+                </div>
+              </div>
             </DropdownMenuLabel>
 
             <DropdownMenuSeparator />

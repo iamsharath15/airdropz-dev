@@ -4,6 +4,8 @@ import React, { useState, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 type Step = {
   title: string;
@@ -16,14 +18,20 @@ type Step = {
 
 interface MultiStepFormProps {
   steps: Step[];
-  onComplete: (data: Record<string, any>) => void;
+  onComplete: (data: Record<string, string[]>) => void;
 }
+type StepComponentProps = {
+  selectedValues: string[];
+  onToggle: (value: string) => void;
+};
+
 
 export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, string[]>>({});
   const [selectedOptions, setSelectedOptions] = useState<Record<number, string[]>>({});
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const totalSteps = steps.length;
 
@@ -71,9 +79,14 @@ export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
     if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
-  const handleCancel = () => {
-    router.push("/");
+   const handleCancel = () => {
+    if (user?.role === "admin") {
+      router.push("/dashboard/admin");
+    } else {
+      router.push("/dashboard/user");
+    }
   };
+
 
   // Calculate progress percentage (1-based)
   const progressPercent = ((currentStep + 1) / totalSteps) * 100;
@@ -109,7 +122,7 @@ export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
 
         {/* Step content */}
         {React.isValidElement(steps[currentStep].component) ? (
-          React.cloneElement(steps[currentStep].component as React.ReactElement<any>, {
+          React.cloneElement(steps[currentStep].component as React.ReactElement<StepComponentProps>, {
             selectedValues: selectedOptions[currentStep] || [],
             onToggle: (value: string) => toggleSelection(currentStep, value, steps[currentStep].isMultiSelect || false),
           })
@@ -131,7 +144,7 @@ export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
           {currentStep === steps.length - 1 && (
             <Button
               onClick={goToNextStep}
-              className="bg-[#8373EE] hover:bg-[#6e59a5] text-white px-8"
+              className="bg-[#8373EE] hover:bg-[#6e59a5] text-white px-8 cursor-pointer"
             >
               Complete
             </Button>

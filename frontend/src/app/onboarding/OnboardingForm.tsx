@@ -8,8 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import type { RootState } from '@/store';  // update path to your store
 
+import axios from "axios";
+ 
+type StepValues = {
+  step_0: string[];
+  step_1: string[];
+  step_2: string[];
+  step_3: string[];
+  step_4: string[];
+};
 // Wrapper for step 0: username input (no selectedValues)
 function UsernameStep({
   value,
@@ -17,10 +26,12 @@ function UsernameStep({
 }: {
   value: string;
   onChange: (val: string) => void;
-}) {
+  }) {
+   const user = useSelector((state: RootState) => state.auth.user);
+  const userName = user?.username || 'User';
   return (
     <Input
-      placeholder="Username"
+      placeholder={userName}
       className="bg-[#2A2A2A] border border-[#2a2a2a] h-12 rounded-md text-white placeholder:text-white/80 focus-visible:border-[#8373EE] focus-visible:outline-none"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -32,9 +43,7 @@ function UsernameStep({
 function SelectButtons({
   options,
   selectedValues,
-  onToggle,
-     isMultiSelect = true,
-
+  onToggle
 }: {
   options: string[];
   selectedValues: string[];
@@ -85,10 +94,13 @@ function WalletAddressStep({
 
 export default function OnboardingForm() {
   const router = useRouter();
-  const userId = useSelector((state: any) => state.auth.user?.id);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userId = user?.id;
+  const userName = user?.username || 'User';
+
 
   // We'll keep the form state here per step, because MultiStepForm does not manage it internally
-  const [stepValues, setStepValues] = useState<Record<string, any>>({
+  const [stepValues, setStepValues] = useState<StepValues>({
     step_0: [""], // username as array for consistency
     step_1: [], // heardFrom multi-select
     step_2: [], // interests multi-select
@@ -127,12 +139,15 @@ export default function OnboardingForm() {
       const res = await axios.post("http://localhost:8080/api/onboarding/v1", data, {
         withCredentials: true,
       });
-      console.log(res)
       return res.data;
     },
     onSuccess: () => {
       toast.success("Onboarding complete!");
-      router.push("/dashboard");
+        if (user?.role === "admin") {
+      router.push("/dashboard/admin");
+    } else {
+      router.push("/dashboard/user");
+    }
     },
     onError: (err) => {
       console.error("Onboarding Error:", err);
@@ -148,7 +163,7 @@ export default function OnboardingForm() {
 
     const payload = {
       userId,
-      username: stepValues.step_0?.[0] || "",
+      username: stepValues.step_0?.[0] || userName,
       heardFrom: stepValues.step_1?.join(", ") || "",
       interests: stepValues.step_2?.join(", ") || "",
       experienceLevel: stepValues.step_3?.[0] || "",
