@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 
 // TEMP REDUX SLICE HANDLER — will move to its own file later
@@ -41,54 +40,180 @@ const AirdropFormModal = () => {
   const [type, setType] = useState<'Free' | 'Paid'>('Free');
   const [customCategory, setCustomCategory] = useState('');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
   const dispatch = useDispatch();
 
   const finalCategory = isAddingCategory ? customCategory : category;
 
-  const createAirdropMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        title: name,
-        category: finalCategory,
-        banner_image_url: 'https://example.com/banner.png', // Replace with real image upload URL later
-        type: type,
-      };
+// const createAirdropMutation = useMutation({
+//   mutationFn: async (payload: any) => {
+//     const response = await axios.post(
+//       'http://localhost:8080/api/airdrop/v1/',
+//       payload,
+//       {
+//         withCredentials: true,
+//       }
+//     );
+//     return response.data;
+//   },
+//   onSuccess: (data) => {
+//     const newAirdropId = data?.airdrop?.id;
+//     if (newAirdropId) {
+//       dispatch(setCreatedAirdrop(data.airdrop));
+//       router.push(`/dashboard/admin/airdrops/create/${newAirdropId}`);
+//     }
+//   },
+//   onError: (error) => {
+//     console.error('Airdrop creation failed:', error);
+//     alert('Failed to create airdrop.');
+//   },
+// });
 
-      const response = await axios.post(
-        'http://localhost:8080/api/airdrop/v1/',
-        payload,
-        {
-          withCredentials: true,
-        }
-      );
-      return response.data;
-    },
-    onSuccess: (data) => {
-      const newAirdropId = data?.airdrop?.id;
-      if (newAirdropId) {
-        dispatch(setCreatedAirdrop(data.airdrop));
-        router.push(`/dashboard/admin/airdrops/create/${newAirdropId}`);
-      }
-    },
-    onError: (error) => {
-      console.error('Airdrop creation failed:', error);
-      alert('Failed to create airdrop.');
-    },
-  });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setImageFile(file);
   };
 
-  const handleCreate = () => {
-    if (!name || !finalCategory) {
-      alert('Please fill in all fields');
+// const handleCreate = async () => {
+//   if (!name || !finalCategory || !imageFile) {
+//     alert('Please fill in all fields and select an image');
+//     return;
+//   }
+
+//   try {
+//     // Step 1: Create airdrop WITHOUT banner_image_url to get the ID
+//     const payload = {
+//       title: name,
+//       category: finalCategory,
+//       type: type,
+//     };
+
+//     const createRes = await axios.post(
+//       'http://localhost:8080/api/airdrop/v1/',
+//       payload,
+//       { withCredentials: true }
+//     );
+
+//     const newAirdrop = createRes.data?.airdrop;
+//     const airdropId = newAirdrop?.id;
+
+//     if (!airdropId) throw new Error('Airdrop ID missing');
+
+//     // Step 2: Get presigned URL for specific path
+//     const fileExt = imageFile.name.split('.').pop();
+//     const s3Path = `airdrops/${airdropId}/banner.${fileExt}`;
+
+//     const presignRes = await axios.get(
+//       'http://localhost:8080/api/upload/v1/generate-upload-url',
+//       {
+//         params: {
+//           filename: s3Path,
+//           contentType: imageFile.type,
+//         },
+//       }
+//     );
+
+//     const { uploadUrl, publicUrl } = presignRes.data;
+
+//     // Step 3: Upload image to S3
+//     await axios.put(uploadUrl, imageFile, {
+//       headers: { 'Content-Type': imageFile.type },
+//     });
+
+//     // Step 4: Update the airdrop with the image URL
+//     await axios.put(
+//       `http://localhost:8080/api/airdrop/v1/${airdropId}`,
+//       { banner_image_url: publicUrl },
+//       { withCredentials: true }
+//     );
+
+//     // Step 5: Dispatch and redirect
+//     dispatch(setCreatedAirdrop({ ...newAirdrop, banner_image_url: publicUrl }));
+//     router.push(`/dashboard/admin/airdrops/create/${airdropId}`);
+//   } catch (err) {
+//     console.error('Airdrop creation or image upload failed:', err);
+//     alert('Failed to create airdrop. Please try again.');
+//   }
+// };
+ const handleCreate = async () => {
+    if (!name || !finalCategory || !imageFile) {
+      alert('Please fill in all fields and select an image');
       return;
     }
-    createAirdropMutation.mutate();
+
+    setIsSubmitting(true);
+
+    try {
+      // Step 1: Create the airdrop without the banner image
+      const createPayload = {
+        title: name,
+        category: finalCategory,
+        type: type,
+      };
+
+      const createRes = await axios.post(
+        'http://localhost:8080/api/airdrop/v1/',
+        createPayload,
+        { withCredentials: true }
+      );
+
+      const newAirdrop = createRes.data?.airdrop;
+      const airdropId = newAirdrop?.id;
+
+      if (!airdropId) throw new Error('Airdrop ID missing');
+
+      // Step 2: Generate S3 path and presigned URL
+      const fileExt = imageFile.name.split('.').pop();
+      const s3Path = `airdrops/${airdropId}/banner.${fileExt}`;
+
+      const presignRes = await axios.get(
+        'http://localhost:8080/api/upload/v1/generate-upload-url',
+        {
+          params: {
+            filename: s3Path,
+            contentType: imageFile.type,
+          },
+        }
+      );
+
+      const { uploadUrl, publicUrl } = presignRes.data;
+
+      // Step 3: Upload to S3
+      await axios.put(uploadUrl, imageFile, {
+        headers: { 'Content-Type': imageFile.type },
+      });
+
+      // Step 4: Update the airdrop with the image URL
+    await axios.put(
+  `http://localhost:8080/api/airdrop/v1/${airdropId}`,
+  {
+    title: name,
+    category: finalCategory,
+    type: type,
+    banner_image_url: publicUrl,
+  },
+  { withCredentials: true }
+);
+
+
+      // Step 5: Dispatch and redirect
+      const updatedAirdrop = {
+        ...newAirdrop,
+        banner_image_url: publicUrl,
+      };
+
+      dispatch(setCreatedAirdrop(updatedAirdrop));
+      router.push(`/dashboard/admin/airdrops/create/${airdropId}`);
+      setOpen(false);
+    } catch (err) {
+      console.error('Airdrop creation or image upload failed:', err);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -217,7 +342,7 @@ const AirdropFormModal = () => {
               </div>
 
               {/* Submit */}
-              <Button
+              {/* <Button
                 onClick={handleCreate}
                 disabled={createAirdropMutation.status === "pending"}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white mt-4 cursor-pointer"
@@ -225,7 +350,11 @@ const AirdropFormModal = () => {
                 {createAirdropMutation.status === "pending"
                   ? 'Creating...'
                   : 'Create Airdrop'}
-              </Button>
+              </Button> */}
+                        <Button onClick={handleCreate} disabled={isSubmitting}>
+            {isSubmitting ? 'Creating...' : 'Create Airdrop'}
+          </Button>
+
             </div>
           </div>
         </div>

@@ -13,6 +13,7 @@ import weeklyTaskRoutes from "./routes/weeklytask.routes.js";
 import userTaskRoutes from "./routes/userTasks.routes.js";
 import userSettingsRoutes from './routes/userSettings.routes.js';
 import streakRoutes from './routes/streak.routes.js';
+import uploadRoutes from './routes/upload.route.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use('/api/weeklytask/v1', weeklyTaskRoutes);
 app.use('/api/user-task/v1', userTaskRoutes);
 app.use('/api/settings/v1', userSettingsRoutes);
 app.use('/api/streak/v1', streakRoutes);
+app.use('/api/upload/v1', uploadRoutes);
 
 
 

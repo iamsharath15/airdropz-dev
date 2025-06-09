@@ -15,23 +15,21 @@ type AirdropCardProps = {
 
 const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   return (
-    <Link
-      href={`/dashboard/admin/airdrops/create/${airdrop.id}`}
+    <div
       className="p-[1%] lg:w-3/12 md:w-4/12 sm:w-6/12 w-full"
     >
-      <div className="flex items-center justify-center w-full">
-        <div className="bg-[#151313] w-full rounded-lg overflow-hidden cursor-pointer h-full">
-          <div className="w-full flex items-center justify-center">
+        <div className="bg-[#151313] w-full rounded-lg overflow-hidden justify-between cursor-pointer flex flex-col ">
+          <div className="w-full flex items-center justify-center h-7/12 p-[4%]">
             <Image
-              className="object-cover w-full h-full rounded-3xl p-[4%]"
-              // src={airdrop.banner_image_url || ''}
-              src={"https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/demo/airdropzimage.png"}
+              className="object-cover w-full h-full rounded-3xl "
+              src={airdrop.banner_image_url || 'https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/demo/airdropzimage.png'}
+              // src={"https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/demo/airdropzimage.png"}
               alt="airdrop image"
               width={1920}
               height={1080}
             />
           </div>
-          <div className="p-4">
+          <div className="p-4  ">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-medium text-white">{airdrop.title}</h3>
             </div>
@@ -45,8 +43,7 @@ const AirdropCard = ({ airdrop }: AirdropCardProps) => {
             </div>
           </div>
         </div>
-      </div>
-    </Link>
+    </div>
   );
 };
 
