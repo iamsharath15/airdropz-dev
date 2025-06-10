@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { partnersData, Partner } from "@/lib/constants";
-import Image from "next/image";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { partnersData, Partner } from '@/lib/constants';
+import Image from 'next/image';
 
 const Page = () => {
   // Animation Variants
@@ -32,21 +32,23 @@ const Page = () => {
     <motion.section className="partners-section">
       {/* Become Partner Section */}
       <motion.div
-        className="flex w-full items-center justify-center py-[10%]"
+        className="flex w-full items-center justify-center pt-[10%]"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUpVariant}
       >
         <div className="container text-center space-y-6 md:w-6/12 w-8/12">
-          <h2 className="text-white font-semibold lg:text-5xl md:text-3xl sm:text-xl">
-            Partners
+          <h2 className="text-white font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-4xl">
+            Join the AirdropZ Partner Network
           </h2>
-          <p className="text-white font-normal text-lg">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut maxime,
-            necessitatibus autem quos possimus corporis? Quos animi omnis quam
-            quibusdam.
+          <p className="text-white text-sm sm:text-base md:text-lg font-normal">
+            Collaborate with us to reach a global community of crypto
+            enthusiasts. Whether youre a project, platform, or influencer,
+            AirdropZ offers high-converting exposure and deep ecosystem
+            integration.
           </p>
+
           <Button className="bg-[#8373EE] hover:bg-[#8373eec4] rounded-2xl">
             <a href="#">Become a partner</a>
           </Button>
@@ -78,7 +80,12 @@ const Page = () => {
                     }}
                   >
                     <div className="cus-logo py-[8%]">
-                      <Image src={partner.logo} alt={partner.name} width={100} height={40} />
+                      <Image
+                        src={partner.logo}
+                        alt={partner.name}
+                        width={100}
+                        height={40}
+                      />
                     </div>
                     <div className="flex items-center justify-center">
                       <p className="text-white">{partner.description}</p>
@@ -93,7 +100,7 @@ const Page = () => {
 
       {/* Partner Callout Section */}
       <motion.section
-        className="flex w-full items-center justify-center px-[4%] py-[10%]"
+        className="flex w-full items-center justify-center px-[4%] pt-[10%] "
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}

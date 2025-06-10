@@ -33,7 +33,7 @@ export default function Header() {
       animate={{ y: 0 }}
       layout
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="bg-white shadow-md rounded-2xl my-6 md:px-6 px-3 md:py-3 py-2 md:w-10/12 w-11/12  max-w-10/12 mx-auto z-50 absolute top-0 flex items-center justify-around flex-col"
+      className="bg-white shadow-md rounded-3xl my-6 md:px-4 px-3 md:py-3 py-2 md:w-10/12 w-11/12  max-w-10/12 mx-auto z-50 top-0 flex items-center justify-around flex-col fixed"
     >
       <div className="flex items-center justify-between w-full">
         {/* Logo */}
@@ -71,15 +71,15 @@ export default function Header() {
         <div className="hidden md:flex items-center space-x-2">
           <Link
             href="/login"
-            className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-2 md:px-5 px-3 rounded-full transition text-sm"
+            className="text-black hover:bg-[#8373EE] hover:text-white font-semibold py-3 md:px-5 px-3 rounded-full transition text-sm"
           >
             Login
           </Link>
           <Link
             href="/signup"
-            className="bg-[#8373EE] hover:bg-black text-white font-semibold py-2 md:px-5 px-3 rounded-full transition text-sm"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/90 text-white font-semibold py-3 md:px-5 px-3 rounded-full transition text-sm"
           >
-            Sign Up
+            Get Started
           </Link>
         </div>
 

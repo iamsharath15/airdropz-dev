@@ -90,8 +90,8 @@ const PricingPlan: React.FC<PricingPlanProps> = ({
 
 const Pricing: NextPage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow bg-black">
+    <div className="min-h-screen flex flex-col background-grid">
+      <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  flex items-center justify-center flex-col ">
           <div className="md:w-6/12 w-8/12 text-center space-y-6 py-[10%]">
             <h2 className="text-white font-semibold lg:text-5xl md:text-3xl sm:text-xl">

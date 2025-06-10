@@ -123,37 +123,38 @@ export const partnersData: Partner[] = [
     name: 'Makeo',
     logo: 'https://assets.website-files.com/64bec233ea9c3e4f5dda1080/64c133c1cee43d6f61df2dce_MAKEO.svg',
     description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vel, reprehenderit tenetur culpa aliquam similique commodi quos minus doloribus praesentium!',
+      'Makeo supports Web3 adoption by offering easy KYC integrations for token airdrops and NFT campaigns.',
   },
   {
     id: '2',
     name: 'Doobank',
     logo: 'https://assets.website-files.com/64bec233ea9c3e4f5dda1080/64c13347d9d1fe0f646887d2_Doobank.svg',
     description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vel, reprehenderit tenetur culpa aliquam similique commodi quos minus doloribus praesentium!',
+      'Doobank bridges DeFi to CeFi — enabling fast fiat off-ramps and reward claims for airdrop hunters worldwide.',
   },
   {
     id: '3',
     name: 'Onebit',
     logo: 'https://assets.website-files.com/64bec233ea9c3e4f5dda1080/64c132b4659381aa61d6c48f_onebit.svg',
     description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vel, reprehenderit tenetur culpa aliquam similique commodi quos minus doloribus praesentium!',
+      'Onebit Wallet offers secure, gasless claiming for token airdrops with multi-chain support.',
   },
   {
     id: '4',
     name: 'BeSound',
     logo: 'https://assets.website-files.com/64bec233ea9c3e4f5dda1080/64c1320ac6cd4b922782e97b_BeSound.svg',
     description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vel, reprehenderit tenetur culpa aliquam similique commodi quos minus doloribus praesentium!',
+      'BeSound collaborates with Web3 creators to launch music-based NFT airdrops and exclusive listener rewards.',
   },
   {
     id: '5',
     name: 'Braintech',
     logo: 'https://assets.website-files.com/64bec233ea9c3e4f5dda1080/64c12fb90ccd6781d9d2138b_braintech.svg',
     description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut vel, reprehenderit tenetur culpa aliquam similique commodi quos minus doloribus praesentium!',
+      'Braintech uses AI to rank and vet upcoming airdrops, helping users discover legit and high-potential drops.',
   },
 ];
+
 
 export const adminNavItems = [
   { label: 'Dashboard', href: '/admin/dashboard' },
