@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import pool from '../config/db.js';
 
 export async function createAirdropsTables() {
   await pool.query(`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
@@ -13,7 +13,11 @@ export async function createAirdropsTables() {
       type TEXT,
       created_by UUID REFERENCES users(id),
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      airdrops_banner_title TEXT,
+      airdrops_banner_description TEXT,
+      airdrops_banner_subTitle TEXT,
+      airdrops_banner_image TEXT
     );
 
     CREATE INDEX IF NOT EXISTS idx_airdrops_created_by ON airdrops(created_by);
@@ -67,5 +71,7 @@ export async function createAirdropsTables() {
     EXECUTE PROCEDURE update_content_blocks_updated_at_column();
   `);
 
-  console.log("✅ airdrops and content_blocks tables created with timestamps and indexes");
+  console.log(
+    '✅ airdrops and content_blocks tables created with timestamps and indexes'
+  );
 }

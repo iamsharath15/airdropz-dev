@@ -1,8 +1,19 @@
-import pool from "../config/db.js";
+import pool from '../config/db.js';
 
 class AirdropController {
   static async createAirdrop(req, res) {
-    const { title, short_description, category, banner_image_url, type, content_blocks } = req.body;
+    const {
+      title,
+      short_description = null,
+      category = null,
+      banner_image_url = null,
+      type = null,
+      content_blocks = [],
+      airdrops_banner_title = null,
+      airdrops_banner_description = null,
+      airdrops_banner_subtitle = null,
+      airdrops_banner_image = null,
+    } = req.body;
     const userId = req.user.userId;
     const client = await pool.connect();
 
@@ -10,15 +21,29 @@ class AirdropController {
       await client.query('BEGIN');
 
       const result = await client.query(
-        `INSERT INTO airdrops (title, short_description, category, banner_image_url, type, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [title, short_description, category, banner_image_url, type, userId]
+        `INSERT INTO airdrops (
+          title, short_description, category, banner_image_url, type, created_by,
+          airdrops_banner_title, airdrops_banner_description, airdrops_banner_subtitle, airdrops_banner_image
+        )
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING *`,
+        [
+          title,
+          short_description,
+          category,
+          banner_image_url,
+          type,
+          userId,
+          airdrops_banner_title,
+          airdrops_banner_description,
+          airdrops_banner_subtitle,
+          airdrops_banner_image,
+        ]
       );
-
       const airdrop = result.rows[0];
 
       if (Array.isArray(content_blocks) && content_blocks.length) {
-        const insertPromises = content_blocks.map(block =>
+        const insertPromises = content_blocks.map((block) =>
           client.query(
             `INSERT INTO content_blocks (airdrop_id, type, value, link)
              VALUES ($1, $2, $3, $4)`,
@@ -29,11 +54,13 @@ class AirdropController {
       }
 
       await client.query('COMMIT');
-      res.status(201).json({ message: "Airdrop created successfully", airdrop });
+      res
+        .status(201)
+        .json({ message: 'Airdrop created successfully', airdrop });
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error("Create Airdrop Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Create Airdrop Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     } finally {
       client.release();
     }
@@ -41,24 +68,48 @@ class AirdropController {
 
   static async updateAirdrop(req, res) {
     const { id } = req.params;
-    const { title, short_description, category, banner_image_url, type } = req.body;
-
+    const {
+      title,
+      short_description = null,
+      category = null,
+      banner_image_url = null,
+      type = null,
+      airdrops_banner_title = null,
+      airdrops_banner_description = null,
+      airdrops_banner_subtitle = null,
+      airdrops_banner_image = null,
+    } = req.body;
     try {
       const result = await pool.query(
         `UPDATE airdrops
-         SET title=$1, short_description=$2, category=$3, banner_image_url=$4, type=$5
-         WHERE id=$6 RETURNING *`,
-        [title, short_description, category, banner_image_url, type, id]
+         SET title=$1, short_description=$2, category=$3, banner_image_url=$4, type=$5,
+             airdrops_banner_title=$6, airdrops_banner_description=$7, airdrops_banner_subtitle=$8, airdrops_banner_image=$9
+         WHERE id=$10 RETURNING *`,
+        [
+          title,
+          short_description,
+          category,
+          banner_image_url,
+          type,
+          airdrops_banner_title,
+          airdrops_banner_description,
+          airdrops_banner_subtitle,
+          airdrops_banner_image,
+          id,
+        ]
       );
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Airdrop not found" });
+        return res.status(404).json({ error: 'Airdrop not found' });
       }
 
-      res.json({ message: "Airdrop updated successfully", airdrop: result.rows[0] });
+      res.json({
+        message: 'Airdrop updated successfully',
+        airdrop: result.rows[0],
+      });
     } catch (error) {
-      console.error("Update Airdrop Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Update Airdrop Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
@@ -67,18 +118,18 @@ class AirdropController {
 
     try {
       const result = await pool.query(
-        `DELETE FROM airdrops WHERE id=$1 RETURNING *`, 
+        `DELETE FROM airdrops WHERE id=$1 RETURNING *`,
         [id]
       );
 
       if (result.rows.length === 0) {
-        return res.status(404).json({ error: "Airdrop not found" });
+        return res.status(404).json({ error: 'Airdrop not found' });
       }
 
-      res.json({ message: "Airdrop deleted successfully" });
+      res.json({ message: 'Airdrop deleted successfully' });
     } catch (error) {
-      console.error("Delete Airdrop Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Delete Airdrop Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
@@ -95,8 +146,8 @@ class AirdropController {
       const result = await pool.query(query);
       res.json(result.rows);
     } catch (error) {
-      console.error("Fetch Airdrops Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Fetch Airdrops Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
@@ -104,20 +155,26 @@ class AirdropController {
     const { id } = req.params;
 
     try {
-      const airdropResult = await pool.query(`SELECT * FROM airdrops WHERE id = $1`, [id]);
+      const airdropResult = await pool.query(
+        `SELECT * FROM airdrops WHERE id = $1`,
+        [id]
+      );
       if (!airdropResult.rowCount) {
-        return res.status(404).json({ error: "Airdrop not found" });
+        return res.status(404).json({ error: 'Airdrop not found' });
       }
 
-      const contentBlocks = await pool.query(`SELECT * FROM content_blocks WHERE airdrop_id = $1`, [id]);
+      const contentBlocks = await pool.query(
+        `SELECT * FROM content_blocks WHERE airdrop_id = $1`,
+        [id]
+      );
 
       res.json({
         ...airdropResult.rows[0],
         content_blocks: contentBlocks.rows,
       });
     } catch (error) {
-      console.error("Fetch Airdrop By ID Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Fetch Airdrop By ID Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 
@@ -126,19 +183,25 @@ class AirdropController {
     const { content_blocks } = req.body;
 
     if (!Array.isArray(content_blocks)) {
-      return res.status(400).json({ error: "content_blocks must be an array" });
+      return res.status(400).json({ error: 'content_blocks must be an array' });
     }
 
     const client = await pool.connect();
     try {
-      const check = await client.query(`SELECT id FROM airdrops WHERE id = $1`, [airdropId]);
-      if (!check.rowCount) return res.status(404).json({ error: "Airdrop not found" });
+      const check = await client.query(
+        `SELECT id FROM airdrops WHERE id = $1`,
+        [airdropId]
+      );
+      if (!check.rowCount)
+        return res.status(404).json({ error: 'Airdrop not found' });
 
       await client.query('BEGIN');
 
-      await client.query(`DELETE FROM content_blocks WHERE airdrop_id = $1`, [airdropId]);
+      await client.query(`DELETE FROM content_blocks WHERE airdrop_id = $1`, [
+        airdropId,
+      ]);
 
-      const insertPromises = content_blocks.map(block =>
+      const insertPromises = content_blocks.map((block) =>
         client.query(
           `INSERT INTO content_blocks (airdrop_id, type, value, link)
            VALUES ($1, $2, $3, $4)`,
@@ -148,11 +211,11 @@ class AirdropController {
       await Promise.all(insertPromises);
 
       await client.query('COMMIT');
-      res.status(200).json({ message: "Content blocks created successfully" });
+      res.status(200).json({ message: 'Content blocks created successfully' });
     } catch (error) {
       await client.query('ROLLBACK');
-      console.error("Create Content Blocks Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      console.error('Create Content Blocks Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     } finally {
       client.release();
     }
@@ -163,15 +226,19 @@ class AirdropController {
     const { content_blocks } = req.body;
 
     if (!Array.isArray(content_blocks)) {
-      return res.status(400).json({ error: "content_blocks must be an array" });
+      return res.status(400).json({ error: 'content_blocks must be an array' });
     }
 
     const client = await pool.connect();
     try {
-      const check = await client.query(`SELECT id FROM airdrops WHERE id = $1`, [airdropId]);
-      if (!check.rowCount) return res.status(404).json({ error: "Airdrop not found" });
+      const check = await client.query(
+        `SELECT id FROM airdrops WHERE id = $1`,
+        [airdropId]
+      );
+      if (!check.rowCount)
+        return res.status(404).json({ error: 'Airdrop not found' });
 
-      await client.query("BEGIN");
+      await client.query('BEGIN');
 
       const incomingIds = [];
 
@@ -197,17 +264,19 @@ class AirdropController {
       // Delete blocks that are not included
       await client.query(
         incomingIds.length
-          ? `DELETE FROM content_blocks WHERE airdrop_id = $1 AND id NOT IN (${incomingIds.map((_, i) => `$${i + 2}`).join(', ')})`
+          ? `DELETE FROM content_blocks WHERE airdrop_id = $1 AND id NOT IN (${incomingIds
+              .map((_, i) => `$${i + 2}`)
+              .join(', ')})`
           : `DELETE FROM content_blocks WHERE airdrop_id = $1`,
         [airdropId, ...incomingIds]
       );
 
-      await client.query("COMMIT");
-      res.status(200).json({ message: "Content blocks updated successfully" });
+      await client.query('COMMIT');
+      res.status(200).json({ message: 'Content blocks updated successfully' });
     } catch (error) {
-      await client.query("ROLLBACK");
-      console.error("Update Content Blocks Error:", error);
-      res.status(500).json({ error: "Internal server error" });
+      await client.query('ROLLBACK');
+      console.error('Update Content Blocks Error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     } finally {
       client.release();
     }
