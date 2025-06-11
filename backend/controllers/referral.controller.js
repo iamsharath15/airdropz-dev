@@ -1,4 +1,4 @@
-// controllers/referral.controller.js
+// done v1
 import pool from "../config/db.js";
 
 export const getReferralStats = async (req, res) => {
@@ -22,11 +22,11 @@ export const getReferralStats = async (req, res) => {
 
     res.status(200).json({
       referralCode: referral_code,
-      referralLink: `${referral_code}`,
+      // referralLink: `${referral_code}`,
       totalReferrals: referrals.rows.length,
       points,
       history: referrals.rows.map(r => ({
-        username: r.username,
+        user_name: r.user_name,
         date: r.created_at,
         pointsEarned: 50
       }))

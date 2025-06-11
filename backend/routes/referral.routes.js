@@ -1,7 +1,7 @@
-// routes/referral.routes.js
+// done v1
 import express from "express";
 import { getReferralStats } from "../controllers/referral.controller.js";
-import { protect } from "../middlewares/authMiddleware.js"; // ensures user is authenticated
+import { protect } from "../middlewares/authMiddleware.js"; 
 
 const router = express.Router();
 

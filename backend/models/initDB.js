@@ -11,7 +11,7 @@ export async function initDB() {
 
   const tableCreators = [
     createUsersTable,
-    // createReferralsTable,
+    createReferralsTable,
     createLeaderboardTable,
     // createStreaksTables,
     // createAirdropsTables,
