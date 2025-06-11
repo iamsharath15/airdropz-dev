@@ -13,7 +13,7 @@ export const getReferralStats = async (req, res) => {
     const { referral_code, points } = userRes.rows[0];
 
     const referrals = await pool.query(`
-      SELECT u.username, r.created_at
+      SELECT u.user_name, r.created_at
       FROM referrals r
       JOIN users u ON r.referred_id = u.id
       WHERE r.referrer_id = $1

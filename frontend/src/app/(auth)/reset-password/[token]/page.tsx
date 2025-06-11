@@ -1,3 +1,4 @@
+// done v1
 'use client';
 
 import { useState } from 'react';
@@ -7,21 +8,22 @@ import axios, { AxiosError } from 'axios';
 import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import AuthSlider from '@/components/shared/AuthSlider';
 
-interface ApiResponse {
+interface ResetPasswordResponse {
   message: string;
 }
 
-export default function ResetPassword() {
+export default function ResetPasswordForm() {
   const router = useRouter();
   const params = useParams();
   const token = typeof params.token === 'string' ? params.token : '';
-  console.log('Token:', token);
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const resetPasswordMutation = useMutation<
-    ApiResponse,
+  const { mutate: resetPassword, status: resetStatus } = useMutation<
+    ResetPasswordResponse,
     AxiosError,
     { token: string; password: string }
   >({
@@ -33,18 +35,13 @@ export default function ResetPassword() {
       return response.data;
     },
     onSuccess: (data) => {
-      toast.success(
-        data.message || 'Password reset successful! You can now log in.'
-      );
+      toast.success(data.message || 'Password reset successfully!');
       router.push('/login');
     },
     onError: (error) => {
       const data = error.response?.data as { message?: string; error?: string };
       const message =
-        data?.message ||
-        data?.error ||
-        error.message ||
-        'Failed to reset password';
+        data?.message || data?.error || error.message || 'Something went wrong';
       toast.error(message);
     },
   });
@@ -52,8 +49,13 @@ export default function ResetPassword() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!token) {
+      toast.error('Invalid or expired token');
+      return;
+    }
+
     if (password.length < 6) {
-      toast.error('Password should be at least 6 characters long');
+      toast.error('Password must be at least 6 characters long');
       return;
     }
 
@@ -62,53 +64,64 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!token) {
-      toast.error('Invalid or missing token');
-      return;
-    }
-
-    resetPasswordMutation.mutate({ token, password });
+    resetPassword({ token, password });
   };
 
-  const isLoading = resetPasswordMutation.status === "pending"
+  const isLoading = resetStatus === 'pending';
 
   return (
     <>
       <Toaster position="top-right" richColors />
-      <div className="flex h-screen w-full justify-center items-center bg-[#8373EE] text-white px-6">
-        <div className="max-w-sm w-full space-y-6 bg-white rounded-xl p-8 text-black">
-          <h1 className="text-3xl font-semibold text-center">Reset Password</h1>
-          <p className="text-center text-sm font-semibold mb-6">
-            Enter your new password below
-          </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              id="password"
-              type="password"
-              placeholder="New Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="py-5"
-            />
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm New Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="py-5"
-            />
-            <Button
-              type="submit"
-              className="w-full py-6 font-semibold text-sm cursor-pointer"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
-            </Button>
-          </form>
+      <div className="flex w-full h-screen">
+        {/* Left - Sign In */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
+          <div className="w-full max-w-sm rounded-xl bg-white p-8 text-black shadow-md space-y-6">
+            <h1 className="text-3xl font-semibold text-center">
+              Reset Password
+            </h1>
+            <p className="text-sm text-center text-gray-600">
+              Enter your new password below
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <label htmlFor="password" className="text-sm font-medium">
+                New Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="py-5"
+              />
+
+              <label htmlFor="confirmPassword" className="text-sm font-medium">
+                Confirm Password
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="py-5"
+              />
+
+              <Button
+                type="submit"
+                className="w-full py-6 text-sm font-semibold cursor-pointer"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Resetting...' : 'Reset Password'}
+              </Button>
+            </form>
+          </div>
         </div>
+        {/* Right - Slider */}
+        <AuthSlider />
       </div>
     </>
   );

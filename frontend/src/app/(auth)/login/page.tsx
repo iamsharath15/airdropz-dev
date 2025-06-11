@@ -1,3 +1,4 @@
+// done v1
 'use client';
 
 import { useState } from 'react';
@@ -18,8 +19,11 @@ interface LoginResponse {
     email: string;
     username: string;
     role: string;
-      is_new_user?: boolean;
-
+    is_new_user?: boolean;
+    wallet_address: string;
+    daily_login_streak_count: number;
+    airdrops_remaining: number;
+    airdrops_earned: number;
   };
 }
 
@@ -51,11 +55,25 @@ export default function Login() {
       }
     },
 
-    onError: (error) => {
+    onError: async (error) => {
       const data = error.response?.data as { message?: string; error?: string };
       const message =
         data?.message || data?.error || error?.message || 'Login failed';
+
       toast.error(message);
+
+      if (message === 'Email not verified.') {
+        try {
+          await axios.post('http://localhost:8080/api/auth/v1/resend-otp', {
+            email,
+          });
+          router.push(`/verify-email?email=${email}`);
+          toast.success('OTP resent. Please verify your email.');
+        } catch (resendError: unknown) {
+          const err = resendError as AxiosError<{ message: string }>;
+          toast.error(err.response?.data?.message || 'Failed to resend OTP.');
+        }
+      }
     },
   });
 
@@ -126,9 +144,9 @@ export default function Login() {
               </Button>
             </form>
 
-            <p className="text-center text-sm">
+            <p className="text-center text-sm mt-4">
               Don’t have an account?{' '}
-              <Link href="/signup" className="underline">
+              <Link href="/signup" className="underline ">
                 Sign Up
               </Link>
             </p>

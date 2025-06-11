@@ -9,7 +9,7 @@ class OnboardingController {
     try {
       const result = await pool.query(
         `UPDATE users SET
-          username = $1,
+          user_name = $1,
           heard_from = $2,
           interests = $3,
           experience_level = $4,
@@ -17,7 +17,7 @@ class OnboardingController {
           is_new_user = false,
           updated_at = NOW()
         WHERE id = $6
-        RETURNING id, username, email`,
+        RETURNING id, user_name, email`,
         [username, heardFrom, interests, experienceLevel, walletAddress, userId]
       );
 
@@ -41,7 +41,7 @@ class OnboardingController {
 
     try {
       const result = await pool.query(
-        `SELECT id, username, email, heard_from, interests, experience_level, wallet_address
+        `SELECT id, user_name, email, heard_from, interests, experience_level, wallet_address
          FROM users WHERE id = $1`,
         [userId]
       );

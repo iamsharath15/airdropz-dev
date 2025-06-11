@@ -24,13 +24,3 @@ export const protect = async (req, res, next) => {
   }
 };
 
-// export const authenticateUser = (req, res, next) => {
-//   const userId = req.user?.id; // or however you're storing user in JWT/session
-
-//   if (!userId) {
-//     return res.status(401).json({ success: false, message: "Unauthorized" });
-//   }
-
-//   req.userId = userId;
-//   next();
-// };

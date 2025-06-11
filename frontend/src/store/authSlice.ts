@@ -5,6 +5,7 @@ interface User {
   email: string;
   username: string;
   role: string;
+  is_new_user?: boolean;
   wallet_address: string;
   daily_login_streak_count: number;
   airdrops_remaining: number;

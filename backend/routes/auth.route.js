@@ -1,8 +1,6 @@
 import express from "express";
 import UserController from "../controllers/auth.controller.js";
-import { authenticateUser } from "../utils/generateTokenAndSetCookie.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
-
 
 const router = express.Router();
 
@@ -35,20 +33,14 @@ router.post("/request-password-reset", UserController.requestPasswordReset)
 // @desc Reset user password using a valid reset token
 // @access Public
 router.post("/reset-password/:token", UserController.resetUserPassword)
+
+// @route POST /api/auth/v1/resend-otp
+// @desc Resend OTP to your mail
+// @access Public
+router.post("/resend-otp", UserController.resendOtp)
+
 router.get("/check-auth", verifyToken, UserController.checkAuth);
 
-// router.get("/check-auth", verifyToken, checkAuth)
 
-// router.get('/users', async (req, res) => {
-//   try {
-//     const result = await pool.query('SELECT * FROM users');
-//     res.json(result.rows);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send('Database error');
-//   }
-// });
-router.get("/profile", authenticateUser, (req, res) => {
-  res.json({ success: true, userId: req.user.userId });
-});
+
 export default router

@@ -11,12 +11,12 @@ export async function initDB() {
 
   const tableCreators = [
     createUsersTable,
-    createReferralsTable,
+    // createReferralsTable,
     createLeaderboardTable,
-    createStreaksTables,
-    createAirdropsTables,
-    createWeeklyTasksTables,
-    createUserTasksTable,
+    // createStreaksTables,
+    // createAirdropsTables,
+    // createWeeklyTasksTables,
+    // createUserTasksTable,
   ];
 
   for (const createTable of tableCreators) {

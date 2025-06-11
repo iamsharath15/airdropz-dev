@@ -7,7 +7,7 @@ class LeaderboardController {
         SELECT 
           l.id,
           l.user_id,
-          u.username,
+          u.user_name,
           l.points,
           l.updated_at
         FROM leaderboard l
