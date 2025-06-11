@@ -38,14 +38,6 @@ app.use('/api/auth/v1', authRoutes);
 // app.use('/api/upload/v1', uploadRoutes);
 
 
-
-// app.use('/api/streak/v1', streakRoutes);
-
-// app.use("/api/login", loginStreakRoutes);
-
-
-
-
 // Test DB connection
 pool
   .query('SELECT NOW()')
