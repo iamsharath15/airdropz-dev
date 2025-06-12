@@ -1,3 +1,5 @@
+// done v1
+
 'use client';
 
 import Image from 'next/image';
@@ -63,13 +65,15 @@ const ReferralTable: React.FC<ReferralTableProps> = ({ referrals }) => {
                     <div className="w-6 h-6 bg-muted rounded-full flex items-center justify-center text-[10px] font-bold text-white">
                       {referral.user.charAt(0)}
                     </div>
-                    <span className="truncate max-w-[100px]">{referral.user}</span>
+                    <span className="truncate max-w-[100px]">
+                      {referral.user}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-right text-yellow-500 font-medium rounded-r-xl whitespace-nowrap">
                     +{referral.points}
                     <span className="inline-block ml-1 align-middle px-2">
                       <Image
-                        src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/svg/airdrop.svg"
+                        src="https://cdn.lootcrate.me/svg/airdrop.svg"
                         alt="Airdrop Logo"
                         width={15}
                         height={15}

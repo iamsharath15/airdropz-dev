@@ -13,7 +13,7 @@ const ContentComponents = () => {
           <div className=" overflow-hidden p-2">
             <div className="bg-[#8373EE] p-[1%] rounded-lg">
               <video
-                src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/video/test.mp4"
+                src="https://cdn.lootcrate.me/video/test.mp4"
                 autoPlay
                 loop
                 muted
@@ -28,7 +28,7 @@ const ContentComponents = () => {
             <div className="w-6/12 p-2">
               <div className="bg-[#8373EE] p-[2%] rounded-lg">
                 <video
-                  src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/video/test.mp4"
+                  src="https://cdn.lootcrate.me/video/test.mp4"
                   autoPlay
                   loop
                   muted
@@ -42,7 +42,7 @@ const ContentComponents = () => {
             <div className="w-6/12 p-2">
               <div className="bg-[#8373EE] p-[2%] rounded-lg">
                 <video
-                  src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/video/test.mp4"
+                  src="https://cdn.lootcrate.me/video/test.mp4"
                   autoPlay
                   loop
                   muted

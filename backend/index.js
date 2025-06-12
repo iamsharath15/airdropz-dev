@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/api/auth/v1', authRoutes);
 app.use("/api/referral/v1", referralRoutes); 
 app.use('/api/onboarding/v1', onboardingRoutes)
-// app.use('/api/leaderboard/v1', leaderboardRoutes)
+app.use('/api/leaderboard/v1', leaderboardRoutes)
 // app.use('/api/airdrop/v1', airdropRoutes)
 // app.use('/api/weeklytask/v1', weeklyTaskRoutes);
 // app.use('/api/user-task/v1', userTaskRoutes);

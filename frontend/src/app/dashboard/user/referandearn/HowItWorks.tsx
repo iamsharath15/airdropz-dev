@@ -1,3 +1,5 @@
+// done v1
+
 import Image from 'next/image';
 import React from 'react';
 
@@ -7,7 +9,7 @@ const HowItWorks = () => {
       {/* Right-side background image (only on large screens) */}
       <div className="hidden lg:block absolute top-0 right-0 w-4/12 h-full z-0">
         <Image
-          src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/static-image-v1/referandearn/refer-and-earn-img1.png"
+          src="https://cdn.lootcrate.me/static-image-v1/referandearn/refer-and-earn-img1.png"
           alt="refer & earn image"
           fill
           className="object-cover object-right"
@@ -22,10 +24,12 @@ const HowItWorks = () => {
         <ol className="space-y-2 list-decimal list-inside font-semibold text-xs sm:text-sm md:text-base">
           <li>Get Your Link – Sign up and grab your unique referral link.</li>
           <li>
-            Invite Friends – Share the link with friends via social media, email, or chat.
+            Invite Friends – Share the link with friends via social media,
+            email, or chat.
           </li>
           <li>
-            They Sign Up – Your friends join using your link and start using the platform.
+            They Sign Up – Your friends join using your link and start using the
+            platform.
           </li>
           <li>
             You Earn Rewards – Get rewarded for every successful referral!

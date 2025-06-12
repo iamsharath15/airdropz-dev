@@ -16,14 +16,12 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 🔥 Get user role from Redux store
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = user ? true : false; // Check if user is authenticated
+  const isAuthenticated = user ? true : false; 
   const role: 'admin' | 'user' = user?.role === 'admin' ? 'admin' : 'user';
 
   const router = useRouter();
 
-  // Redirect to login if the user is not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/'); // Or any other login page URL
@@ -38,14 +36,14 @@ export default function DashboardLayout({
         setIsCollapsed={setIsCollapsed}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        role={role} // ✅ Dynamic role passed to Sidebar
+        role={role}
       />
 
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Navbar with role-based dynamic display */}
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          role={role} // ✅ Dynamic role passed to Navbar
+          role={role} 
         />
         
         {/* Main content area */}

@@ -37,14 +37,14 @@ const PricingPlan: React.FC<PricingPlanProps> = ({
         <div className="flex items-center gap-1">
           {highlighted ? (
             <Image
-              src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/static-image-v1/plans/airdropz-plan-light.png"
+              src="https://cdn.lootcrate.me/static-image-v1/plans/airdropz-plan-light.png"
               alt="logo"
               width={150}
               height={100}
             />
           ) : (
             <Image
-              src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/static-image-v1/plans/airdropz-plan-dark.png"
+              src="https://cdn.lootcrate.me/static-image-v1/plans/airdropz-plan-dark.png"
               alt="logo"
               width={150}
               height={100}

@@ -1,3 +1,5 @@
+//done v1
+
 'use client';
 
 import React from 'react';
@@ -10,23 +12,23 @@ import type { RootState } from '@/store';
 interface ProfileStatsProps {
   totalReferrals: number;
   totalEarned: number;
-  referralLink: string;
+  referralCode: string;
 }
 
 const ProfileStats: React.FC<ProfileStatsProps> = ({
   totalReferrals,
   totalEarned,
-  referralLink,
+  referralCode,
 }) => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.username || 'User';
+  const userName = user?.user_name || 'User';
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralLink);
+    navigator.clipboard.writeText(referralCode);
     toast.success('Referral code copied to clipboard');
   };
   const shareOnPlatform = (platform: string) => {
-    const encodedLink = encodeURIComponent(referralLink);
+    const encodedLink = encodeURIComponent(referralCode);
     const encodedMessage = encodeURIComponent('Join me and earn rewards! 🎉');
 
     let shareUrl = '';
@@ -76,7 +78,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
               <div className="bg-black rounded-2xl w-full flex items-center justify-start p-[10%] gap-4">
                 <div className=" flex items-center justify-center">
                   <Image
-                    src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/svg/airdrop.svg"
+                    src="https://cdn.lootcrate.me/svg/airdrop.svg"
                     alt="Airdrop Logo"
                     width={40}
                     height={40}
@@ -95,7 +97,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
             <div className="flex flex-col items-start justify-center w-full">
               <div className="w-full flex bg-black justify-between items-center p-[1.5%] rounded-2xl flex-row gap-4 ">
                 <p className="text-white break-all text-sm px-2 md:w-6/12 w-7/12">
-                  {referralLink}
+                  {referralCode}
                 </p>
 
                 {/* Buttons */}
@@ -119,7 +121,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
                     <div className="flex">
                       <Button
                         variant="default"
-                        className="bg-[#8373EE] cursor-pointer flex items-center gap-2 w-full"
+                        className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer flex items-center gap-2 w-full"
                       >
                         {/* Mobile icon only */}
                         <Share2 className="h-2 w-2 block md:hidden" />
@@ -165,7 +167,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
                 Get 50
                 <span className="inline-block px-1">
                   <Image
-                    src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/svg/airdrop.svg"
+                    src="https://cdn.lootcrate.me/svg/airdrop.svg"
                     alt="Airdrop Logo"
                     width={15}
                     height={15}

@@ -1,3 +1,5 @@
+// done v1
+
 'use client';
 
 import React from 'react';
@@ -29,30 +31,15 @@ const Page = () => {
 const referralData = {
   totalReferrals: data.totalReferrals,
   totalEarned: data.history.reduce((sum: number, item: { pointsEarned: number }) => sum + item.pointsEarned, 0),
-  referralLink: data.referralLink,
+  referralCode: data.referralCode,
 };
 
-const referrals = data.history.map((entry: { date: string; username: string; pointsEarned: number }, index: number) => ({
+const referrals = data.history.map((entry: { date: string; user_name: string; pointsEarned: number }, index: number) => ({
   id: index + 1,
   date: new Date(entry.date).toLocaleDateString(),
-  user: entry.username,
+  user: entry.user_name,
   points: entry.pointsEarned,
 }));
-
-
-
-  // const referralData = {
-  //   totalReferrals: 4,
-  //   totalEarned: 200,
-  //   referralLink: 'https://airdrop.com/ref=1234',
-  // };
-
-  // const referrals = [
-  //   { id: 1, date: '12/04/25', user: 'User 1', points: 50 },
-  //   { id: 2, date: '13/04/25', user: 'User 2', points: 50 },
-  //   { id: 3, date: '14/04/25', user: 'User 3', points: 50 },
-  //   { id: 4, date: '15/04/25', user: 'User 4', points: 50 },
-  // ];
 
   return (
     <div className="min-h-screen max-w-[1440px] w-full flex items-center justify-center bg-black">
@@ -61,7 +48,7 @@ const referrals = data.history.map((entry: { date: string; username: string; poi
         <ProfileStats
           totalReferrals={referralData.totalReferrals}
           totalEarned={referralData.totalEarned}
-          referralLink={referralData.referralLink}
+          referralCode={referralData.referralCode}
         />
         <ReferralTable referrals={referrals} />
       </div>

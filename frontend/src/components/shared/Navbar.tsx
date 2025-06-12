@@ -53,15 +53,15 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
     (role === 'admin' ? 'Admin Dashboard' : 'Dashboard');
 
   const handleLogout = async () => {
-    dispatch(logoutAction()); // clear redux auth state
-    router.push('/'); // redirect to login/home
+    dispatch(logoutAction());
+    router.push('/'); 
   };
 
   const handleAccountSettings = () => {
     router.push('/dashboard/user/settings'); // or admin settings path
   };
 
-  const userName = user?.username || 'User';
+  const userName = user?.user_name || 'User';
   const userEmail = user?.email || 'user@example.com';
 
   return (

@@ -6,7 +6,7 @@ import Image from 'next/image';
 interface LeaderboardUser {
   id: string;
   user_id: string;
-  username: string;
+  user_name: string;
   points: number;
 }
 
@@ -64,17 +64,17 @@ const LeaderboardItem = ({
   <div className="bg-[#151313] rounded-xl p-4 flex items-start justify-center gap-4 w-4/12 flex-col">
     <div className="flex flex-row gap-4">
       <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#8373EE]">
-        {user.username.charAt(0)}
+        {user.user_name.charAt(0)}
       </div>
       <div className="flex-1">
-        <h4 className="text-white font-semibold">{user.username}</h4>
+        <h4 className="text-white font-semibold">{user.user_name}</h4>
         <p className="text-sm text-gray-400">Free tier</p>
       </div>
     </div>
     <div className="text-right flex flex-row justify-between items-center w-full">
       <div className="flex items-center gap-2 text-white text-sm">
         <Image
-          src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/svg/Rank.svg"
+          src="https://cdn.lootcrate.me/svg/Rank.svg"
           alt="Rank Icon"
           width={15}
           height={15}
@@ -83,7 +83,7 @@ const LeaderboardItem = ({
       </div>{' '}
       <div className="flex items-center gap-2 text-white text-sm">
           <Image
-          src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/svg/airdrop.svg"
+          src="https://cdn.lootcrate.me/svg/airdrop.svg"
           alt="Airdropz Icon"
           width={15}
           height={15}

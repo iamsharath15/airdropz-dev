@@ -39,7 +39,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/static-image-v1/airdropz-logo.png"
+            src="https://cdn.lootcrate.me/static-image-v1/airdropz-logo.png"
             alt="AirdropZ"
             width={100}
             height={50}

@@ -32,7 +32,7 @@ const AirdropCard = ({ airdrop }: AirdropCardProps) => {
               className="object-cover w-full h-full rounded-3xl"
               src={
                 airdrop.banner_image_url ||
-                'https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/demo/airdropzimage.png'
+                'https://cdn.lootcrate.me/demo/airdropzimage.png'
               }
               alt="airdrop image"
               width={1920}

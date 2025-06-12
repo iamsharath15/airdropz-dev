@@ -107,7 +107,7 @@ export function Sidebar({
             {!isCollapsed && !sidebarOpen && (
               <div className="ml-2">
                 <Image
-                  src="https://airdropzofficial-static-v1.s3.ap-south-1.amazonaws.com/static-image-v1/plans/airdropz-plan-light.png"
+                  src="https://cdn.lootcrate.me/static-image-v1/plans/airdropz-plan-light.png"
                   alt="Logo"
                   width={80}
                   height={25}
