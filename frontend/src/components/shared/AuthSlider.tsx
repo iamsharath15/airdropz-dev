@@ -6,17 +6,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 const slides = [
   {
-    image: '/images/slider1.png',
+    image: 'https://cdn.lootcrate.me/static-image-v1/auth/slider1.png',
     title: 'Track Airdrops Effortlessly',
     description: 'Real-time updates and tracking tools for all your airdrops.',
   },
   {
-    image: '/images/slider2.png',
+    image: 'https://cdn.lootcrate.me/static-image-v1/auth/slider2.png',
     title: 'Earn With Referrals',
     description: 'Invite friends and earn bonuses through verified referrals.',
   },
   {
-    image: '/images/slider1.png',
+    image: 'https://cdn.lootcrate.me/static-image-v1/auth/slider1.png',
     title: 'Your Web3 Dashboard',
     description: 'Everything you need for airdrops, rewards, and insights—all in one place.',
   },

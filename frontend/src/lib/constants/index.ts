@@ -154,16 +154,3 @@ export const partnersData: Partner[] = [
       'Braintech uses AI to rank and vet upcoming airdrops, helping users discover legit and high-potential drops.',
   },
 ];
-
-
-export const adminNavItems = [
-  { label: 'Dashboard', href: '/admin/dashboard' },
-  { label: 'Users', href: '/admin/users' },
-  { label: 'Settings', href: '/admin/settings' },
-];
-
-export const userNavItems = [
-  { label: 'Dashboard', href: '/user/dashboard' },
-  { label: 'Airdrops', href: '/user/airdrops' },
-  { label: 'Settings', href: '/user/settings' },
-];

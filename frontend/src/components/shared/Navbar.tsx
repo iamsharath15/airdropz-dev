@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '../ui/dropdown-menu';
+import { logout } from '@/app/(auth)/logout/page';
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -54,6 +55,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
   const handleLogout = async () => {
     dispatch(logoutAction());
+    await logout();
     router.push('/'); 
   };
 
