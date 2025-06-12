@@ -12,7 +12,7 @@ import Calendar from '@/components/shared/Calendar';
 
 const Dashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.username || 'User';
+  const userName = user?.user_name || 'User';
   const checkIn = user?.daily_login_streak_count || 1;
   const airdropsEarned = user?.airdrops_earned || 1;
   const airdropsRemaining = user?.airdrops_remaining || 1;

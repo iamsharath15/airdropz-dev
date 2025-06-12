@@ -1,27 +1,28 @@
-// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Only protect dashboard routes (example)
-  if (pathname.startsWith("/dashboard")) {
-    // Read HttpOnly cookie named 'token'
-    const token = req.cookies.get("token")?.value;
+  const protectedPaths = ["/dashboard", "/onboarding"];
+  const requiresAuth = protectedPaths.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+
+  if (requiresAuth) {
+    const token = req.cookies.get("token");
+console.log("hi",token);
 
     if (!token) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/"; // redirect to home or login
-      return NextResponse.redirect(url);
+      const loginUrl = req.nextUrl.clone();
+      loginUrl.pathname = "/"; // Or redirect to /signin
+      return NextResponse.redirect(loginUrl);
     }
-
-    // Optional: You can add token validation here (e.g., JWT verification)
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: "/dashboard/:path*",
+  matcher: ["/dashboard", "/dashboard/:path*", "/onboarding"],
 };

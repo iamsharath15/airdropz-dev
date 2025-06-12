@@ -2,9 +2,8 @@ import pool from "../config/db.js";
 
 class OnboardingController {
   static async submitOnboarding(req, res) {
-    const userId = req.user?.userId; // ✅ FIXED: correct way to access userId
-    console.log(userId);
-    const { username, heardFrom, interests, experienceLevel, walletAddress } = req.body;
+    const userId = req.user?.userId; 
+    const { userName, heardFrom, interests, experienceLevel, walletAddress } = req.body;
 
     try {
       const result = await pool.query(
@@ -18,7 +17,7 @@ class OnboardingController {
           updated_at = NOW()
         WHERE id = $6
         RETURNING id, user_name, email`,
-        [username, heardFrom, interests, experienceLevel, walletAddress, userId]
+        [userName, heardFrom, interests, experienceLevel, walletAddress, userId]
       );
 
       if (result.rowCount === 0) {
