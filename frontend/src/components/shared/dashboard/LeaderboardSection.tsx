@@ -22,7 +22,7 @@ const SectionHeader = ({
   <div className="flex justify-between items-center mb-4">
     <h2 className="text-xl font-bold text-white">{title}</h2>
     <div className="flex gap-2">
-      <button onClick={onPrev} className="text-gray-400">
+      <button onClick={onPrev} className="text-gray-400 cursor-pointer hover:text-[#8373EE]">
         <svg
           className="w-5 h-5"
           xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +36,7 @@ const SectionHeader = ({
           <polyline points="15 18 9 12 15 6" />
         </svg>
       </button>
-      <button onClick={onNext} className="text-gray-400">
+      <button onClick={onNext} className="text-gray-400  cursor-pointer hover:text-[#8373EE]">
         <svg
           className="w-5 h-5"
           xmlns="http://www.w3.org/2000/svg"

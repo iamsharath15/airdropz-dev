@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import React, { memo, useMemo } from 'react';
+import React from 'react';
 
 
 type PricingPlanProps = {

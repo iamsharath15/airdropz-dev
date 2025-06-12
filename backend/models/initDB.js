@@ -13,10 +13,10 @@ export async function initDB() {
     createUsersTable,
     createReferralsTable,
     createLeaderboardTable,
-    // createStreaksTables,
-    // createAirdropsTables,
-    // createWeeklyTasksTables,
-    // createUserTasksTable,
+    createStreaksTables,
+    createAirdropsTables,
+    createWeeklyTasksTables,
+    createUserTasksTable,
   ];
 
   for (const createTable of tableCreators) {
