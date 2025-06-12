@@ -55,8 +55,7 @@ const CreateAirdropPage = () => {
       day: 'numeric',
     }),
     airdrops_banner_image: '',
-    title:""
-
+    title: '',
   });
   const [contentBlocks, setContentBlocks] = useState<
     {
@@ -76,11 +75,14 @@ const CreateAirdropPage = () => {
           `http://localhost:8080/api/airdrop/v1/${airdropId}`,
           { withCredentials: true }
         );
-        const data = res.data;        
+        const data = res.data;
         setAirdropData({
-          title: data.title || "aidrop title",
-          airdrops_banner_title: data.airdrops_banner_title || 'How to Join the 3DOS Airdrop',
-          airdrops_banner_description: data.airdrops_banner_description || '3DOS Network is building a more efficient, accessible, and globally distributed system...',
+          title: data.title || 'aidrop title',
+          airdrops_banner_title:
+            data.airdrops_banner_title || 'How to Join the 3DOS Airdrop',
+          airdrops_banner_description:
+            data.airdrops_banner_description ||
+            '3DOS Network is building a more efficient, accessible, and globally distributed system...',
           airdrops_banner_subtitle: data.airdrops_banner_subtitle || 'Guides',
           airdrops_date: new Date(data.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -123,9 +125,7 @@ const CreateAirdropPage = () => {
     //   return toast.error('Title is required.');
     const payload = {
       title: airdropData.title,
-      // short_description:"",
       // category: "",
-      // banner_image_url: "",
       //type: airdropData.type,
       content_blocks: contentBlocks,
       airdrops_banner_title: airdropData.airdrops_banner_title,
@@ -255,11 +255,15 @@ const CreateAirdropPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold">{ airdropData.title}</h1>
+          <h1 className="text-xl font-semibold">{airdropData.title}</h1>
         </div>
         <div className="flex gap-3">
           {airdropId && (
-            <Button variant="destructive" className='cursor-pointer' onClick={handleDelete}>
+            <Button
+              variant="destructive"
+              className="cursor-pointer"
+              onClick={handleDelete}
+            >
               Delete
             </Button>
           )}
@@ -309,9 +313,9 @@ const CreateAirdropPage = () => {
               <div>
                 <label
                   htmlFor="airdrop-short-description"
-                  className="block text-sm text-white mb-1"
+                  className="block text-sm text-white mb-3"
                 >
-                  Short Banner Description
+                  Airdrop Description
                 </label>
                 <Textarea
                   value={airdropData.airdrops_banner_description}
@@ -329,7 +333,7 @@ const CreateAirdropPage = () => {
               <div>
                 <label
                   htmlFor="airdrop-date"
-                  className="block text-sm text-white mb-1"
+                  className="block text-sm text-white mb-3"
                 >
                   Date
                 </label>
@@ -343,24 +347,29 @@ const CreateAirdropPage = () => {
               <div>
                 <label
                   htmlFor="airdrop-category"
-                  className="block text-sm text-white mb-1"
+                  className="block text-sm text-white mb-3"
                 >
-                  Category
+                  Airdrop Sub Title
                 </label>
-                        <Input
-                value={airdropData.airdrops_banner_subtitle}
-                onChange={(e) => setAirdropData((p) => ({ ...p, airdrops_banner_subtitle: e.target.value }))}
-                placeholder="Category"
-                className="bg-zinc-800 text-white mb-4"
-              />
+                <Input
+                  value={airdropData.airdrops_banner_subtitle}
+                  onChange={(e) =>
+                    setAirdropData((p) => ({
+                      ...p,
+                      airdrops_banner_subtitle: e.target.value,
+                    }))
+                  }
+                  placeholder="Category"
+                  className="bg-zinc-800 text-white mb-3"
+                />
               </div>
 
               <div>
                 <label
                   htmlFor="banner-upload"
-                  className="block text-sm text-white mb-1"
+                  className="block text-sm text-white mb-4"
                 >
-                  Banner Image
+                  Airdrop Banner Image
                 </label>
                 <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
                   {airdropData.airdrops_banner_image ? (
@@ -376,21 +385,27 @@ const CreateAirdropPage = () => {
                       Click here to upload banner image
                     </span>
                   )}
-                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) readFile(file, (res) => setAirdropData((p) => ({ ...p, airdrops_banner_image: res })));
-                  }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file)
+                        readFile(file, (res) =>
+                          setAirdropData((p) => ({
+                            ...p,
+                            airdrops_banner_image: res,
+                          }))
+                        );
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
                 </div>
               </div>
 
               <div className="flex justify-end mt-6">
                 <Button
-                 onClick={() => setStep(2)}
+                  onClick={() => setStep(2)}
                   className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
                 >
                   Next
@@ -584,8 +599,10 @@ const CreateAirdropPage = () => {
             //     </Button>
             //   </div>
             // </div>
-             <>
-               <h2 className="text-lg font-bold mb-4">Step 2: Content & Reorder</h2>
+            <>
+              <h2 className="text-lg font-bold mb-4">
+                Step 2: Content & Reorder
+              </h2>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -593,11 +610,16 @@ const CreateAirdropPage = () => {
                   if (active.id !== over?.id) {
                     const oldIndex = parseInt(active.id);
                     const newIndex = parseInt(over!.id);
-                    setContentBlocks((blocks) => arrayMove(blocks, oldIndex, newIndex));
+                    setContentBlocks((blocks) =>
+                      arrayMove(blocks, oldIndex, newIndex)
+                    );
                   }
                 }}
               >
-                <SortableContext items={contentBlocks.map((_, i) => i.toString())} strategy={verticalListSortingStrategy}>
+                <SortableContext
+                  items={contentBlocks.map((_, i) => i.toString())}
+                  strategy={verticalListSortingStrategy}
+                >
                   {contentBlocks.map((block, index) => (
                     <SortableItem key={index} id={index.toString()}>
                       <div className="border border-zinc-700 rounded-lg p-4 mb-4 relative">
@@ -608,10 +630,7 @@ const CreateAirdropPage = () => {
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-        <div className="mt-6">
-          {renderBlock(block, index)}
-        </div>
-                        
+                        <div className="mt-6">{renderBlock(block, index)}</div>
                       </div>
                     </SortableItem>
                   ))}
@@ -627,7 +646,10 @@ const CreateAirdropPage = () => {
                 ].map((tool) => (
                   <Tooltip key={tool.type}>
                     <TooltipTrigger asChild>
-                      <Button className='bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer' onClick={() => addBlock(tool.type as any)}>
+                      <Button
+                        className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
+                        onClick={() => addBlock(tool.type as any)}
+                      >
                         {tool.icon}
                       </Button>
                     </TooltipTrigger>
@@ -636,10 +658,17 @@ const CreateAirdropPage = () => {
                 ))}
               </div>
               <div className="flex gap-2 mt-6">
-                <Button variant="outline" className='text-black cursor-pointer' onClick={() => setStep(1)}>
+                <Button
+                  variant="outline"
+                  className="text-black cursor-pointer"
+                  onClick={() => setStep(1)}
+                >
                   Back
                 </Button>
-                <Button onClick={handleSubmit} className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer">
+                <Button
+                  onClick={handleSubmit}
+                  className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
+                >
                   {airdropId ? 'Update' : 'Create'}
                 </Button>
               </div>
@@ -738,10 +767,14 @@ const CreateAirdropPage = () => {
                 );
               }
             })} */}
-             {contentBlocks.map((block, i) => {
+            {contentBlocks.map((block, i) => {
               switch (block.type) {
                 case 'description':
-                  return <p key={i} className="mb-4 text-zinc-300">{block.value}</p>;
+                  return (
+                    <p key={i} className="mb-4 text-zinc-300">
+                      {block.value}
+                    </p>
+                  );
                 case 'image':
                   return block.value ? (
                     <Image
@@ -754,12 +787,18 @@ const CreateAirdropPage = () => {
                       unoptimized
                     />
                   ) : (
-                    <div key={i} className="w-full h-48 bg-zinc-800 rounded-xl mb-4" />
+                    <div
+                      key={i}
+                      className="w-full h-48 bg-zinc-800 rounded-xl mb-4"
+                    />
                   );
                 case 'checklist':
                   const items = block.value.split('\n').filter(Boolean);
                   return (
-                    <ul key={i} className="list-disc list-inside text-zinc-300 mb-4">
+                    <ul
+                      key={i}
+                      className="list-disc list-inside text-zinc-300 mb-4"
+                    >
                       {items.map((it, idx) => (
                         <li key={idx}>{it}</li>
                       ))}
@@ -768,7 +807,11 @@ const CreateAirdropPage = () => {
                 case 'link':
                   return (
                     <p key={i} className="mb-4">
-                      <a href={block.link} target="_blank" className="text-purple-400 underline">
+                      <a
+                        href={block.link}
+                        target="_blank"
+                        className="text-purple-400 underline"
+                      >
                         {block.value}
                       </a>
                     </p>
@@ -785,4 +828,3 @@ const CreateAirdropPage = () => {
 };
 
 export default CreateAirdropPage;
-

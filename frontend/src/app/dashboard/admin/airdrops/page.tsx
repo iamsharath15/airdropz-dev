@@ -23,9 +23,7 @@
 // type Airdrop = {
 //   id: string;
 //   title: string;
-//   short_description: string | null;
 //   category: string | null;
-//   banner_image_url: string | null;
 //   type: string | null;
 //   created_by: string;
 //   created_at: string;
@@ -125,7 +123,6 @@
 //               id: airdrop.id,
 //               title: airdrop.title,
 //               category: airdrop.category ?? 'Unknown',
-//               banner_image_url: airdrop.banner_image_url ?? '',
 //               type: airdrop.type ?? 'free',
 //             }}
 //           />
@@ -171,9 +168,8 @@ type ContentBlock = {
 type Airdrop = {
   id: string;
   title: string;
-  short_description: string | null;
   category: string | null;
-  banner_image_url: string | null;
+  preview_image_url: string | null;
   type: string | null;
   created_by: string;
   created_at: string;
@@ -312,7 +308,7 @@ const AirdropsListingContent = () => {
               id: airdrop.id,
               title: airdrop.title,
               category: airdrop.category ?? 'Unknown',
-              banner_image_url: airdrop.banner_image_url ?? '',
+              preview_image_url: airdrop.preview_image_url ?? '',
               type: airdrop.type ?? 'free',
             }}
           />

@@ -1,12 +1,13 @@
 import pool from '../config/db.js';
+import { deleteObjectFromS3 } from '../utils/deleteS3Object.js';
+import { extractKeyFromUrl } from '../utils/extractKey.js';
 
 class AirdropController {
   static async createAirdrop(req, res) {
     const {
       title,
-      short_description = null,
       category = null,
-      banner_image_url = null,
+      preview_image_url = null,
       type = null,
       content_blocks = [],
       airdrops_banner_title = null,
@@ -22,16 +23,15 @@ class AirdropController {
 
       const result = await client.query(
         `INSERT INTO airdrops (
-          title, short_description, category, banner_image_url, type, created_by,
+          title, category, preview_image_url, type, created_by,
           airdrops_banner_title, airdrops_banner_description, airdrops_banner_subtitle, airdrops_banner_image
         )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
         [
           title,
-          short_description,
           category,
-          banner_image_url,
+          preview_image_url,
           type,
           userId,
           airdrops_banner_title,
@@ -70,9 +70,8 @@ class AirdropController {
     const { id } = req.params;
     const {
       title,
-      short_description = null,
       category = null,
-      banner_image_url = null,
+      preview_image_url = null,
       type = null,
       airdrops_banner_title = null,
       airdrops_banner_description = null,
@@ -82,14 +81,13 @@ class AirdropController {
     try {
       const result = await pool.query(
         `UPDATE airdrops
-         SET title=$1, short_description=$2, category=$3, banner_image_url=$4, type=$5,
-             airdrops_banner_title=$6, airdrops_banner_description=$7, airdrops_banner_subtitle=$8, airdrops_banner_image=$9
-         WHERE id=$10 RETURNING *`,
+         SET title=$1, category=$2, preview_image_url=$3, type=$4,
+             airdrops_banner_title=$5, airdrops_banner_description=$6, airdrops_banner_subtitle=$7, airdrops_banner_image=$8
+         WHERE id=$9 RETURNING *`,
         [
           title,
-          short_description,
           category,
-          banner_image_url,
+          preview_image_url,
           type,
           airdrops_banner_title,
           airdrops_banner_description,
@@ -117,6 +115,18 @@ class AirdropController {
     const { id } = req.params;
 
     try {
+      const fetchResult = await pool.query(
+      `SELECT preview_image_url FROM airdrops WHERE id = $1`,
+      [id]
+    );
+
+    if (fetchResult.rows.length === 0) {
+      return res.status(404).json({ error: "Airdrop not found" });
+    }
+
+    const imageUrl = fetchResult.rows[0].preview_image_url;
+
+
       const result = await pool.query(
         `DELETE FROM airdrops WHERE id=$1 RETURNING *`,
         [id]
@@ -125,7 +135,10 @@ class AirdropController {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Airdrop not found' });
       }
-
+       if (imageUrl) {
+      const key = extractKeyFromUrl(imageUrl);
+      await deleteObjectFromS3(key);
+    }
       res.json({ message: 'Airdrop deleted successfully' });
     } catch (error) {
       console.error('Delete Airdrop Error:', error);

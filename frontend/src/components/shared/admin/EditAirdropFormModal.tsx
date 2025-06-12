@@ -30,7 +30,7 @@ type EditAirdropFormModalProps = {
     id: string;
     title: string;
     category: string;
-    banner_image_url: string;
+    preview_image_url: string;
     type: 'Free' | 'Paid';
   };
 };
@@ -65,11 +65,11 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
     setIsSubmitting(true);
 
     try {
-      let publicUrl = airdrop.banner_image_url;
+      let publicUrl = airdrop.preview_image_url;
 
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop();
-        const s3Path = `airdrops/${airdrop.id}/banner.${fileExt}`;
+        const s3Path = `airdrops/${airdrop.id}/previewr.${fileExt}`;
 
         const presignRes = await axios.get(
           'http://localhost:8080/api/upload/v1/generate-upload-url',
@@ -96,7 +96,7 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
           title: name,
           category: finalCategory,
           type: type,
-          banner_image_url: publicUrl,
+          preview_image_url: publicUrl,
         },
         { withCredentials: true }
       );
@@ -120,7 +120,7 @@ toast.error('Something went wrong.');
         </button>
       </DialogTrigger>
 
-      <DialogContent className="md:w-[900px] bg-black border-0 text-white w-11/12 max-h-[90vh] rounded-xl">
+      <DialogContent className="md:w-[950px] bg-[#151313] border-0 text-white w-11/12 max-h-[90vh] rounded-xl">
         <DialogHeader>
           <DialogTitle>Edit Airdrop</DialogTitle>
         </DialogHeader>
@@ -128,7 +128,7 @@ toast.error('Something went wrong.');
         <div className="flex flex-col md:flex-row gap-6 mt-4">
           {/* Preview */}
           <div className="md:w-6/12 w-full flex justify-center">
-            <div className="bg-[#151313] text-white rounded-lg p-4 w-full max-w-[320px]">
+            <div className="bg-black text-white rounded-lg p-4 w-full max-w-[320px]">
               {imageFile ? (
                 <Image
                   src={URL.createObjectURL(imageFile)}
@@ -139,7 +139,7 @@ toast.error('Something went wrong.');
                 />
               ) : (
                 <Image
-                  src={airdrop.banner_image_url}
+                  src={airdrop.preview_image_url}
                   alt="Preview"
                   width={1920}
                   height={1080}
@@ -163,7 +163,7 @@ toast.error('Something went wrong.');
           {/* Form */}
           <div className="md:w-6/12 w-full space-y-4">
             <div className="space-y-2">
-              <Label>Upload Image</Label>
+              <Label className=''>Upload Image</Label>
               <Input   className="text-white file:text-white  file:cursor-pointer"
 
                 type="file"
@@ -173,7 +173,7 @@ toast.error('Something went wrong.');
               />
             </div>
             <div className="space-y-2">
-              <Label>Airdrop Name</Label>
+              <Label className='text-white'>Airdrop Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
@@ -207,7 +207,7 @@ toast.error('Something went wrong.');
               )}
             </div>
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label className='text-white'>Type</Label>
               <Select
                 value={type}
                 onValueChange={(val) => setType(val as 'Free' | 'Paid')}

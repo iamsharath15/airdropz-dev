@@ -7,9 +7,8 @@ export async function createAirdropsTables() {
     CREATE TABLE IF NOT EXISTS airdrops (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       title TEXT NOT NULL,
-      short_description TEXT,
       category TEXT,
-      banner_image_url TEXT,
+      preview_image_url TEXT,
       type TEXT,
       created_by UUID REFERENCES users(id),
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

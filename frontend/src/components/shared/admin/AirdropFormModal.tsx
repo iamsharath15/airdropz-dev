@@ -84,7 +84,7 @@ const AirdropFormModal = () => {
 //   }
 
 //   try {
-//     // Step 1: Create airdrop WITHOUT banner_image_url to get the ID
+//     // Step 1: Create airdrop WITHOUT previewr_image_url to get the ID
 //     const payload = {
 //       title: name,
 //       category: finalCategory,
@@ -126,12 +126,12 @@ const AirdropFormModal = () => {
 //     // Step 4: Update the airdrop with the image URL
 //     await axios.put(
 //       `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-//       { banner_image_url: publicUrl },
+//       { previewr_image_url: publicUrl },
 //       { withCredentials: true }
 //     );
 
 //     // Step 5: Dispatch and redirect
-//     dispatch(setCreatedAirdrop({ ...newAirdrop, banner_image_url: publicUrl }));
+//     dispatch(setCreatedAirdrop({ ...newAirdrop, previewr_image_url: publicUrl }));
 //     router.push(`/dashboard/admin/airdrops/create/${airdropId}`);
 //   } catch (err) {
 //     console.error('Airdrop creation or image upload failed:', err);
@@ -193,7 +193,7 @@ const AirdropFormModal = () => {
     title: name,
     category: finalCategory,
     type: type,
-    banner_image_url: publicUrl,
+    preview_image_url: publicUrl,
   },
   { withCredentials: true }
 );
@@ -202,7 +202,7 @@ const AirdropFormModal = () => {
       // Step 5: Dispatch and redirect
       const updatedAirdrop = {
         ...newAirdrop,
-        banner_image_url: publicUrl,
+        preview_image_url: publicUrl,
       };
 
       dispatch(setCreatedAirdrop(updatedAirdrop));
@@ -228,10 +228,10 @@ const AirdropFormModal = () => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:w-[900px] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center">
+      <DialogContent className="md:w-[950px] bg-[#151313] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center">
         <div className="overflow-y-auto max-h-[80vh] pr-1 scrollable-modal w-full touch-pan-y">
           <DialogHeader>
-            <DialogTitle>Create New Airdrop</DialogTitle>
+            <DialogTitle className='text-white'>Create New Airdrop</DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-col md:flex-row gap-6 mt-4">
@@ -271,19 +271,19 @@ const AirdropFormModal = () => {
             <div className="md:w-6/12 w-full space-y-4">
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label>Upload Image</Label>
+                <Label className='text-white'>Upload Image</Label>
                 <Input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-white file:text-white"
                 />
               </div>
 
               {/* Name */}
               <div className="space-y-2">
-                <Label>Airdrop Name</Label>
-                <Input
+                <Label className='text-white'>Airdrop Name</Label>
+                <Input className='text-white placeholder:text-white'
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter name"
@@ -292,9 +292,9 @@ const AirdropFormModal = () => {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label>Category</Label>
+                <Label className='text-white'>Category</Label>
                 {!isAddingCategory ? (
-                  <Select
+                  <Select 
                     onValueChange={(val) =>
                       val === 'add_new'
                         ? setIsAddingCategory(true)
@@ -306,17 +306,17 @@ const AirdropFormModal = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {defaultCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
+                        <SelectItem key={cat} value={cat} >
                           {cat}
                         </SelectItem>
                       ))}
-                      <SelectItem value="add_new">
+                      <SelectItem value="add_new" >
                         ➕ Add new category
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  <Input
+                  <Input className='text-white placeholder:text-white'
                     value={customCategory}
                     onChange={(e) => setCustomCategory(e.target.value)}
                     placeholder="Enter new category"
