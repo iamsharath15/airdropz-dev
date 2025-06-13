@@ -44,7 +44,16 @@ const adminNavItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/admin' },
   { label: 'Users', icon: Users, href: '/dashboard/admin/users' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/admin/airdrops' },
-  { label: 'Weekly Task', icon: ClipboardCheck, href: '/dashboard/admin/weeklytask' },
+  {
+    label: 'Expert Recommendation',
+    icon: Star,
+    href: '/dashboard/admin/expertrecommendation',
+  },
+  {
+    label: 'Weekly Task',
+    icon: ClipboardCheck,
+    href: '/dashboard/admin/weeklytask',
+  },
   { label: 'Settings', icon: Settings, href: '/dashboard/admin/settings' },
 ];
 
@@ -140,16 +149,28 @@ export function Sidebar({
 
         {/* Telegram CTA */}
         {(!isCollapsed || sidebarOpen) && (
-          <div className="mt-6 bg-[#1a1a2e] p-4 rounded-xl text-center">
-            <div className="flex justify-center mb-2">
-              <Bitcoin className="text-orange-400" />
+          <div className="relative bg-[#141522] rounded-2xl px-4 py-6 text-center  shadow-lg">
+            {/* Decorative Circles */}
+            <div className="overflow-hidden absolute h-full w-full top-0 left-0 rounded-2xl">
+              <div className="absolute -top-12 -left-15 w-30 h-30 bg-[#ffffff61] rounded-full opacity-30  pointer-events-none" />
+              <div className="absolute -bottom-16 -right-15 w-35 h-35 bg-[#ffffff61] z-10 rounded-full opacity-30 pointer-events-none" />
             </div>
-            <p className="text-xs text-gray-400 mb-2">
-              Join our Telegram community for airdrop updates
-            </p>
-            <Button className="w-full text-black bg-white text-xs font-medium">
-              Join Telegram
-            </Button>
+            {/* Floating Bitcoin Icon */}
+            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FF9900] w-12 h-12 rounded-full flex items-center justify-center shadow-md z-10">
+              <Bitcoin className="text-white w-8 h-8" />
+            </div>
+
+            <div className="flex flex-col items-center justify-center z-50 relative">
+              <h3 className="mt-8 text-white text-base font-semibold">
+                Join channel
+              </h3>
+              <p className="text-sm text-gray-400 mt-1 mb-4">
+                Join our Telegram community for airdrop updates
+              </p>
+              <Button className="bg-white text-black w-full text-sm font-semibold rounded-md">
+                Join Telegram
+              </Button>
+            </div>
           </div>
         )}
       </aside>

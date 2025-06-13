@@ -14,6 +14,7 @@ import userTaskRoutes from "./routes/userTasks.routes.js";
 import userSettingsRoutes from './routes/userSettings.routes.js';
 import streakRoutes from './routes/streak.routes.js';
 import uploadRoutes from './routes/upload.route.js';
+import expertStoriesRoutes from './routes/expertStories.routes.js';
 
 dotenv.config();
 
@@ -37,6 +38,8 @@ app.use('/api/user-task/v1', userTaskRoutes);
 app.use('/api/settings/v1', userSettingsRoutes);
 app.use('/api/streak/v1', streakRoutes);
 app.use('/api/upload/v1', uploadRoutes);
+app.use('/api/expertStories/v1', expertStoriesRoutes);
+
 
 
 // Test DB connection

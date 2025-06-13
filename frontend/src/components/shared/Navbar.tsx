@@ -33,7 +33,9 @@ const pageTitles: Record<string, Record<string, string>> = {
   },
   admin: {
     '/dashboard/admin': 'Admin Dashboard',
+    '/dashboard/admin/users': 'Manage User Details',
     '/dashboard/admin/airdrops': 'Manage Airdrops',
+      '/dashboard/admin/airdrops/create/*': 'Create Airdrop',
     '/dashboard/admin/weeklytask': 'Manage Weekly Tasks',
     '/dashboard/admin/expertrecommendation': 'Expert Insights',
     '/dashboard/admin/referandearn': 'Referral Analytics',

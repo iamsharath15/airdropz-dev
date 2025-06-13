@@ -5,6 +5,7 @@ import { createWeeklyTasksTables } from './weeklyTasks.model.js';
 import { createReferralsTable } from './referrals.model.js';
 import { createUsersTable } from './user.model.js';
 import { createUserTasksTable } from './userTasks.model.js';
+import { createExpertStories } from './expertStories.model.js';
 
 export async function initDB() {
   console.log('Initializing databse tables...');
@@ -17,6 +18,7 @@ export async function initDB() {
     createAirdropsTables,
     createWeeklyTasksTables,
     createUserTasksTable,
+    createExpertStories
   ];
 
   for (const createTable of tableCreators) {
