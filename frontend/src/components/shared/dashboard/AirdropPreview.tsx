@@ -30,7 +30,7 @@ export default function AirdropPreview({ airdropData, contentBlocks }: Props) {
 
   return (
     <section className="w-full flex flex-col items-center py-[5%] justify-start bg-black overflow-y-auto px-6">
-      <div className="w-full max-w-2xl">
+      <div className="w-full">
         <div className="flex items-center justify-center space-x-2">
           <h2 className="bg-zinc-800 px-2 py-1 rounded-full">
             {airdropData.airdrops_banner_subtitle}
