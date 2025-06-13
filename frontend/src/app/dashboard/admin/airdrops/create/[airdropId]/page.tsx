@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 import AirdropFormEditor from '@/components/shared/dashboard/AirdropFormEditor';
+import { Save, Trash2 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/airdrop/v1';
 
@@ -49,7 +50,13 @@ const CreateAirdropPage = () => {
 
   const [contentBlocks, setContentBlocks] = useState<
     {
-      type: 'description' | 'image' | 'checklist' | 'link';
+      type:
+        | 'description'
+        | 'image'
+        | 'checklist'
+        | 'link'
+        | 'highlight'
+        | 'header1';
       value: string;
       link?: string;
       file?: File;
@@ -114,7 +121,15 @@ const CreateAirdropPage = () => {
   }, []);
 
   const addBlock = useCallback(
-    (type: 'description' | 'image' | 'checklist' | 'link') => {
+    (
+      type:
+        | 'description'
+        | 'image'
+        | 'checklist'
+        | 'link'
+        | 'highlight'
+        | 'header1'
+    ) => {
       setContentBlocks((blocks) => [
         ...blocks,
         { type, value: '', ...(type === 'link' && { link: '' }) },
@@ -260,6 +275,28 @@ const CreateAirdropPage = () => {
             />
           </div>
         );
+      case 'highlight':
+        return (
+          <div className="space-y-2">
+            <Input
+              value={block.value}
+              onChange={(e) => updateBlock(idx, 'value', e.target.value)}
+              placeholder="highlight"
+              className={commonInputClass}
+            />
+          </div>
+        );
+      case 'header1':
+        return (
+          <div className="space-y-2">
+            <Input
+              value={block.value}
+              onChange={(e) => updateBlock(idx, 'value', e.target.value)}
+              placeholder="header1"
+              className={commonInputClass}
+            />
+          </div>
+        );
       default:
         return null;
     }
@@ -268,25 +305,37 @@ const CreateAirdropPage = () => {
   return (
     <div className="flex flex-col max:h-screen bg-black text-white">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
-        <h1 className="text-xl font-semibold">{airdropData.title}</h1>
-        <div className="flex gap-3">
+      <div className="flex flex-row items-center justify-between border-b border-zinc-800 px-5 sm:px-6 sm:py-4 py-2 bg-zinc-900 shadow-sm rounded-2xl gap-3 sm:gap-0">
+        <h1 className="text-lg sm:text-xl font-semibold truncate">
+          {airdropData.title}
+        </h1>
+
+        <div className="flex items-center gap-2 sm:gap-3">
           {airdropId && (
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              className="text-sm sm:text-base px-3"
+            >
+              <Trash2 className="w-4 h-4 sm:hidden" />
+              <span className="hidden sm:inline">Delete</span>
             </Button>
           )}
+
           <Button
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white"
             onClick={handleSubmit}
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white text-sm sm:text-base px-3"
           >
-            {airdropId ? 'Update' : 'Create'}
+            <Save className="w-4 h-4 sm:hidden" />
+            <span className="hidden sm:inline">
+              {airdropId ? 'Update' : 'Create'}
+            </span>
           </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex md:flex-row flex-col-reverse overflow-hidden">
         <AirdropFormEditor
           airdropData={airdropData}
           setAirdropData={setAirdropData}

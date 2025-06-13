@@ -178,25 +178,25 @@ class WeeklyTaskController {
 
 
   // 5. DELETE a Weekly Task and cascade delete tasks/sub-tasks
-  // static async delete(req, res) {
-  //   const { id } = req.params;
+  static async delete(req, res) {
+    const { id } = req.params;
 
-  //   try {
-  //     const result = await pool.query(
-  //       `DELETE FROM weekly_tasks WHERE id = $1 RETURNING *;`,
-  //       [id]
-  //     );
+    try {
+      const result = await pool.query(
+        `DELETE FROM weekly_tasks WHERE id = $1 RETURNING *;`,
+        [id]
+      );
 
-  //     if (!result.rows.length) {
-  //       return res.status(404).json({ success: false, message: "Weekly task not found" });
-  //     }
+      if (!result.rows.length) {
+        return res.status(404).json({ success: false, message: "Weekly task not found" });
+      }
 
-  //     res.status(200).json({ success: true, message: "Weekly task deleted" });
-  //   } catch (error) {
-  //     console.error("delete error:", error);
-  //     res.status(500).json({ success: false, message: "Failed to delete weekly task" });
-  //   }
-  // }
+      res.status(200).json({ success: true, message: "Weekly task deleted" });
+    } catch (error) {
+      console.error("delete error:", error);
+      res.status(500).json({ success: false, message: "Failed to delete weekly task" });
+    }
+  }
 }
 
 export default WeeklyTaskController;

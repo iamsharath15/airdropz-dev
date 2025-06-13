@@ -49,17 +49,21 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
         <div className="xl:w-2/3 w-full space-y-6 bg-[#151313]">
           {/* Banner */}
           <div className="relative rounded-xl overflow-hidden">
-{task.task_banner_image ? (
-  <Image
-    src={typeof task.task_banner_image === 'string' ? task.task_banner_image : URL.createObjectURL(task.task_banner_image)}
-    alt="Task Banner"
-    className="w-full h-64 lg:h-80 object-cover rounded-lg"
-    width={1920}
-    height={1080}
-  />
-) : (
-  <div className="w-full h-64 lg:h-80 bg-gray-400 rounded-lg relative" />
-)}
+            {task.task_banner_image ? (
+              <Image
+                src={
+                  typeof task.task_banner_image === 'string'
+                    ? task.task_banner_image
+                    : URL.createObjectURL(task.task_banner_image)
+                }
+                alt="Task Banner"
+                className="w-full h-64 lg:h-80 object-cover rounded-lg"
+                width={1920}
+                height={1080}
+              />
+            ) : (
+              <div className="w-full h-64 lg:h-80 bg-gray-400 rounded-lg relative" />
+            )}
           </div>
 
           {/* Task Info Section */}

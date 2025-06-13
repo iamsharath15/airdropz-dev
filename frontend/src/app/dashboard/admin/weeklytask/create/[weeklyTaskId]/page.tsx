@@ -9,20 +9,18 @@ import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 
-
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
   const taskId = params?.weeklyTaskId as string;
 
-
-const [taskData, setTaskData] = useState({
+  const [taskData, setTaskData] = useState({
     task_title: '',
     task_category: '',
     start_time: '',
     end_time: '',
-  task_description: '',
-  task_banner_image: "",
-    week:""
+    task_description: '',
+    task_banner_image: '',
+    week: '',
     // add other fields as needed (checklists, content blocks, etc.)
   });
 
@@ -32,7 +30,9 @@ const [taskData, setTaskData] = useState({
   useEffect(() => {
     async function fetchWeeklyTask() {
       try {
-        const response = await axios.get(`http://localhost:8080/api/weeklytask/v1/${taskId}`);
+        const response = await axios.get(
+          `http://localhost:8080/api/weeklytask/v1/${taskId}`
+        );
         if (response.data.success) {
           setTaskData(response.data.data);
         } else {
@@ -45,70 +45,85 @@ const [taskData, setTaskData] = useState({
       }
     }
 
-        if (taskId) fetchWeeklyTask();
+    if (taskId) fetchWeeklyTask();
   }, [taskId]);
 
- 
   const handleTaskUpdate = (updates: any) => {
     setTaskData((prev: any) => ({ ...prev, ...updates }));
   };
 
+  const handleSaveChanges = async () => {
+    try {
+      setSaving(true);
 
-const handleSaveChanges = async () => {
-  try {
-    setSaving(true);
+      const payload: any = {
+        task_title: taskData.task_title,
+        task_category: taskData.task_category,
+        start_time: taskData.start_time,
+        end_time: taskData.end_time,
+        task_description: taskData.task_description,
+        week: taskData.week,
+      };
 
-    const payload: any = {
-      task_title: taskData.task_title,
-      task_category: taskData.task_category,
-      start_time: taskData.start_time,
-      end_time: taskData.end_time,
-      task_description: taskData.task_description,
-      week:taskData.week
-    };
+      // ✅ Handle and upload image if it's a File
+      let bannerImage = taskData.task_banner_image;
+      if (bannerImage instanceof File) {
+        bannerImage = await uploadImageToS3(
+          bannerImage,
+          `task/${taskId}/taskBannerImage`
+        );
+      }
 
-    // ✅ Handle and upload image if it's a File
-    let bannerImage = taskData.task_banner_image;
-    if (bannerImage instanceof File) {
-      bannerImage = await uploadImageToS3(
-        bannerImage,
-        `task/${taskId}/taskBannerImage`
+      payload.task_banner_image = bannerImage; // ✅ Now it's a string URL
+
+      console.log('Sending payload:', payload);
+      // Optional: Include other fields if available
+      // if (taskData.content_blocks) {
+      //   payload.content_blocks = taskData.content_blocks;
+      // }
+
+      // if (taskData.checklists) {
+      //   payload.checklists = taskData.checklists;
+      // }
+
+      // ✅ Send PUT request
+      const response = await axios.put(
+        `http://localhost:8080/api/weeklytask/v1/${taskId}`,
+        payload
       );
+
+      if (response.data.success) {
+        toast.success('✅ Weekly Task updated successfully!');
+      } else {
+        toast.error('❌ Failed to update Weekly Task');
+      }
+    } catch (error) {
+      console.error('PUT error:', error);
+      toast.error('❌ Error while saving changes');
+    } finally {
+      setSaving(false);
     }
+  };
+const handleDelete = async () => {
+  if (!taskId) return;
 
-    payload.task_banner_image = bannerImage; // ✅ Now it's a string URL
+  const confirmDelete = window.confirm('Are you sure you want to delete this Weekly Task?');
+  if (!confirmDelete) return;
 
-    console.log('Sending payload:', payload);
- // Optional: Include other fields if available
-    // if (taskData.content_blocks) {
-    //   payload.content_blocks = taskData.content_blocks;
-    // }
-
-    // if (taskData.checklists) {
-    //   payload.checklists = taskData.checklists;
-    // }
-
-    // ✅ Send PUT request
-    const response = await axios.put(
-      `http://localhost:8080/api/weeklytask/v1/${taskId}`,
-      payload
-    );
-
-    if (response.data.success) {
-      toast.success('✅ Weekly Task updated successfully!');
+  try {
+    const res = await axios.delete(`http://localhost:8080/api/weeklytask/v1/${taskId}`);
+    if (res.data.success) {
+      toast.success('🗑️ Weekly Task deleted successfully!');
+      // ✅ Redirect to weekly task list page
+      window.location.href = 'http://localhost:3000/dashboard/admin/weeklytask';
     } else {
-      toast.error('❌ Failed to update Weekly Task');
+      toast.error('❌ Failed to delete Weekly Task');
     }
   } catch (error) {
-    console.error('PUT error:', error);
-    toast.error('❌ Error while saving changes');
-  } finally {
-    setSaving(false);
+    console.error('DELETE error:', error);
+    toast.error('❌ Error deleting Weekly Task');
   }
 };
-
-
-
 
 
   return (
@@ -117,15 +132,16 @@ const handleSaveChanges = async () => {
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <h1 className="text-xl font-semibold">Edit Weekly Task</h1>
         <div className="flex gap-3">
-          <Button variant="destructive">Delete</Button>
-                   <Button
+<Button variant="destructive" onClick={handleDelete} disabled={saving}>
+  Delete
+</Button>
+          <Button
             onClick={handleSaveChanges}
             disabled={saving}
             className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
-
         </div>
       </div>
 
@@ -142,5 +158,5 @@ const handleSaveChanges = async () => {
       </div>
     </div>
   );
-}
+};
 export default CreateWeeklyTaskPage;

@@ -1,7 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { Trash2, FileText, ImageIcon, CheckSquare, Link2 } from 'lucide-react';
+import {
+  Trash2,
+  FileText,
+  ImageIcon,
+  CheckSquare,
+  Link2,
+  Highlighter,
+  Heading1,
+} from 'lucide-react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -12,12 +20,22 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import SortableItem from '../SortableItem';
 import StepProgress from '../StepProgress';
 
 type ContentBlock = {
-  type: 'description' | 'image' | 'checklist' | 'link';
+  type:
+    | 'description'
+    | 'image'
+    | 'checklist'
+    | 'link'
+    | 'highlight'
+    | 'header1';
   value: string;
   link?: string;
 };
@@ -51,18 +69,24 @@ export default function AirdropFormEditor({
   sensors,
   airdropId,
 }: Props) {
+  const totalSteps = 2;
+
+  const progressPercent = (step / totalSteps) * 100;
+
   return (
-    <div className="w-full md:w-1/2 p-6 overflow-auto border-r border-zinc-800 bg-black">
+    <div className="w-full md:w-1/2 md:p-6 px-1 py-6 overflow-auto md:border-t-0  md:border-r border-t border-zinc-800 bg-black">
       <div className="mb-6">
-        <StepProgress progress={step} />
+        <StepProgress progress={progressPercent} />
       </div>
 
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold mb-4">Step 1: Airdrop Details</h2>
+          <h2 className="md:text-lg tetx-sm font-bold mb-4">Step 1: Airdrop Details</h2>
 
           <div>
-            <label className="block text-sm text-white mb-1">Airdrop Title</label>
+            <label className="block text-sm text-white font-semibold mb-3">
+              Airdrop Title
+            </label>
             <Input
               value={airdropData.airdrops_banner_title}
               onChange={(e) =>
@@ -72,12 +96,14 @@ export default function AirdropFormEditor({
                 }))
               }
               placeholder="Title"
-              className="bg-zinc-800 text-white mb-4"
+              className="bg-zinc-800 text-white mb-4 border-white/60 hover:border-[#8373EE] active:border-[#8373EE] focus-visible:border-[#8373EE]"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-3">Airdrop Description</label>
+            <label className="block text-sm text-white mb-3 font-semibold">
+              Airdrop Description
+            </label>
             <Textarea
               value={airdropData.airdrops_banner_description}
               onChange={(e) =>
@@ -87,21 +113,23 @@ export default function AirdropFormEditor({
                 }))
               }
               placeholder="Short description"
-              className="bg-zinc-900 border-zinc-700 text-white mb-4"
+              className="bg-zinc-900  text-white mb-4 border-white hover:border-[#8373EE] active:border-[#8373EE] focus-visible:border-[#8373EE]"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-3">Date</label>
+            <label className="block text-sm text-white mb-3 font-semibold">Date</label>
             <Input
               value={airdropData.airdrops_date}
-              readOnly
-              className="bg-zinc-800 text-white mb-4"
+              disabled
+              className="bg-zinc-800 text-white opacity-60 cursor-not-allowed mb-4 border-[#8373EE] hover:border-[#8373EE] active:border-[#8373EE] focus-visible:border-[#8373EE]"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-3">Airdrop Sub Title</label>
+            <label className="block text-sm text-white mb-3 font-semibold">
+              Airdrop Sub Title
+            </label>
             <Input
               value={airdropData.airdrops_banner_subtitle}
               onChange={(e) =>
@@ -111,13 +139,15 @@ export default function AirdropFormEditor({
                 }))
               }
               placeholder="Category"
-              className="bg-zinc-800 text-white mb-3"
+              className="bg-zinc-800 text-white mb-3 border-white hover:border-[#8373EE] active:border-[#8373EE] focus-visible:border-[#8373EE]"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-4">Airdrop Banner Image</label>
-            <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
+            <label className="block text-sm text-white mb-4 font-semibold">
+              Airdrop Banner Image
+            </label>
+            <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-[#8373EE] transition">
               {airdropData.airdrops_banner_image ? (
                 <Image
                   src={
@@ -155,7 +185,7 @@ export default function AirdropFormEditor({
           <div className="flex justify-end mt-6">
             <Button
               onClick={() => setStep(2)}
-              className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
+              className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer font-semibold"
             >
               Next
             </Button>
@@ -165,7 +195,7 @@ export default function AirdropFormEditor({
 
       {step === 2 && (
         <>
-          <h2 className="text-lg font-bold mb-4">Step 2: Content & Reorder</h2>
+          <h2 className="md:text-lg text-sm font-bold mb-4">Step 2: Content & Reorder</h2>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -173,7 +203,9 @@ export default function AirdropFormEditor({
               if (active.id !== over?.id) {
                 const oldIndex = parseInt(active.id);
                 const newIndex = parseInt(over!.id);
-                setContentBlocks((blocks) => arrayMove(blocks, oldIndex, newIndex));
+                setContentBlocks((blocks) =>
+                  arrayMove(blocks, oldIndex, newIndex)
+                );
               }
             }}
           >
@@ -198,12 +230,14 @@ export default function AirdropFormEditor({
             </SortableContext>
           </DndContext>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {[
               { icon: <FileText />, type: 'description' },
               { icon: <ImageIcon />, type: 'image' },
               { icon: <CheckSquare />, type: 'checklist' },
               { icon: <Link2 />, type: 'link' },
+              { icon: <Highlighter />, type: 'highlight' },
+              { icon: <Heading1 />, type: 'header1' },
             ].map((tool) => (
               <Tooltip key={tool.type}>
                 <TooltipTrigger asChild>
@@ -220,12 +254,16 @@ export default function AirdropFormEditor({
           </div>
 
           <div className="flex gap-2 mt-6">
-            <Button variant="outline" className="text-black" onClick={() => setStep(1)}>
+            <Button
+              variant="outline"
+              className="text-black font-semibold cursor-pointer"
+              onClick={() => setStep(1)}
+            >
               Back
             </Button>
             <Button
               onClick={handleSubmit}
-              className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
+              className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer font-semibold"
             >
               {airdropId ? 'Update' : 'Create'}
             </Button>
