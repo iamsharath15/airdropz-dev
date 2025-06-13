@@ -1,9 +1,16 @@
 'use client';
 
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, ChevronDown } from "lucide-react";
-import { useId } from "react";
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, Filter, ChevronDown } from 'lucide-react';
+import { useId } from 'react';
+import WeeklyTaskFormModal from './WeeklyTaskFormModal';
 
 interface TaskHeaderProps {
   searchQuery: string;
@@ -22,46 +29,48 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
   sortBy,
   setSortBy,
 }) => {
-  const categories = ["All", "DeFi", "GameFi", "Social", "Infrastructure"];
-  const sortOptions = ["Week", "Progress", "Title"];
+  const categories = ['All', 'DeFi', 'GameFi', 'Social', 'Infrastructure'];
+  const sortOptions = ['Week', 'Progress', 'Title'];
 
   const inputId = useId();
 
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
       <div className="relative w-full md:max-w-md">
-        <Search className="absolute text-white left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
+          size={18}
+        />{' '}
         <Input
           id={inputId}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search Task"
-          className="pl-10 placeholder:text-white"
+          className="pl-10 bg-black border-white text-white py-6 rounded-lg placeholder:text-white"
         />
       </div>
 
       <div className="flex gap-4 w-full md:w-auto">
+<WeeklyTaskFormModal />
+
         <Select
           value={selectedCategory}
           onValueChange={(value) => setSelectedCategory(value)}
         >
           <SelectTrigger className="w-full md:w-[160px] text-white">
             <Filter className="mr-2 h-4 w-4 text-white" />
-            <SelectValue placeholder="Category"  className=""/>
+            <SelectValue placeholder="Category" className="" />
           </SelectTrigger>
           <SelectContent>
             {categories.map((category) => (
               <SelectItem key={category} value={category} className="">
-                {category === "All" ? "Category" : category}
+                {category === 'All' ? 'Category' : category}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Select
-          value={sortBy}
-          onValueChange={(value) => setSortBy(value)}
-        >
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
           <SelectTrigger className="w-full md:w-[160px] text-white">
             <ChevronDown className="mr-2 h-4 w-4 text-white" />
             <SelectValue placeholder="Sort By" />

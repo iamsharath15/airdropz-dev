@@ -48,7 +48,6 @@ export default function WeeklyTaskPage() {
   const handleBackToTasks = () => {
     setSelectedTask(null);
   };
-  const myTasks = sortTasks(filterTasks(mockTasks.myTasks));
   const weeklyTasks = sortTasks(filterTasks(mockTasks.weeklyTasks));
 
   return (
@@ -57,9 +56,6 @@ export default function WeeklyTaskPage() {
         <div className="max-w-7xl mx-auto">
           {!selectedTask ? (
             <>
-              <h1 className="text-3xl font-semibold mb-8 text-white">
-                Weekly Tasks
-              </h1>
 
               <TaskHeader
                 searchQuery={searchQuery}
@@ -70,7 +66,6 @@ export default function WeeklyTaskPage() {
                 setSortBy={setSortBy}
               />
 
-              <TaskSection title="My Tasks" tasks={myTasks} onTaskClick={handleTaskClick} />
               <TaskSection title="Weekly Tasks" tasks={weeklyTasks}  onTaskClick={handleTaskClick}/>
             </>
           ) : (

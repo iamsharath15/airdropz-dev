@@ -44,7 +44,7 @@ const adminNavItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/admin' },
   { label: 'Users', icon: Users, href: '/dashboard/admin/users' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/admin/airdrops' },
-  { label: 'Weekly Stats', icon: ClipboardCheck, href: '/dashboard/admin/weekly' },
+  { label: 'Weekly Task', icon: ClipboardCheck, href: '/dashboard/admin/weeklytask' },
   { label: 'Settings', icon: Settings, href: '/dashboard/admin/settings' },
 ];
 
