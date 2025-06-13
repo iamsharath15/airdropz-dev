@@ -146,7 +146,7 @@ const TargetAudience = () => {
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {audiences.map((audience, index) => (
+          {audiences.map((audience) => (
             <motion.div
               key={audience.title}
               variants={itemVariants}

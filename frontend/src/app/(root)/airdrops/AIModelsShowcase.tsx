@@ -149,7 +149,7 @@ const AIModelsShowcase = () => {
                       { color: 'bg-creative-blue', label: 'Style', value: null },
                       { color: 'bg-creative-pink', label: 'Composition', value: null },
                       { color: 'bg-creative-orange', label: 'Effects', value: null }
-                    ].map((item, index) => (
+                    ].map((item) => (
                       <motion.div
                         key={item.label}
                         className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -212,7 +212,7 @@ const AIModelsShowcase = () => {
           variants={containerVariants}
           className="flex flex-wrap justify-center gap-3 mt-12"
         >
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <motion.button
               key={category}
               variants={itemVariants}

@@ -105,7 +105,7 @@ const CreativeSuite = () => {
           viewport={{ once: true, margin: "-100px" }}
           variants={containerVariants}
         >
-          {suiteFeatures.map((feature, index) => (
+          {suiteFeatures.map((feature) => (
             <motion.div
               key={feature.title}
               variants={itemVariants}

@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface StoryItem {
   id: number;
@@ -102,7 +103,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
           >
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 mb-2 group-hover:scale-105 transition-transform relative">
               <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center overflow-hidden">
-                <img src={story.cover_image} alt={story.cover_name} />
+                <Image src={story.cover_image} alt={story.cover_name} />
               </div>
               {story.stories.length > 1 && (
                 <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
@@ -145,7 +146,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
                     <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
-                      <img src={selectedStory.cover_image} alt="cover" />
+                      <Image src={selectedStory.cover_image} alt="cover" />
                     </div>
                   </div>
                   <div>
@@ -176,7 +177,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
 
               {/* Story Image + Link */}
               <div className="w-full flex flex-col items-center relative">
-                <img src={currentStory.image} alt="story" />
+                <Image src={currentStory.image} alt="story" />
                 <Button className="w-6/12 bg-purple-600 hover:bg-purple-700 text-white mt-6 absolute bottom-3">
                   {currentStory.link}
                 </Button>

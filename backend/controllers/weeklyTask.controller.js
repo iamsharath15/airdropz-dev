@@ -1,18 +1,34 @@
-import pool from "../config/db.js";
+import pool from '../config/db.js';
 
 class WeeklyTaskController {
   // 1. CREATE a Weekly Task with nested Tasks and Sub-Tasks
   static async create(req, res) {
     const client = await pool.connect();
-    const { task_title, task_category, week, start_time, end_time} = req.body;
+    const {
+      task_title,
+      task_category,
+      week,
+      start_time,
+      end_time,
+      task_banner_image,
+      task_description,
+    } = req.body;
 
     try {
-      await client.query("BEGIN");
+      await client.query('BEGIN');
 
       const weeklyTaskRes = await client.query(
-        `INSERT INTO weekly_tasks ( task_title, task_category, week, start_time, end_time)
-         VALUES ($1, $2, $3, $4, $5) RETURNING id;`,
-        [ task_title, task_category, week, start_time, end_time]
+        `INSERT INTO weekly_tasks (task_title, task_category, week, start_time, end_time, task_banner_image, task_description)
+   VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;`,
+        [
+          task_title,
+          task_category,
+          week,
+          start_time,
+          end_time,
+          task_banner_image || null,
+          task_description || null,
+        ]
       );
 
       const weeklyTaskId = weeklyTaskRes.rows[0].id;
@@ -33,12 +49,14 @@ class WeeklyTaskController {
       //   }
       // }
 
-      await client.query("COMMIT");
+      await client.query('COMMIT');
       res.status(201).json({ success: true, id: weeklyTaskId });
     } catch (error) {
-      await client.query("ROLLBACK");
-      console.error("create error:", error);
-      res.status(500).json({ success: false, message: "Failed to create weekly task" });
+      await client.query('ROLLBACK');
+      console.error('create error:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to create weekly task' });
     } finally {
       client.release();
     }
@@ -68,74 +86,96 @@ class WeeklyTaskController {
 
       res.status(200).json({ success: true, data: result.rows });
     } catch (error) {
-      console.error("getAll error:", error);
-      res.status(500).json({ success: false, message: "Failed to fetch weekly tasks" });
+      console.error('getAll error:', error);
+      res
+        .status(500)
+        .json({ success: false, message: 'Failed to fetch weekly tasks' });
     }
   }
 
   // 3. GET one Weekly Task by ID
-  // static async getById(req, res) {
-  //   const { id } = req.params;
-  //   try {
-  //     const result = await pool.query(`
-  //       SELECT wt.*, 
-  //         json_agg(
-  //           json_build_object(
-  //             'id', t.id,
-  //             'title', t.title,
-  //             'description', t.description,
-  //             'sub_tasks', (
-  //               SELECT json_agg(json_build_object('id', st.id, 'title', st.title, 'hyperlink', st.hyperlink))
-  //               FROM sub_tasks st WHERE st.task_id = t.id
-  //             )
-  //           )
-  //         ) AS tasks
-  //       FROM weekly_tasks wt
-  //       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
-  //       WHERE wt.id = $1
-  //       GROUP BY wt.id;
-  //     `, [id]);
+  static async getById(req, res) {
+    const { id } = req.params;
+    try {
+      const result = await pool.query(`
+        SELECT wt.*,
+          json_agg(
+            json_build_object(
+              'id', t.id,
+              'title', t.title,
+              'description', t.description,
+              'sub_tasks', (
+                SELECT json_agg(json_build_object('id', st.id, 'title', st.title, 'hyperlink', st.hyperlink))
+                FROM sub_tasks st WHERE st.task_id = t.id
+              )
+            )
+          ) AS tasks
+        FROM weekly_tasks wt
+        LEFT JOIN tasks t ON t.weekly_task_id = wt.id
+        WHERE wt.id = $1
+        GROUP BY wt.id;
+      `, [id]);
 
-  //     if (!result.rows.length) {
-  //       return res.status(404).json({ success: false, message: "Weekly task not found" });
-  //     }
+      if (!result.rows.length) {
+        return res.status(404).json({ success: false, message: "Weekly task not found" });
+      }
 
-  //     res.status(200).json({ success: true, data: result.rows[0] });
-  //   } catch (error) {
-  //     console.error("getById error:", error);
-  //     res.status(500).json({ success: false, message: "Failed to fetch weekly task" });
-  //   }
-  // }
+      res.status(200).json({ success: true, data: result.rows[0] });
+    } catch (error) {
+      console.error("getById error:", error);
+      res.status(500).json({ success: false, message: "Failed to fetch weekly task" });
+    }
+  }
 
-  // 4. UPDATE a Weekly Task (only main fields, not nested for simplicity)
-  // static async update(req, res) {
-  //   const { id } = req.params;
-  //   const {  week, type, title, description } = req.body;
+  //4. UPDATE a Weekly Task (only main fields, not nested for simplicity)
+ static async update(req, res) {
+  const { id } = req.params;
+  const {
+    task_title,
+    task_category,
+    week,
+    start_time,
+    end_time,
+    task_banner_image,
+    task_description,
+  } = req.body;
 
-  //   try {
-  //     const result = await pool.query(
-  //       `UPDATE weekly_tasks
-  //        SET banner_image = $1,
-  //            week = $2,
-  //            type = $3,
-  //            title = $4,
-  //            description = $5,
-  //            updated_at = CURRENT_TIMESTAMP
-  //        WHERE id = $6
-  //        RETURNING *;`,
-  //       [banner_image, week, type, title, description, id]
-  //     );
+  try {
+    const result = await pool.query(
+      `UPDATE weekly_tasks
+       SET task_title = $1,
+           task_category = $2,
+           week = $3,
+           start_time = $4,
+           end_time = $5,
+           task_banner_image = $6,
+           task_description = $7,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $8
+       RETURNING *;`,
+      [
+        task_title,
+        task_category,
+        week,
+        start_time,
+        end_time,
+        task_banner_image || null,
+        task_description || null,
+        id,
+      ]
+    );
 
-  //     if (!result.rows.length) {
-  //       return res.status(404).json({ success: false, message: "Weekly task not found" });
-  //     }
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: "Weekly task not found" });
+    }
 
-  //     res.status(200).json({ success: true, data: result.rows[0] });
-  //   } catch (error) {
-  //     console.error("update error:", error);
-  //     res.status(500).json({ success: false, message: "Failed to update weekly task" });
-  //   }
-  // }
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("update error:", error);
+    res.status(500).json({ success: false, message: "Failed to update weekly task" });
+  }
+}
+
 
   // 5. DELETE a Weekly Task and cascade delete tasks/sub-tasks
   // static async delete(req, res) {

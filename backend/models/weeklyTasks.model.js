@@ -15,6 +15,8 @@ export async function createWeeklyTasksTables() {
         task_title TEXT NOT NULL,
         start_time TIMESTAMPTZ NOT NULL,
         end_time TIMESTAMPTZ NOT NULL,
+        task_banner_image TEXT,
+        task_description TEXT,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       );

@@ -4,19 +4,10 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { notFound } from 'next/navigation';
 import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 
-interface Airdrop {
-  id: string;
-  name: string;
-  description: string;
-  steps?: string[];
-  twitterEmbed?: string;
-  date?: string;
-}
 
 export default function AirdropDetailPage() {
   const { airdropId } = useParams();

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import AirdropCard from '@/components/shared/AirdropCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, LayoutGrid, SlidersHorizontal } from 'lucide-react';
