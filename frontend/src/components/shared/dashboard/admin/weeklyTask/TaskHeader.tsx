@@ -51,7 +51,7 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
       </div>
 
       <div className="flex gap-4 w-full md:w-auto">
-<WeeklyTaskFormModal />
+        <WeeklyTaskFormModal />
 
         <Select
           value={selectedCategory}

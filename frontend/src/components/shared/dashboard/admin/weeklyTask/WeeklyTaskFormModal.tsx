@@ -26,8 +26,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const WeeklyTaskFormModal = () => {
+  const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [weekOptions, setWeekOptions] = useState(['1', '2', '3', '4', '5']);
@@ -36,24 +40,56 @@ const WeeklyTaskFormModal = () => {
   const [endDate, setEndDate] = useState<Date | undefined>();
   // inside WeeklyTaskFormModal
 
-const [categories, setCategories] = useState(['Game', 'Cricket']);
-const [category, setCategory] = useState('');
-const [showCategoryInput, setShowCategoryInput] = useState(false);
-const [newCategoryInput, setNewCategoryInput] = useState('');
+  const [categories, setCategories] = useState(['Game', 'Cricket']);
+  const [category, setCategory] = useState('');
+  const [showCategoryInput, setShowCategoryInput] = useState(false);
+  const [newCategoryInput, setNewCategoryInput] = useState('');
 
   const handleAddWeek = () => {
     const nextWeek = (weekOptions.length + 1).toString();
     setWeekOptions((prev) => [...prev, nextWeek]);
     setWeek(nextWeek);
   };
-  const handleCreate = async () => {
-    if (!title || !week || !startDate || !endDate) {
-      alert('Please fill in all fields');
-      return;
-    }
+const handleCreate = async () => {
+  if (!title || !week || !startDate || !endDate || !category) {
+    alert('Please fill in all fields');
+    return;
+  }
 
-    alert('Submit logic will be added later');
-  };
+  try {
+    const payload = {
+      task_title: title,
+      task_category: category,
+      week: parseInt(week),
+      start_time: startDate.toISOString(),
+      end_time: endDate.toISOString(),
+    };
+
+    const response = await axios.post('http://localhost:8080/api/weeklytask/v1', payload);
+
+    if ((response.status === 200 || response.status === 201) && response.data?.id) {
+      const weeklyTaskId = response.data.id;
+
+      // Reset form
+      setOpen(false);
+      setTitle('');
+      setCategory('');
+      setWeek('');
+      setStartDate(undefined);
+      setEndDate(undefined);
+
+      // Navigate to the created weekly task page
+      router.push(`/dashboard/admin/weeklytask/create/${weeklyTaskId}`);
+    } else {
+      alert('Something went wrong. Please try again.');
+    }
+  } catch (error: any) {
+    console.error('Error creating weekly task:', error);
+    alert(`❌ Error: ${error.response?.data?.message || error.message}`);
+  }
+};
+
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -88,80 +124,83 @@ const [newCategoryInput, setNewCategoryInput] = useState('');
                   className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500 placeholder:text-gray-400"
                 />
               </div>
-{/* Category */}
-{/* Category */}
-<div className="space-y-2">
-  <Label className="text-sm text-gray-300">Category</Label>
-  <Select value={category} onValueChange={setCategory}>
-    <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500">
-      <SelectValue placeholder="Select category" />
-    </SelectTrigger>
-   <SelectContent
-  className="bg-[#1F1F1F] text-white border border-gray-700 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
->
-  {categories.map((cat) => (
-    <SelectItem key={cat} value={cat} className="cursor-pointer">
-      {cat}
-    </SelectItem>
-  ))}
+              {/* Category */}
+              {/* Category */}
+              <div className="space-y-2">
+                <Label className="text-sm text-gray-300">Category</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1F1F1F] text-white border border-gray-700 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                    {categories.map((cat) => (
+                      <SelectItem
+                        key={cat}
+                        value={cat}
+                        className="cursor-pointer"
+                      >
+                        {cat}
+                      </SelectItem>
+                    ))}
 
-  <div className="border-t border-gray-600 my-1" />
+                    <div className="border-t border-gray-600 my-1" />
 
-  {!showCategoryInput ? (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setShowCategoryInput(true);
-      }}
-      className="w-full text-left px-2 py-2 text-sm text-violet-400 hover:text-violet-500 hover:bg-[#2A2A2A]"
-    >
-      ➕ Add New Category
-    </button>
-  ) : (
-    <div className="px-3 py-2 space-y-2">
-      <input
-        type="text"
-        value={newCategoryInput}
-        onChange={(e) => setNewCategoryInput(e.target.value)}
-        placeholder="Enter category name"
-        className="w-full px-2 py-1 text-sm bg-[#2A2A2A] border border-gray-600 rounded text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500"
-      />
-      <div className="flex justify-between gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (
-              newCategoryInput.trim() &&
-              !categories.includes(newCategoryInput.trim())
-            ) {
-              setCategories((prev) => [...prev, newCategoryInput.trim()]);
-              setCategory(newCategoryInput.trim());
-            }
-            setNewCategoryInput('');
-            setShowCategoryInput(false);
-          }}
-          className="text-sm text-violet-400 hover:text-violet-500"
-        >
-          ✅ Add
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowCategoryInput(false);
-            setNewCategoryInput('');
-          }}
-          className="text-sm text-gray-400 hover:text-red-400"
-        >
-          ❌ Cancel
-        </button>
-      </div>
-    </div>
-  )}
-</SelectContent>
-
-  </Select>
-</div>
-
+                    {!showCategoryInput ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowCategoryInput(true);
+                        }}
+                        className="w-full text-left px-2 py-2 text-sm text-violet-400 hover:text-violet-500 hover:bg-[#2A2A2A]"
+                      >
+                        ➕ Add New Category
+                      </button>
+                    ) : (
+                      <div className="px-3 py-2 space-y-2">
+                        <input
+                          type="text"
+                          value={newCategoryInput}
+                          onChange={(e) => setNewCategoryInput(e.target.value)}
+                          placeholder="Enter category name"
+                          className="w-full px-2 py-1 text-sm bg-[#2A2A2A] border border-gray-600 rounded text-white placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-violet-500"
+                        />
+                        <div className="flex justify-between gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (
+                                newCategoryInput.trim() &&
+                                !categories.includes(newCategoryInput.trim())
+                              ) {
+                                setCategories((prev) => [
+                                  ...prev,
+                                  newCategoryInput.trim(),
+                                ]);
+                                setCategory(newCategoryInput.trim());
+                              }
+                              setNewCategoryInput('');
+                              setShowCategoryInput(false);
+                            }}
+                            className="text-sm text-violet-400 hover:text-violet-500"
+                          >
+                            ✅ Add
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowCategoryInput(false);
+                              setNewCategoryInput('');
+                            }}
+                            className="text-sm text-gray-400 hover:text-red-400"
+                          >
+                            ❌ Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Week */}
               <div className="space-y-2">

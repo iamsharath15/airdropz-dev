@@ -47,98 +47,13 @@ const AirdropFormModal = () => {
 
   const finalCategory = isAddingCategory ? customCategory : category;
 
-// const createAirdropMutation = useMutation({
-//   mutationFn: async (payload: any) => {
-//     const response = await axios.post(
-//       'http://localhost:8080/api/airdrop/v1/',
-//       payload,
-//       {
-//         withCredentials: true,
-//       }
-//     );
-//     return response.data;
-//   },
-//   onSuccess: (data) => {
-//     const newAirdropId = data?.airdrop?.id;
-//     if (newAirdropId) {
-//       dispatch(setCreatedAirdrop(data.airdrop));
-//       router.push(`/dashboard/admin/airdrops/create/${newAirdropId}`);
-//     }
-//   },
-//   onError: (error) => {
-//     console.error('Airdrop creation failed:', error);
-//     alert('Failed to create airdrop.');
-//   },
-// });
-
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setImageFile(file);
   };
 
-// const handleCreate = async () => {
-//   if (!name || !finalCategory || !imageFile) {
-//     alert('Please fill in all fields and select an image');
-//     return;
-//   }
-
-//   try {
-//     // Step 1: Create airdrop WITHOUT previewr_image_url to get the ID
-//     const payload = {
-//       title: name,
-//       category: finalCategory,
-//       type: type,
-//     };
-
-//     const createRes = await axios.post(
-//       'http://localhost:8080/api/airdrop/v1/',
-//       payload,
-//       { withCredentials: true }
-//     );
-
-//     const newAirdrop = createRes.data?.airdrop;
-//     const airdropId = newAirdrop?.id;
-
-//     if (!airdropId) throw new Error('Airdrop ID missing');
-
-//     // Step 2: Get presigned URL for specific path
-//     const fileExt = imageFile.name.split('.').pop();
-//     const s3Path = `airdrops/${airdropId}/banner.${fileExt}`;
-
-//     const presignRes = await axios.get(
-//       'http://localhost:8080/api/upload/v1/generate-upload-url',
-//       {
-//         params: {
-//           filename: s3Path,
-//           contentType: imageFile.type,
-//         },
-//       }
-//     );
-
-//     const { uploadUrl, publicUrl } = presignRes.data;
-
-//     // Step 3: Upload image to S3
-//     await axios.put(uploadUrl, imageFile, {
-//       headers: { 'Content-Type': imageFile.type },
-//     });
-
-//     // Step 4: Update the airdrop with the image URL
-//     await axios.put(
-//       `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-//       { previewr_image_url: publicUrl },
-//       { withCredentials: true }
-//     );
-
-//     // Step 5: Dispatch and redirect
-//     dispatch(setCreatedAirdrop({ ...newAirdrop, previewr_image_url: publicUrl }));
-//     router.push(`/dashboard/admin/airdrops/create/${airdropId}`);
-//   } catch (err) {
-//     console.error('Airdrop creation or image upload failed:', err);
-//     alert('Failed to create airdrop. Please try again.');
-//   }
-// };
- const handleCreate = async () => {
+  const handleCreate = async () => {
     if (!name || !finalCategory || !imageFile) {
       alert('Please fill in all fields and select an image');
       return;
@@ -187,17 +102,16 @@ const AirdropFormModal = () => {
       });
 
       // Step 4: Update the airdrop with the image URL
-    await axios.put(
-  `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-  {
-    title: name,
-    category: finalCategory,
-    type: type,
-    preview_image_url: publicUrl, 
-  },
-  { withCredentials: true }
-);
-
+      await axios.put(
+        `http://localhost:8080/api/airdrop/v1/${airdropId}`,
+        {
+          title: name,
+          category: finalCategory,
+          type: type,
+          preview_image_url: publicUrl,
+        },
+        { withCredentials: true }
+      );
 
       // Step 5: Dispatch and redirect
       const updatedAirdrop = {
@@ -231,7 +145,7 @@ const AirdropFormModal = () => {
       <DialogContent className="md:w-[950px] bg-[#151313] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center">
         <div className="overflow-y-auto max-h-[80vh] pr-1 scrollable-modal w-full touch-pan-y">
           <DialogHeader>
-            <DialogTitle className='text-white'>Create New Airdrop</DialogTitle>
+            <DialogTitle className="text-white">Create New Airdrop</DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-col md:flex-row gap-6 mt-4">
@@ -271,7 +185,7 @@ const AirdropFormModal = () => {
             <div className="md:w-6/12 w-full space-y-4">
               {/* Image Upload */}
               <div className="space-y-2">
-                <Label className='text-white'>Upload Image</Label>
+                <Label className="text-white">Upload Image</Label>
                 <Input
                   type="file"
                   accept="image/*"
@@ -282,8 +196,9 @@ const AirdropFormModal = () => {
 
               {/* Name */}
               <div className="space-y-2">
-                <Label className='text-white'>Airdrop Name</Label>
-                <Input className='text-white placeholder:text-white'
+                <Label className="text-white">Airdrop Name</Label>
+                <Input
+                  className="text-white placeholder:text-white"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter name"
@@ -292,9 +207,9 @@ const AirdropFormModal = () => {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label className='text-white'>Category</Label>
+                <Label className="text-white">Category</Label>
                 {!isAddingCategory ? (
-                  <Select 
+                  <Select
                     onValueChange={(val) =>
                       val === 'add_new'
                         ? setIsAddingCategory(true)
@@ -306,17 +221,18 @@ const AirdropFormModal = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {defaultCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat} >
+                        <SelectItem key={cat} value={cat}>
                           {cat}
                         </SelectItem>
                       ))}
-                      <SelectItem value="add_new" >
+                      <SelectItem value="add_new">
                         ➕ Add new category
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
-                  <Input className='text-white placeholder:text-white'
+                  <Input
+                    className="text-white placeholder:text-white"
                     value={customCategory}
                     onChange={(e) => setCustomCategory(e.target.value)}
                     placeholder="Enter new category"
@@ -351,10 +267,9 @@ const AirdropFormModal = () => {
                   ? 'Creating...'
                   : 'Create Airdrop'}
               </Button> */}
-                        <Button onClick={handleCreate} disabled={isSubmitting}>
-            {isSubmitting ? 'Creating...' : 'Create Airdrop'}
-          </Button>
-
+              <Button onClick={handleCreate} disabled={isSubmitting}>
+                {isSubmitting ? 'Creating...' : 'Create Airdrop'}
+              </Button>
             </div>
           </div>
         </div>

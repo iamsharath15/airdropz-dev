@@ -9,12 +9,12 @@ export async function createWeeklyTasksTables() {
     const createTablesQuery = `
       -- Weekly Tasks
       CREATE TABLE IF NOT EXISTS weekly_tasks (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        banner_image TEXT,
+         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         week INT NOT NULL,
-        type VARCHAR(50),
-        title TEXT NOT NULL,
-        description TEXT,
+        task_category TEXT NOT NULL,
+        task_title TEXT NOT NULL,
+        start_time TIMESTAMPTZ NOT NULL,
+        end_time TIMESTAMPTZ NOT NULL,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       );
