@@ -357,6 +357,31 @@ class UserController {
     // await sendVerificationEmail(email, newToken);
     return res.json({ message: 'OTP resent to your email.' });
   }
+
+  static async getAllUsers(req, res) {
+    try {
+      const query = `
+        SELECT 
+          user_name, 
+          email, 
+          airdrops_earned, 
+          daily_login_streak_count 
+        FROM users
+        ORDER BY created_at DESC;
+      `;
+      const result = await pool.query(query);
+      return res.status(200).json({
+        success: true,
+        data: result.rows,
+      });
+    } catch (error) {
+      console.error('❌ Error fetching users:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch users',
+      });
+    }
+  }
 }
 
 export default UserController;

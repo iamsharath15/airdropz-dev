@@ -117,8 +117,8 @@ export default function Page() {
     }
   };
   const removeChecklist = (index: number) => {
-  setChecklists((prev) => prev.filter((_, i) => i !== index));
-};
+    setChecklists((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="flex flex-col max:h-screen bg-black text-white">
@@ -379,17 +379,18 @@ export default function Page() {
                   key={index}
                   className="space-y-4 border border-zinc-700 p-4 rounded-xl mb-4"
                 >
-                     <div className="flex justify-between items-center mb-2">
-      <h3 className="text-md font-semibold text-purple-300">Checklist {index + 1}</h3>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={() => removeChecklist(index)}
-      >
-        Delete
-      </Button>
-    </div>
-
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-md font-semibold text-purple-300">
+                      Checklist {index + 1}
+                    </h3>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => removeChecklist(index)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
 
                   {/* Checklist Title */}
                   <div>
