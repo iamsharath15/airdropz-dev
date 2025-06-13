@@ -193,7 +193,7 @@ const AirdropFormModal = () => {
     title: name,
     category: finalCategory,
     type: type,
-    preview_image_url: publicUrl,
+    preview_image_url: publicUrl, 
   },
   { withCredentials: true }
 );

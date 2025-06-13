@@ -14,9 +14,11 @@ import {
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 
 import authReducer from './authSlice';
+import airdropsReducer from './airdropsSlice'; // ✅ Import
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  airdrops: airdropsReducer, 
 });
 
 const persistConfig = {
@@ -24,6 +26,8 @@ const persistConfig = {
   version: 1,
   storage,
   whitelist: ['auth'], // only persist the auth slice
+    //whitelist: ['auth', 'airdrops'], // ✅ Add airdrops if you want it persisted
+
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Pencil } from 'lucide-react';
 import EditAirdropFormModal from './admin/EditAirdropFormModal';
 
 type AirdropCardProps = {
@@ -31,7 +30,7 @@ const AirdropCard = ({ airdrop }: AirdropCardProps) => {
             <Image
               className="object-cover w-full h-full rounded-3xl"
               src={
-                airdrop.banner_image_url ||
+                airdrop.preview_image_url ||
                 'https://cdn.lootcrate.me/demo/airdropzimage.png'
               }
               alt="airdrop image"

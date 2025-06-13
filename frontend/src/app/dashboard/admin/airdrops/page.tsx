@@ -1,72 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import AirdropCard from '@/components/shared/AirdropCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, LayoutGrid, SlidersHorizontal } from 'lucide-react';
 import AirdropFormModal from '@/components/shared/admin/AirdropFormModal';
-import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '@/store';
+import {
+  setAirdrops,
+  setSelectedCategory,
+  setSelectedType,
+} from '@/store/airdropsSlice';
 
-// -------------------- Types --------------------
-type ContentBlock = {
-  id: string;
-  airdrop_id: string;
-  type: 'checklist' | 'image' | 'description';
-  value: string;
-  link: string | null;
-};
-
-type Airdrop = {
-  id: string;
-  title: string;
-  category: string | null;
-  preview_image_url: string | null;
-  type: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  content_blocks: ContentBlock[];
-};
-
-// -------------------- Redux Slice --------------------
-const airdropSlice = createSlice({
-  name: 'airdrops',
-  initialState: {
-    list: [] as Airdrop[],
-    selectedCategory: 'All',
-    selectedType: 'All',
-  },
-  reducers: {
-    setAirdrops: (state, action: PayloadAction<Airdrop[]>) => {
-      state.list = action.payload;
-    },
-    setSelectedCategory: (state, action: PayloadAction<string>) => {
-      state.selectedCategory = action.payload;
-    },
-    setSelectedType: (
-      state,
-      action: PayloadAction<'All' | 'Free' | 'Paid'>
-    ) => {
-      state.selectedType = action.payload;
-    },
-  },
-});
-
-const { setAirdrops, setSelectedCategory } = airdropSlice.actions;
-
-const store = configureStore({
-  reducer: {
-    airdrops: airdropSlice.reducer,
-  },
-});
-
-type RootState = ReturnType<typeof store.getState>;
-
-// -------------------- Component --------------------
-const AirdropsListingContent = () => {
+const AirdropsListing = () => {
   const dispatch = useDispatch();
   const airdrops = useSelector((state: RootState) => state.airdrops.list);
   const selectedCategory = useSelector(
@@ -75,52 +24,45 @@ const AirdropsListingContent = () => {
   const selectedType = useSelector(
     (state: RootState) => state.airdrops.selectedType
   );
-  const { setSelectedType } = airdropSlice.actions;
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('Free');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   useEffect(() => {
-    const fetchAirdrops = async () => {
-      try {
-        const response = await axios.get(
-          'http://localhost:8080/api/airdrop/v1/'
-        );
-        dispatch(setAirdrops(response.data));
-      } catch (error) {
-        console.error('Failed to fetch airdrops:', error);
-      }
-    };
-
-    fetchAirdrops();
+    axios
+      .get('http://localhost:8080/api/airdrop/v1/')
+      .then((res) => dispatch(setAirdrops(res.data)))
+      .catch((err) => console.error('Failed to fetch airdrops:', err));
   }, [dispatch]);
 
-  const categories = [
-    'All',
-    ...new Set(airdrops.map((a) => a.category ?? 'Unknown')),
-  ];
-  const filteredAirdrops = airdrops.filter((airdrop) => {
-    const matchesSearch = airdrop.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+  const categories = useMemo(
+    () => [
+      'All',
+      ...Array.from(new Set(airdrops.map((a) => a.category ?? 'Unknown'))),
+    ],
+    [airdrops]
+  );
 
-    const matchesCategory =
-      selectedCategory === 'All' || airdrop.category === selectedCategory;
-
-    const normalizedType = airdrop.type === 'Paid' ? 'Paid' : 'Free';
-    const matchesType =
-      selectedType === 'All' || normalizedType === selectedType;
-
-    return matchesSearch && matchesCategory && matchesType;
-  });
+  const filteredAirdrops = useMemo(() => {
+    return airdrops.filter((airdrop) => {
+      const matchesSearch = airdrop.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'All' || airdrop.category === selectedCategory;
+      const normalizedType = airdrop.type === 'Paid' ? 'Paid' : 'Free';
+      const matchesType =
+        selectedType === 'All' || normalizedType === selectedType;
+      return matchesSearch && matchesCategory && matchesType;
+    });
+  }, [airdrops, searchTerm, selectedCategory, selectedType]);
 
   return (
     <div className="mb-8">
-      {/* Search + Filters */}
-      <div className="flex justify-between items-center mb-6">
-        {/* Search Bar */}
+      {/* Header: Search + Filters */}
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+        {/* Search */}
         <div className="relative w-full max-w-md">
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
@@ -134,83 +76,43 @@ const AirdropsListingContent = () => {
           />
         </div>
 
-        {/* Filters */}
+        {/* Right Filters */}
         <div className="flex gap-4 relative">
           <AirdropFormModal />
 
-          {/* Category Dropdown */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              className="gap-2 text-white border-white bg-black cursor-pointer"
-              onClick={() => setShowCategoryDropdown((prev) => !prev)}
-            >
-              <LayoutGrid size={18} />
-              {selectedCategory}
-            </Button>
+          {/* Category Filter */}
+          <Dropdown
+            label={selectedCategory}
+            icon={<LayoutGrid size={18} />}
+            options={categories}
+            activeOption={selectedCategory}
+            show={showCategoryDropdown}
+            toggleShow={() => setShowCategoryDropdown((prev) => !prev)}
+            onSelect={(category) => {
+              dispatch(setSelectedCategory(category));
+              setShowCategoryDropdown(false);
+            }}
+          />
 
-            {showCategoryDropdown && (
-              <div className="absolute right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-[2%]">
-                {categories.map((category) => (
-                  <div
-                    key={category}
-                    onClick={() => {
-                      dispatch(setSelectedCategory(category));
-                      setShowCategoryDropdown(false);
-                    }}
-                    className={`px-4 py-2 text-white cursor-pointer hover:bg-white hover:text-black rounded-lg space-y-2 ${
-                      selectedCategory === category
-                        ? 'bg-white  rounded-lg text-black'
-                        : ''
-                    }`}
-                  >
-                    {category}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Sort Button */}
-          {/* Sort/Type Dropdown */}
-          <div className="relative">
-            <Button
-              variant="outline"
-              className="gap-2 text-white border-white bg-black cursor-pointer"
-              onClick={() => setShowSortDropdown((prev) => !prev)}
-            >
-              <SlidersHorizontal size={18} />
-              Sort By: {selectedType}
-            </Button>
-
-            {showSortDropdown && (
-              <div className="absolute right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2">
-                {['All', 'Free', 'Paid'].map((typeOption) => (
-                  <div
-                    key={typeOption}
-                    onClick={() => {
-                      dispatch(
-                        setSelectedType(typeOption as 'All' | 'Free' | 'Paid')
-                      );
-                      setShowSortDropdown(false);
-                    }}
-                    className={`px-4 py-2 text-white cursor-pointer hover:bg-white hover:text-black rounded-lg ${
-                      selectedType === typeOption ? 'bg-white text-black' : ''
-                    }`}
-                  >
-                    {typeOption}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Type Filter */}
+          <Dropdown
+            label={`Sort By: ${selectedType}`}
+            icon={<SlidersHorizontal size={18} />}
+            options={['All', 'Free', 'Paid']}
+            activeOption={selectedType}
+            show={showSortDropdown}
+            toggleShow={() => setShowSortDropdown((prev) => !prev)}
+            onSelect={(type) => {
+              dispatch(setSelectedType(type as 'All' | 'Free' | 'Paid'));
+              setShowSortDropdown(false);
+            }}
+          />
         </div>
       </div>
 
       {/* Listing */}
       <h2 className="text-2xl font-bold mb-6 px-[2%]">Top Airdropz</h2>
-
-      <div className="flex  flex-wrap">
+      <div className="flex flex-wrap">
         {filteredAirdrops.map((airdrop) => (
           <AirdropCard
             key={airdrop.id}
@@ -228,11 +130,50 @@ const AirdropsListingContent = () => {
   );
 };
 
-// -------------------- Wrapper with Provider --------------------
-const AirdropsListing = () => (
-  <Provider store={store}>
-    <AirdropsListingContent />
-  </Provider>
+// -------------------- Dropdown Component --------------------
+const Dropdown = ({
+  label,
+  icon,
+  options,
+  activeOption,
+  show,
+  toggleShow,
+  onSelect,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  options: string[];
+  activeOption: string;
+  show: boolean;
+  toggleShow: () => void;
+  onSelect: (option: string) => void;
+}) => (
+  <div className="relative">
+    <Button
+      variant="outline"
+      className="gap-2 text-white border-white bg-black cursor-pointer"
+      onClick={toggleShow}
+    >
+      {icon}
+      {label}
+    </Button>
+
+    {show && (
+      <div className="absolute right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2">
+        {options.map((option) => (
+          <div
+            key={option}
+            onClick={() => onSelect(option)}
+            className={`px-4 py-2 text-white cursor-pointer hover:bg-white hover:text-black rounded-lg ${
+              activeOption === option ? 'bg-white text-black' : ''
+            }`}
+          >
+            {option}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
 );
 
 export default AirdropsListing;

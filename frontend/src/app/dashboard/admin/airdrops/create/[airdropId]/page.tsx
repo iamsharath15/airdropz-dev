@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
@@ -8,52 +8,34 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip';
-import StepProgress from '@/components/shared/StepProgress';
-
-import {
-  FileText,
-  Image as ImageIcon,
-  CheckSquare,
-  Link2,
-  Trash2,
-} from 'lucide-react';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-
-import SortableItem from '@/components/shared/SortableItem';
+import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { v4 as uuidv4 } from 'uuid';
+
+import { uploadImageToS3 } from '@/lib/uploadToS3';
+import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
+import AirdropFormEditor from '@/components/shared/dashboard/AirdropFormEditor';
+
+const API_BASE = 'http://localhost:8080/api/airdrop/v1';
 
 const CreateAirdropPage = () => {
   const params = useParams();
-  const { airdropId } = params;
   const router = useRouter();
-  const [step, setStep] = useState(1);
-  const totalSteps = 2;
-  const progress = (step / totalSteps) * 100;
 
+  const rawAirdropId = params?.airdropId;
+  const airdropId = Array.isArray(rawAirdropId)
+    ? rawAirdropId[0]
+    : rawAirdropId;
+
+  const [step, setStep] = useState(1);
   const [airdropData, setAirdropData] = useState<{
-    airdrops_banner_image: string | File;
+    title: string;
     airdrops_banner_title: string;
     airdrops_banner_description: string;
     airdrops_banner_subtitle: string;
     airdrops_date: string;
-    title: string;
+    airdrops_banner_image: string | File;
   }>({
+    title: '',
     airdrops_banner_title: '',
     airdrops_banner_description: '',
     airdrops_banner_subtitle: '',
@@ -63,188 +45,52 @@ const CreateAirdropPage = () => {
       day: 'numeric',
     }),
     airdrops_banner_image: '',
-    title: '',
   });
+
   const [contentBlocks, setContentBlocks] = useState<
     {
       type: 'description' | 'image' | 'checklist' | 'link';
       value: string;
       link?: string;
+      file?: File;
     }[]
   >([]);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    const fetchAirdrop = async () => {
-      if (!airdropId) return;
+    if (!airdropId) return;
+
+    (async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-          { withCredentials: true }
-        );
-        const data = res.data;
+        const { data } = await axios.get(`${API_BASE}/${airdropId}`, {
+          withCredentials: true,
+        });
+
         setAirdropData({
-          title: data.title || 'aidrop title',
+          title: data.title || 'Airdrop Title',
           airdrops_banner_title:
-            data.airdrops_banner_title || 'How to Join the 3DOS Airdrop',
+            data.airdrops_banner_title || 'How to Join the Airdrop',
           airdrops_banner_description:
-            data.airdrops_banner_description ||
-            '3DOS Network is building a more efficient, accessible, and globally distributed system...',
+            data.airdrops_banner_description || 'Airdrop details...',
           airdrops_banner_subtitle: data.airdrops_banner_subtitle || 'Guides',
+          airdrops_banner_image: data.airdrops_banner_image || '',
           airdrops_date: new Date(data.created_at).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
           }),
-          airdrops_banner_image: data.airdrops_banner_image || '',
         });
+
         setContentBlocks(data.content_blocks || []);
       } catch (error) {
-        toast.error(`Failed to load airdrop for editing.${error}`);
+        toast.error(`Failed to load airdrop. ${error}`);
       }
-    };
-    fetchAirdrop();
+    })();
   }, [airdropId]);
 
-  const readFile = (file: File, callback: (res: string) => void) => {
-    const reader = new FileReader();
-    reader.onloadend = () => callback(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    idx: number
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      updateBlock(idx, 'file', file); // Set actual file for upload
-      updateBlock(idx, 'value', URL.createObjectURL(file)); // Preview image
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!airdropId) {
-      toast.error('Airdrop ID not found in URL.');
-    }
-    try {
-      await axios.delete(`http://localhost:8080/api/airdrop/v1/${airdropId}`, {
-        withCredentials: true,
-      });
-      toast.success('Airdrop deleted successfully!');
-      router.push('/dashboard/admin/airdrops/');
-    } catch (error) {
-      console.error('Failed to delete airdrop:', error);
-      toast.error('Failed to delete airdrop. Please try again.');
-    }
-  };
-  const handleSubmit = async () => {
-    try {
-      let createdAirdropId = airdropId;
-
-      // Step 1: Create or update airdrop to get ID
-      if (!airdropId) {
-        const res = await axios.post(
-          `http://localhost:8080/api/airdrop/v1`,
-          { title: airdropData.title }, // temp payload without image
-          { withCredentials: true }
-        );
-        createdAirdropId = res.data.id;
-      }
-
-      // Step 2: Upload airdrops_banner_image if it's a File
-      let bannerImage = airdropData.airdrops_banner_image;
-      if (bannerImage instanceof File) {
-        const fileExt = bannerImage.name.split('.').pop();
-        const s3Path = `airdrops/${createdAirdropId}/airdropsBannerImage.${fileExt}`;
-
-        const presignRes = await axios.get(
-          'http://localhost:8080/api/upload/v1/generate-upload-url',
-          {
-            params: {
-              filename: s3Path,
-              contentType: bannerImage.type,
-            },
-          }
-        );
-
-        const { uploadUrl, publicUrl } = presignRes.data;
-
-        await axios.put(uploadUrl, bannerImage, {
-          headers: { 'Content-Type': bannerImage.type },
-        });
-
-        bannerImage = publicUrl;
-      }
-
-      // Step 3: Update airdrop with full banner payload
-      const step1Payload = {
-        title: airdropData.title,
-        airdrops_banner_title: airdropData.airdrops_banner_title,
-        airdrops_banner_description: airdropData.airdrops_banner_description,
-        airdrops_banner_subtitle: airdropData.airdrops_banner_subtitle,
-        airdrops_banner_image: bannerImage,
-      };
-
-      await axios.put(
-        `http://localhost:8080/api/airdrop/v1/${createdAirdropId}`,
-        step1Payload,
-        { withCredentials: true }
-      );
-
-      // Step 4: Upload content blocks (images + other types)
-      const uploadedBlocks = await Promise.all(
-        contentBlocks.map(async (block) => {
-          if (block.type === 'image' && block.file instanceof File) {
-            const fileExt = block.file.name.split('.').pop();
-            const uniqueId = uuidv4();
-
-            const s3Path = `airdrops/${createdAirdropId}/content-blocks/${uniqueId}.${fileExt}`;
-
-            const presignRes = await axios.get(
-              'http://localhost:8080/api/upload/v1/generate-upload-url',
-              {
-                params: {
-                  filename: s3Path,
-                  contentType: block.file.type,
-                },
-              }
-            );
-
-            const { uploadUrl, publicUrl } = presignRes.data;
-
-            await axios.put(uploadUrl, block.file, {
-              headers: { 'Content-Type': block.file.type },
-            });
-
-            return {
-              type: 'image',
-              value: publicUrl,
-              link: null,
-            };
-          }
-
-          return block;
-        })
-      );
-
-      // Step 5: Save content blocks
-      await axios.post(
-        `http://localhost:8080/api/airdrop/v1/content-blocks/${createdAirdropId}`,
-        { content_blocks: uploadedBlocks },
-        { withCredentials: true }
-      );
-
-      toast.success(airdropId ? 'Airdrop updated!' : 'Airdrop created!');
-      router.push('/dashboard/admin/airdrops');
-    } catch (error) {
-      console.error('Airdrop submit error:', error);
-      toast.error('Submit failed.');
-    }
-  };
-
   const updateBlock = useCallback(
-    (idx: number, field: 'value' | 'link', val: string) => {
+    (idx: number, field: 'value' | 'link' | 'file', val: string | File) => {
       setContentBlocks((blocks) =>
         blocks.map((b, i) => (i === idx ? { ...b, [field]: val } : b))
       );
@@ -252,28 +98,119 @@ const CreateAirdropPage = () => {
     []
   );
 
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      updateBlock(idx, 'file', file);
+      updateBlock(idx, 'value', URL.createObjectURL(file));
+    }
+  };
+
   const removeBlock = useCallback((idx: number) => {
     setContentBlocks((blocks) => blocks.filter((_, i) => i !== idx));
   }, []);
 
-  const addBlock = useCallback((type) => {
-    setContentBlocks((blocks) => [
-      ...blocks,
-      { type, value: '', ...(type === 'link' && { link: '' }) },
-    ]);
-  }, []);
-  const handleChange = (field: string, value: string) => {
-    setAirdropData((prev) => ({ ...prev, [field]: value }));
+  const addBlock = useCallback(
+    (type: 'description' | 'image' | 'checklist' | 'link') => {
+      setContentBlocks((blocks) => [
+        ...blocks,
+        { type, value: '', ...(type === 'link' && { link: '' }) },
+      ]);
+    },
+    []
+  );
+
+  const handleDelete = async () => {
+    if (!airdropId) return toast.error('Airdrop ID not found.');
+    try {
+      await axios.delete(`${API_BASE}/${airdropId}`, { withCredentials: true });
+      toast.success('Airdrop deleted!');
+      router.push('/dashboard/admin/airdrops/');
+    } catch {
+      toast.error('Failed to delete airdrop.');
+    }
   };
+
+  const handleSubmit = async () => {
+    try {
+      let createdId = airdropId;
+
+      if (!createdId) {
+        const { data } = await axios.post(
+          API_BASE,
+          { title: airdropData.title },
+          { withCredentials: true }
+        );
+        createdId = data.id;
+      }
+
+      let bannerImage = airdropData.airdrops_banner_image;
+      if (bannerImage instanceof File) {
+        bannerImage = await uploadImageToS3(
+          bannerImage,
+          `airdrops/${createdId}/airdropsBannerImage`
+        );
+      }
+
+      await axios.put(
+        `${API_BASE}/${createdId}`,
+        {
+          ...airdropData,
+          airdrops_banner_image: bannerImage,
+        },
+        { withCredentials: true }
+      );
+
+      const uploadedBlocks = await Promise.all(
+        contentBlocks.map(async (block) => {
+          if (
+            block?.type === 'image' &&
+            typeof block.file === 'object' &&
+            block.file instanceof File
+          ) {
+            const url = await uploadImageToS3(
+              block.file,
+              `airdrops/${createdId}/content-blocks/${uuidv4()}`
+            );
+            return { ...block, value: url, file: undefined };
+          }
+          return block;
+        })
+      );
+
+      await axios.post(
+        `${API_BASE}/content-blocks/${createdId}`,
+        { content_blocks: uploadedBlocks },
+        { withCredentials: true }
+      );
+
+      toast.success(airdropId ? 'Airdrop updated!' : 'Airdrop created!');
+      router.push('/dashboard/admin/airdrops');
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast.error('Submit failed.');
+    }
+  };
+
   const renderBlock = (block: (typeof contentBlocks)[number], idx: number) => {
+    const commonInputClass = 'bg-zinc-800 text-white';
+
     switch (block.type) {
       case 'description':
+      case 'checklist':
         return (
           <Textarea
             value={block.value}
             onChange={(e) => updateBlock(idx, 'value', e.target.value)}
-            placeholder="Enter description"
-            className="bg-zinc-800 text-white"
+            placeholder={
+              block.type === 'checklist'
+                ? 'Checklist items, one per line'
+                : 'Description'
+            }
+            className={commonInputClass}
           />
         );
       case 'image':
@@ -283,38 +220,28 @@ const CreateAirdropPage = () => {
               value={block.value}
               onChange={(e) => updateBlock(idx, 'value', e.target.value)}
               placeholder="Enter image URL"
-              className="bg-zinc-800 text-white"
+              className={commonInputClass}
             />
             <label className="relative w-full h-48 border-dashed border-2 border-zinc-700 rounded-lg bg-zinc-900 flex items-center justify-center overflow-hidden hover:border-purple-500">
-              {block.value ? (
+              {block.value && (
                 <Image
                   src={block.value}
                   alt={`Block image ${idx}`}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  width={1920}
-                  height={1080}
+                  fill
+                  className="object-cover"
                 />
-              ) : (
+              )}
+              {!block.value && (
                 <span className="z-10 text-white">Upload image</span>
               )}
-
               <Input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleImageChange(e, idx)}
-                className="cursor-pointer text-white file:text-white"
+                className="absolute inset-0 opacity-0 cursor-pointer"
               />
             </label>
           </div>
-        );
-      case 'checklist':
-        return (
-          <Textarea
-            value={block.value}
-            onChange={(e) => updateBlock(idx, 'value', e.target.value)}
-            placeholder="Checklist items, one per line"
-            className="bg-zinc-800 text-white"
-          />
         );
       case 'link':
         return (
@@ -323,13 +250,13 @@ const CreateAirdropPage = () => {
               value={block.value}
               onChange={(e) => updateBlock(idx, 'value', e.target.value)}
               placeholder="Link title"
-              className="bg-zinc-800 text-white"
+              className={commonInputClass}
             />
             <Input
               value={block.link || ''}
               onChange={(e) => updateBlock(idx, 'link', e.target.value)}
               placeholder="URL"
-              className="bg-zinc-800 text-white"
+              className={commonInputClass}
             />
           </div>
         );
@@ -337,25 +264,20 @@ const CreateAirdropPage = () => {
         return null;
     }
   };
+
   return (
     <div className="flex flex-col max:h-screen bg-black text-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold">{airdropData.title}</h1>
-        </div>
+        <h1 className="text-xl font-semibold">{airdropData.title}</h1>
         <div className="flex gap-3">
           {airdropId && (
-            <Button
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={handleDelete}
-            >
+            <Button variant="destructive" onClick={handleDelete}>
               Delete
             </Button>
           )}
           <Button
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white"
             onClick={handleSubmit}
           >
             {airdropId ? 'Update' : 'Create'}
@@ -363,313 +285,26 @@ const CreateAirdropPage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel: Steps */}
-        <div className="w-full md:w-1/2 p-6 overflow-auto border-r border-zinc-800 bg-black">
-          <div className="mb-6">
-            <StepProgress progress={progress} />
-          </div>
-
-          {step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold mb-4">
-                Step 1: Airdrop Details
-              </h2>
-
-              <div>
-                <label
-                  htmlFor="airdrop-title"
-                  className="block text-sm text-white mb-1"
-                >
-                  Airdrop Title
-                </label>
-                <Input
-                  value={airdropData.airdrops_banner_title}
-                  onChange={(e) =>
-                    setAirdropData((p) => ({
-                      ...p,
-                      airdrops_banner_title: e.target.value,
-                    }))
-                  }
-                  placeholder="Title"
-                  className="bg-zinc-800 text-white mb-4"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="airdrop-short-description"
-                  className="block text-sm text-white mb-3"
-                >
-                  Airdrop Description
-                </label>
-                <Textarea
-                  value={airdropData.airdrops_banner_description}
-                  onChange={(e) =>
-                    setAirdropData((p) => ({
-                      ...p,
-                      airdrops_banner_description: e.target.value,
-                    }))
-                  }
-                  placeholder="Short description"
-                  className="bg-zinc-900 border-zinc-700 text-white mb-4"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="airdrop-date"
-                  className="block text-sm text-white mb-3"
-                >
-                  Date
-                </label>
-                <Input
-                  value={airdropData.airdrops_date}
-                  readOnly
-                  className="bg-zinc-800 text-white mb-4"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="airdrop-category"
-                  className="block text-sm text-white mb-3"
-                >
-                  Airdrop Sub Title
-                </label>
-                <Input
-                  value={airdropData.airdrops_banner_subtitle}
-                  onChange={(e) =>
-                    setAirdropData((p) => ({
-                      ...p,
-                      airdrops_banner_subtitle: e.target.value,
-                    }))
-                  }
-                  placeholder="Category"
-                  className="bg-zinc-800 text-white mb-3"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="banner-upload"
-                  className="block text-sm text-white mb-4"
-                >
-                  Airdrop Banner Image
-                </label>
-                <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
-                  {airdropData.airdrops_banner_image ? (
-                    <Image
-                      src={
-                        airdropData.airdrops_banner_image instanceof File
-                          ? URL.createObjectURL(
-                              airdropData.airdrops_banner_image
-                            )
-                          : airdropData.airdrops_banner_image
-                      }
-                      alt="Banner preview"
-                      className="absolute inset-0 w-full h-full object-cover"
-                      width={1920}
-                      height={1080}
-                    />
-                  ) : (
-                    <span className="text-white z-10 pointer-events-none select-none px-4 text-center">
-                      Click here to upload banner image
-                    </span>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setAirdropData((prev) => ({
-                          ...prev,
-                          airdrops_banner_image: file, // ✅ Store File object
-                        }));
-                      }
-                    }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end mt-6">
-                <Button
-                  onClick={() => setStep(2)}
-                  className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <>
-              <h2 className="text-lg font-bold mb-4">
-                Step 2: Content & Reorder
-              </h2>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={({ active, over }) => {
-                  if (active.id !== over?.id) {
-                    const oldIndex = parseInt(active.id);
-                    const newIndex = parseInt(over!.id);
-                    setContentBlocks((blocks) =>
-                      arrayMove(blocks, oldIndex, newIndex)
-                    );
-                  }
-                }}
-              >
-                <SortableContext
-                  items={contentBlocks.map((_, i) => i.toString())}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {contentBlocks.map((block, index) => (
-                    <SortableItem key={index} id={index.toString()}>
-                      <div className="border border-zinc-700 rounded-lg p-4 mb-4 relative">
-                        <button
-                          className="absolute top-2 right-2 text-white bg-black hover:bg-red-400 p-1 rounded-md cursor-pointer"
-                          onClick={() => removeBlock(index)}
-                          type="button"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                        <div className="mt-6">{renderBlock(block, index)}</div>
-                      </div>
-                    </SortableItem>
-                  ))}
-                </SortableContext>
-              </DndContext>
-
-              <div className="flex gap-2">
-                {[
-                  { icon: <FileText />, type: 'description' },
-                  { icon: <ImageIcon />, type: 'image' },
-                  { icon: <CheckSquare />, type: 'checklist' },
-                  { icon: <Link2 />, type: 'link' },
-                ].map((tool) => (
-                  <Tooltip key={tool.type}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-                        onClick={() => addBlock(tool.type as any)}
-                      >
-                        {tool.icon}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Add {tool.type}</TooltipContent>
-                  </Tooltip>
-                ))}
-              </div>
-              <div className="flex gap-2 mt-6">
-                <Button
-                  variant="outline"
-                  className="text-black cursor-pointer"
-                  onClick={() => setStep(1)}
-                >
-                  Back
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-                >
-                  {airdropId ? 'Update' : 'Create'}
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Right Panel: Live Preview */}
-        <section className="w-full flex flex-col items-center py-[5%] justify-start bg-black overflow-y-auto px-6">
-          <div className="w-full max-w-2xl">
-            <div className="flex items-center justify-center space-x-2">
-              <h2 className="bg-zinc-800 px-2 py-1 rounded-full">
-                {airdropData.airdrops_banner_subtitle}
-              </h2>
-              <h2>{airdropData.airdrops_date}</h2>
-            </div>
-            <div className="text-center py-4">
-              <h1 className="text-2xl font-semibold">
-                {airdropData.airdrops_banner_title}
-              </h1>
-              <p className="text-sm text-zinc-400 mt-2">
-                {airdropData.airdrops_banner_description}
-              </p>
-            </div>
-            <div className="rounded-2xl overflow-hidden mb-6">
-              {airdropData.airdrops_banner_image ? (
-                <Image
-                  src={airdropData.airdrops_banner_image}
-                  alt="Banner"
-                  className="w-full  object-cover rounded-2xl"
-                  width={1920}
-                  height={1080}
-                />
-              ) : (
-                <div className="w-full h-48 bg-zinc-800 rounded-2xl"></div>
-              )}
-            </div>
-            {contentBlocks.map((block, i) => {
-              switch (block.type) {
-                case 'description':
-                  return (
-                    <p key={i} className="mb-4 text-zinc-300">
-                      {block.value}
-                    </p>
-                  );
-                case 'image':
-                  return block.value ? (
-                    <Image
-                      key={i}
-                      src={block.value}
-                      alt={`Content ${i}`}
-                      width={1920}
-                      height={1080}
-                      className="mb-4 rounded-xl object-contain"
-                      unoptimized
-                    />
-                  ) : (
-                    <div
-                      key={i}
-                      className="w-full h-48 bg-zinc-800 rounded-xl mb-4"
-                    />
-                  );
-                case 'checklist':
-                  const items = block.value.split('\n').filter(Boolean);
-                  return (
-                    <ul
-                      key={i}
-                      className="list-disc list-inside text-zinc-300 mb-4"
-                    >
-                      {items.map((it, idx) => (
-                        <li key={idx}>{it}</li>
-                      ))}
-                    </ul>
-                  );
-                case 'link':
-                  return (
-                    <p key={i} className="mb-4">
-                      {block.value}{' '}
-                      <a
-                        href={block.link}
-                        target="_blank"
-                        className="text-purple-400 underline"
-                      >
-                        Link{' '}
-                      </a>
-                    </p>
-                  );
-                default:
-                  return null;
-              }
-            })}
-          </div>
-        </section>
+        <AirdropFormEditor
+          airdropData={airdropData}
+          setAirdropData={setAirdropData}
+          step={step}
+          setStep={setStep}
+          contentBlocks={contentBlocks}
+          setContentBlocks={setContentBlocks}
+          renderBlock={renderBlock}
+          removeBlock={removeBlock}
+          addBlock={addBlock}
+          handleSubmit={handleSubmit}
+          sensors={sensors}
+          airdropId={airdropId}
+        />
+        <AirdropPreview
+          airdropData={airdropData}
+          contentBlocks={contentBlocks}
+        />
       </div>
     </div>
   );
