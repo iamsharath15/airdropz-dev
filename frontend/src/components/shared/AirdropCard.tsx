@@ -10,7 +10,7 @@ type AirdropCardProps = {
     id: string;
     title: string;
     category: string | null;
-    banner_image_url: string;
+    preview_image_url: string;
     type: 'Free' | 'Paid';
 
   };

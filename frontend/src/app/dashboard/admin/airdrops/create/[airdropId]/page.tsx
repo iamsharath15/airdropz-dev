@@ -36,6 +36,7 @@ import {
 } from '@dnd-kit/sortable';
 
 import SortableItem from '@/components/shared/SortableItem';
+import { v4 as uuidv4 } from 'uuid';
 
 const CreateAirdropPage = () => {
   const params = useParams();
@@ -45,7 +46,14 @@ const CreateAirdropPage = () => {
   const totalSteps = 2;
   const progress = (step / totalSteps) * 100;
 
-  const [airdropData, setAirdropData] = useState({
+  const [airdropData, setAirdropData] = useState<{
+    airdrops_banner_image: string | File;
+    airdrops_banner_title: string;
+    airdrops_banner_description: string;
+    airdrops_banner_subtitle: string;
+    airdrops_date: string;
+    title: string;
+  }>({
     airdrops_banner_title: '',
     airdrops_banner_description: '',
     airdrops_banner_subtitle: '',
@@ -104,6 +112,16 @@ const CreateAirdropPage = () => {
     reader.onloadend = () => callback(reader.result as string);
     reader.readAsDataURL(file);
   };
+  const handleImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    idx: number
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      updateBlock(idx, 'file', file); // Set actual file for upload
+      updateBlock(idx, 'value', URL.createObjectURL(file)); // Preview image
+    }
+  };
 
   const handleDelete = async () => {
     if (!airdropId) {
@@ -121,34 +139,106 @@ const CreateAirdropPage = () => {
     }
   };
   const handleSubmit = async () => {
-    // if (!airdropData.airdrop_title.trim())
-    //   return toast.error('Title is required.');
-    const payload = {
-      title: airdropData.title,
-      // category: "",
-      //type: airdropData.type,
-      content_blocks: contentBlocks,
-      airdrops_banner_title: airdropData.airdrops_banner_title,
-      airdrops_banner_description: airdropData.airdrops_banner_description,
-      airdrops_banner_subtitle: airdropData.airdrops_banner_subtitle,
-      airdrops_banner_image: airdropData.airdrops_banner_image,
-    };
     try {
-      if (airdropId) {
-        await axios.put(
-          `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-          payload,
+      let createdAirdropId = airdropId;
+
+      // Step 1: Create or update airdrop to get ID
+      if (!airdropId) {
+        const res = await axios.post(
+          `http://localhost:8080/api/airdrop/v1`,
+          { title: airdropData.title }, // temp payload without image
           { withCredentials: true }
         );
-        toast.success('Airdrop updated!');
-      } else {
-        await axios.post(`http://localhost:8080/api/airdrop/v1`, payload, {
-          withCredentials: true,
-        });
-        toast.success('Airdrop created!');
+        createdAirdropId = res.data.id;
       }
+
+      // Step 2: Upload airdrops_banner_image if it's a File
+      let bannerImage = airdropData.airdrops_banner_image;
+      if (bannerImage instanceof File) {
+        const fileExt = bannerImage.name.split('.').pop();
+        const s3Path = `airdrops/${createdAirdropId}/airdropsBannerImage.${fileExt}`;
+
+        const presignRes = await axios.get(
+          'http://localhost:8080/api/upload/v1/generate-upload-url',
+          {
+            params: {
+              filename: s3Path,
+              contentType: bannerImage.type,
+            },
+          }
+        );
+
+        const { uploadUrl, publicUrl } = presignRes.data;
+
+        await axios.put(uploadUrl, bannerImage, {
+          headers: { 'Content-Type': bannerImage.type },
+        });
+
+        bannerImage = publicUrl;
+      }
+
+      // Step 3: Update airdrop with full banner payload
+      const step1Payload = {
+        title: airdropData.title,
+        airdrops_banner_title: airdropData.airdrops_banner_title,
+        airdrops_banner_description: airdropData.airdrops_banner_description,
+        airdrops_banner_subtitle: airdropData.airdrops_banner_subtitle,
+        airdrops_banner_image: bannerImage,
+      };
+
+      await axios.put(
+        `http://localhost:8080/api/airdrop/v1/${createdAirdropId}`,
+        step1Payload,
+        { withCredentials: true }
+      );
+
+      // Step 4: Upload content blocks (images + other types)
+      const uploadedBlocks = await Promise.all(
+        contentBlocks.map(async (block) => {
+          if (block.type === 'image' && block.file instanceof File) {
+            const fileExt = block.file.name.split('.').pop();
+            const uniqueId = uuidv4();
+
+            const s3Path = `airdrops/${createdAirdropId}/content-blocks/${uniqueId}.${fileExt}`;
+
+            const presignRes = await axios.get(
+              'http://localhost:8080/api/upload/v1/generate-upload-url',
+              {
+                params: {
+                  filename: s3Path,
+                  contentType: block.file.type,
+                },
+              }
+            );
+
+            const { uploadUrl, publicUrl } = presignRes.data;
+
+            await axios.put(uploadUrl, block.file, {
+              headers: { 'Content-Type': block.file.type },
+            });
+
+            return {
+              type: 'image',
+              value: publicUrl,
+              link: null,
+            };
+          }
+
+          return block;
+        })
+      );
+
+      // Step 5: Save content blocks
+      await axios.post(
+        `http://localhost:8080/api/airdrop/v1/content-blocks/${createdAirdropId}`,
+        { content_blocks: uploadedBlocks },
+        { withCredentials: true }
+      );
+
+      toast.success(airdropId ? 'Airdrop updated!' : 'Airdrop created!');
       router.push('/dashboard/admin/airdrops');
-    } catch {
+    } catch (error) {
+      console.error('Airdrop submit error:', error);
       toast.error('Submit failed.');
     }
   };
@@ -207,15 +297,12 @@ const CreateAirdropPage = () => {
               ) : (
                 <span className="z-10 text-white">Upload image</span>
               )}
-              <input
+
+              <Input
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file)
-                    readFile(file, (res) => updateBlock(idx, 'value', res));
-                }}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={(e) => handleImageChange(e, idx)}
+                className="cursor-pointer text-white file:text-white"
               />
             </label>
           </div>
@@ -374,7 +461,13 @@ const CreateAirdropPage = () => {
                 <div className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
                   {airdropData.airdrops_banner_image ? (
                     <Image
-                      src={airdropData.airdrops_banner_image}
+                      src={
+                        airdropData.airdrops_banner_image instanceof File
+                          ? URL.createObjectURL(
+                              airdropData.airdrops_banner_image
+                            )
+                          : airdropData.airdrops_banner_image
+                      }
                       alt="Banner preview"
                       className="absolute inset-0 w-full h-full object-cover"
                       width={1920}
@@ -390,13 +483,12 @@ const CreateAirdropPage = () => {
                     accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file)
-                        readFile(file, (res) =>
-                          setAirdropData((p) => ({
-                            ...p,
-                            airdrops_banner_image: res,
-                          }))
-                        );
+                      if (file) {
+                        setAirdropData((prev) => ({
+                          ...prev,
+                          airdrops_banner_image: file, // ✅ Store File object
+                        }));
+                      }
                     }}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
@@ -415,190 +507,6 @@ const CreateAirdropPage = () => {
           )}
 
           {step === 2 && (
-            // <div className="space-y-4">
-            //   <h2 className="text-lg font-bold mb-4">
-            //     Step 2: Airdrop Content
-            //   </h2>
-            //   <div className="flex gap-2">
-            //     <Tooltip>
-            //       <TooltipTrigger asChild>
-            //         <Button
-            //           variant="ghost"
-            //           onClick={() => addBlock('description')}
-            //           className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-            //         >
-            //           <FileText className="w-5 h-5 text-white" />
-            //         </Button>
-            //       </TooltipTrigger>
-            //       <TooltipContent>
-            //         <p>Add About</p>
-            //       </TooltipContent>
-            //     </Tooltip>
-
-            //     <Tooltip>
-            //       <TooltipTrigger asChild>
-            //         <Button
-            //           variant="secondary"
-            //           onClick={() => addBlock('image')}
-            //           className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-            //         >
-            //           <ImageIcon className="w-5 h-5 text-white" />
-            //         </Button>
-            //       </TooltipTrigger>
-            //       <TooltipContent>
-            //         <p>Add Image block</p>
-            //       </TooltipContent>
-            //     </Tooltip>
-
-            //     <Tooltip>
-            //       <TooltipTrigger asChild>
-            //         <Button
-            //           variant="secondary"
-            //           onClick={() => addBlock('checklist')}
-            //           className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-            //         >
-            //           <CheckSquare className="w-5 h-5 text-white" />
-            //         </Button>
-            //       </TooltipTrigger>
-            //       <TooltipContent>
-            //         <p>Add Checklist</p>
-            //       </TooltipContent>
-            //     </Tooltip>
-
-            //     <Tooltip>
-            //       <TooltipTrigger asChild>
-            //         <Button
-            //           variant="secondary"
-            //           onClick={() => addBlock('link')}
-            //           className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-            //         >
-            //           <Link2 className="w-5 h-5 text-white" />
-            //         </Button>
-            //       </TooltipTrigger>
-            //       <TooltipContent>
-            //         <p>Add Link</p>
-            //       </TooltipContent>
-            //     </Tooltip>
-            //   </div>
-
-            //   {contentBlocks.map((block, index) => (
-            //     <div
-            //       key={index}
-            //       className="space-y-2 border border-zinc-700 p-3 rounded-md bg-zinc-900"
-            //     >
-            //       {block.type === 'description' && (
-            //         <Textarea
-            //           placeholder="Enter description"
-            //           value={block.value}
-            //           onChange={(e) => updateBlockValue(index, e.target.value)}
-            //           className="bg-zinc-800 text-white"
-            //         />
-            //       )}
-            //       {block.type === 'image' && (
-            //         <div className="space-y-2">
-            //           {/* Image URL input */}
-            //           <Input
-            //             placeholder="Enter image URL"
-            //             value={block.value}
-            //             onChange={(e) =>
-            //               updateBlockValue(index, e.target.value)
-            //             }
-            //             className="bg-zinc-800 text-white"
-            //           />
-
-            //           {/* Image upload label and file input */}
-            //           <label
-            //             htmlFor={`image-upload-${index}`}
-            //             className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition"
-            //           >
-            //             {block.value ? (
-            //               <Image
-            //                 src={block.value}
-            //                 alt={`Content Image ${index + 1}`}
-            //                 className="absolute inset-0 w-full h-full object-cover"
-            //                 width={1920}
-            //                 height={1080}
-            //               />
-            //             ) : (
-            //               <span className="text-white z-10 pointer-events-none select-none px-4 text-center">
-            //                 Click here to upload image
-            //               </span>
-            //             )}
-            //             <input
-            //               id={`image-upload-${index}`}
-            //               type="file"
-            //               accept="image/*"
-            //               onChange={(e) => {
-            //                 const file = e.target.files?.[0];
-            //                 if (file) {
-            //                   const reader = new FileReader();
-            //                   reader.onloadend = () => {
-            //                     updateBlockValue(
-            //                       index,
-            //                       reader.result as string
-            //                     );
-            //                   };
-            //                   reader.readAsDataURL(file);
-            //                 }
-            //               }}
-            //               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            //             />
-            //           </label>
-            //         </div>
-            //       )}
-
-            //       {block.type === 'checklist' && (
-            //         <Textarea
-            //           placeholder="Enter checklist items (e.g. one per line)"
-            //           value={block.value}
-            //           onChange={(e) => updateBlockValue(index, e.target.value)}
-            //           className="bg-zinc-800 text-white"
-            //         />
-            //       )}
-            //       {block.type === 'link' && (
-            //         <div className="space-y-2">
-            //           <Input
-            //             placeholder="Enter title"
-            //             value={block.value}
-            //             onChange={(e) =>
-            //               updateBlockValue(index, e.target.value)
-            //             }
-            //             className="bg-zinc-800 text-white"
-            //           />
-            //           <Input
-            //             placeholder="Enter hyperlink"
-            //             value={block.link}
-            //             onChange={(e) => {
-            //               const updated = [...contentBlocks];
-            //               updated[index].link = e.target.value;
-            //               setContentBlocks(updated);
-            //             }}
-            //             className="bg-zinc-800 text-white"
-            //           />
-            //         </div>
-            //       )}
-
-            //       <Button
-            //         variant="destructive"
-            //         size="sm"
-            //         onClick={() => removeBlock(index)}
-            //         className="text-sm cursor-pointer"
-            //       >
-            //         <Trash2 className="w-4 h-4" />
-            //       </Button>
-            //     </div>
-            //   ))}
-
-            //   <div className="flex justify-start mt-6">
-            //     <Button
-            //       onClick={prevStep}
-            //       variant="outline"
-            //       className="border-zinc-700 text-zinc-400"
-            //     >
-            //       Back
-            //     </Button>
-            //   </div>
-            // </div>
             <>
               <h2 className="text-lg font-bold mb-4">
                 Step 2: Content & Reorder
@@ -706,67 +614,6 @@ const CreateAirdropPage = () => {
                 <div className="w-full h-48 bg-zinc-800 rounded-2xl"></div>
               )}
             </div>
-            {/* Render content blocks */}
-            {/* {contentBlocks.map((block, i) => {
-              if (block.type === 'description') {
-                return (
-                  <p key={i} className="mb-4 text-zinc-300">
-                    {block.value || `Description ${i + 1}`}
-                  </p>
-                );
-              }
-              if (block.type === 'image') {
-                return block.value ? (
-                  <Image
-                    key={i}
-                    src={block.value}
-                    alt={`Content Image ${i + 1}`}
-                    className="mb-4 rounded-md object-contain"
-                    width={1920}
-                    height={1080}
-                    unoptimized // Add this if you're using base64 or non-remote images to prevent optimization errors
-                  />
-                ) : (
-                  <div
-                    key={i}
-                    className="w-full h-48 bg-zinc-800 rounded-2xl mb-4"
-                    aria-label={`Placeholder for image ${i + 1}`}
-                  />
-                );
-              }
-
-              if (block.type === 'checklist') {
-                const items = block.value
-                  ? block.value.split('\n').filter((line) => line.trim() !== '')
-                  : [`Checklist item ${i + 1}.1`, `Checklist item ${i + 1}.2`];
-                return (
-                  <ul
-                    key={i}
-                    className="list-disc list-inside mb-4 text-zinc-300"
-                  >
-                    {items.map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
-                );
-              }
-              if (block.type === 'link') {
-                const linkText = block.value || `Example Link ${i + 1}`;
-                const linkHref = block.link || 'https://example.com';
-                return (
-                  <p key={i} className="mb-4">
-                    <a
-                      href={linkHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-purple-400 underline"
-                    >
-                      {linkText}
-                    </a>
-                  </p>
-                );
-              }
-            })} */}
             {contentBlocks.map((block, i) => {
               switch (block.type) {
                 case 'description':
@@ -807,12 +654,13 @@ const CreateAirdropPage = () => {
                 case 'link':
                   return (
                     <p key={i} className="mb-4">
+                      {block.value}{' '}
                       <a
                         href={block.link}
                         target="_blank"
                         className="text-purple-400 underline"
                       >
-                        {block.value}
+                        Link{' '}
                       </a>
                     </p>
                   );
