@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '../ui/dropdown-menu';
 import { logout } from '@/app/(auth)/logout/page';
+import Image from 'next/image';
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -67,6 +68,8 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
   const userName = user?.user_name || 'User';
   const userEmail = user?.email || 'user@example.com';
+  const userProfile = user?.profile_image;
+
 
   return (
     <header className="h-16 border-b border-[#272727] px-6 flex items-center justify-between bg-black">
@@ -91,12 +94,24 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              aria-label="User menu"
-              className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
-            >
-              {userName.charAt(0).toUpperCase()}
-            </button>
+            
+            {userProfile ? (
+  <Image
+    src={userProfile}
+    alt="User Avatar"
+    width={32}
+    height={32}
+    className="rounded-full object-cover w-8 h-8 cursor-pointer"
+  />
+) : (
+  <button
+    aria-label="User menu"
+    className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
+  >
+    {userName.charAt(0).toUpperCase()}
+  </button>
+)}
+
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -107,9 +122,20 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
               Profile
               <div className="flex">
                 <div className="flex items-center justify-center pr-3">
+                        {userProfile ? (
+  <Image
+    src={userProfile}
+    alt="User Avatar"
+    width={32}
+    height={32}
+    className="rounded-full object-cover w-8 h-8 cursor-pointer"
+  />
+) : (
                   <div className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold">
                     {userName.charAt(0).toUpperCase()}
-                  </div>
+                      </div>
+                      )}
+
                 </div>
                 <div className=" flex flex-col items-start justify-center">
                   <div className="mt-1 text-sm font-medium">{userName}</div>

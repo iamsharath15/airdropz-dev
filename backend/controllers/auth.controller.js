@@ -77,6 +77,13 @@ class UserController {
 
       const newUser = insertUserResult.rows[0];
       await pool.query(
+        `INSERT INTO user_settings (user_id)
+   VALUES ($1)
+   ON CONFLICT (user_id) DO NOTHING`,
+        [newUser.id]
+      );
+
+      await pool.query(
         `INSERT INTO leaderboard (user_id, points)
        VALUES ($1, 0)
        ON CONFLICT (user_id) DO NOTHING`,

@@ -10,6 +10,8 @@ interface User {
   daily_login_streak_count: number;
   airdrops_remaining: number;
   airdrops_earned: number;
+  profile_image: string
+
 }
 
 interface AuthState {

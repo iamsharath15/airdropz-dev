@@ -14,6 +14,7 @@ export async function createUsersTable() {
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         user_name VARCHAR(100) NOT NULL,
+        profile_image TEXT,
         referral_code VARCHAR(50) UNIQUE,
         points INT DEFAULT 0,
         last_login TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

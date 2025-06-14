@@ -4,12 +4,13 @@ import { verifyToken } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
+// Protect all routes with token verification
 router.use(verifyToken);
 
+// GET current user settings
 router.get('/', UserSettingsController.getSettings);
-router.put('/account', UserSettingsController.updateAccount);
-router.put('/notifications', UserSettingsController.updateNotifications);
-router.put('/display', UserSettingsController.updateDisplay);
-router.put('/wallet', UserSettingsController.updateWallet);
+
+// PATCH all settings in a single API call
+router.patch('/', UserSettingsController.updateAllSettings);
 
 export default router;
