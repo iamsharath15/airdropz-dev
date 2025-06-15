@@ -38,6 +38,8 @@ type EditAirdropFormModalProps = {
 const defaultCategories = ['Solana', 'Ethereum', 'Polygon'];
 
 const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
+  console.log(airdrop);
+  
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [name, setName] = useState(airdrop.title);

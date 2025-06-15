@@ -42,18 +42,20 @@ export default function AirdropPreview({ airdropData, contentBlocks }: Props) {
             <h2 className="bg-zinc-800 px-2 py-1 rounded-full md:text-sm text-xs font-medium text-white'">
               {airdropData.airdrops_banner_subtitle}
             </h2>
-            <p className='md:text-sm text-xs font-medium text-white' >{airdropData.airdrops_date}</p>
+            <p className="md:text-sm text-xs font-medium text-white">
+              {airdropData.airdrops_date}
+            </p>
           </div>
           <div className="text-center py-4">
-            <h1 className="md:text-2xl text-xl font-semibold">
+            <h1 className="md:text-2xl text-xl font-semibold text-center">
               {airdropData.airdrops_banner_title}
             </h1>
-            <p className="md:text-lg tetx-sm text-white/80 mt-2">
+            <p className="md:text-lg text-sm text-white/80 mt-2 font-medium text-center">
               {airdropData.airdrops_banner_description}
             </p>
           </div>
         </div>
-        <div className="rounded-2xl overflow-hidden mb-6 w-full">
+        <div className="rounded-2xl overflow-hidden w-full p-[2%]">
           {previewImage ? (
             <Image
               src={previewImage}
@@ -67,14 +69,19 @@ export default function AirdropPreview({ airdropData, contentBlocks }: Props) {
             <div className="w-full md:h-48 h-30 bg-zinc-800 rounded-2xl" />
           )}
         </div>
-        <div className=" w-8/12 flex flex-col items-center justify-center">
+        <div className=" md:w-8/12 w-10/12 flex flex-col items-center justify-center">
           {contentBlocks.map((block, i) => {
             switch (block.type) {
               case 'description':
                 return (
-                  <p key={i} className="mb-4 text-zinc-300 text-left">
-                    {block.value}
-                  </p>
+                  <div
+                    className="py-[2%] flex items-center justify-start w-full"
+                    key={i}
+                  >
+                    <p className="text-left font-medium text-white md:text-lg text-sm">
+                      {block.value}
+                    </p>
+                  </div>
                 );
               case 'image':
                 return block.value?.trim() ? (
@@ -96,42 +103,57 @@ export default function AirdropPreview({ airdropData, contentBlocks }: Props) {
               case 'checklist':
                 const items = block.value.split('\n').filter(Boolean);
                 return (
-                  <ul
+                  <div
+                    className="py-[1%] flex itesms-center justify-start w-full"
                     key={i}
-                    className="list-disc list-inside text-zinc-300 mb-4"
                   >
-                    {items.map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
+                    <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
+                      {items.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 );
               case 'link':
                 return (
-                  <p key={i} className="mb-4">
-                    {block.value}{' '}
-                    <a
-                      href={block.link}
-                      target="_blank"
-                      className="text-purple-400 underline"
-                      rel="noreferrer"
-                    >
-                      Link
-                    </a>
-                  </p>
+                  <div
+                    className="py-[1%] flex itesms-center justify-start w-full"
+                    key={i}
+                  >
+                    <p className="text-white md:text-lg text-sm font-medium">
+                      {block.value}{' '}
+                      <a
+                        href={block.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-400 underline"
+                      >
+                        Link
+                      </a>
+                    </p>
+                  </div>
                 );
               case 'highlight':
                 return (
-                  <div className="bg-[#111112] py-[2%] px-[10%] rounded-2xl w-full">
-                    <p key={i} className="text-white text-2xl">
+                  <div
+                    className="bg-[#111112] my-[2%] py-[2%] px-[10%] rounded-2xl w-full"
+                    key={i}
+                  >
+                    <p className="text-center text-white md:text-2xl text-xl font-medium ">
                       {block.value}
                     </p>
                   </div>
                 );
               case 'header1':
                 return (
-                  <h1 key={i} className="text-white text-2xl text-left">
-                    {block.value}
-                  </h1>
+                  <div
+                    className="py-[1%] flex itesms-center justify-start w-full"
+                    key={i}
+                  >
+                    <h1 className="text-white md:text-2xl text-xl font-medium text-left ">
+                      {block.value}
+                    </h1>
+                  </div>
                 );
               default:
                 return null;

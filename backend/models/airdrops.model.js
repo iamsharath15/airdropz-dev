@@ -15,7 +15,7 @@ export async function createAirdropsTables() {
       updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
       airdrops_banner_title TEXT,
       airdrops_banner_description TEXT,
-      airdrops_banner_subTitle TEXT,
+      airdrops_banner_subtitle TEXT,
       airdrops_banner_image TEXT
     );
 
@@ -24,7 +24,7 @@ export async function createAirdropsTables() {
     CREATE TABLE IF NOT EXISTS content_blocks (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       airdrop_id UUID NOT NULL REFERENCES airdrops(id) ON DELETE CASCADE,
-      type TEXT NOT NULL CHECK (type IN ('description', 'image', 'checklist', 'link')),
+      type TEXT NOT NULL CHECK (type IN ('description', 'image', 'checklist', 'link', 'highlight', 'header1')),
       value TEXT,
       link TEXT,
       created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,

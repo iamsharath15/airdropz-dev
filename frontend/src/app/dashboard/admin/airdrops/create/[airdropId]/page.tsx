@@ -30,6 +30,9 @@ const CreateAirdropPage = () => {
   const [step, setStep] = useState(1);
   const [airdropData, setAirdropData] = useState<{
     title: string;
+    category: string;
+    preview_image_url: string;
+    type: string;
     airdrops_banner_title: string;
     airdrops_banner_description: string;
     airdrops_banner_subtitle: string;
@@ -37,6 +40,9 @@ const CreateAirdropPage = () => {
     airdrops_banner_image: string | File;
   }>({
     title: '',
+    category: "",
+    preview_image_url: "",
+    type:"",
     airdrops_banner_title: '',
     airdrops_banner_description: '',
     airdrops_banner_subtitle: '',
@@ -76,6 +82,9 @@ const CreateAirdropPage = () => {
 
         setAirdropData({
           title: data.title || 'Airdrop Title',
+          preview_image_url: data.preview_image_url,
+          type: data.type,
+          category:data.category,
           airdrops_banner_title:
             data.airdrops_banner_title || 'How to Join the Airdrop',
           airdrops_banner_description:
