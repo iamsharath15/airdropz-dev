@@ -51,10 +51,10 @@ const Calendar = () => {
     fetchLoginDates();
   }, []);
 
-  const isLoggedInDate = (date: Date) => {
-    const formatted = format(date, 'yyyy-MM-dd');
-    return loginDates.includes(formatted);
-  };
+const isLoggedInDate = (date: Date) => {
+  const formatted = date.toISOString().split('T')[0]; // ensure UTC comparison
+  return loginDates.includes(formatted);
+};
 
   const handlePrevMonth = () => {
     setCurrentDate(prev => subMonths(prev, 1));

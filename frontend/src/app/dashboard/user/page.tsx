@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
           <WelcomeCard
             name={userName}
             stats={[
-              { label: 'Check Ins', value: checkIn },
+              { label: 'Streak', value: checkIn },
               {
                 label: 'Airdrops Earned',
                 value: airdropsEarned,

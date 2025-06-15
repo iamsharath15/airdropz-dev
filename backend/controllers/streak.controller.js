@@ -6,9 +6,16 @@ class DailyLoginController {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     // Use mockDate from query param for testing, fallback to today
-    const today = req.query.mockDate || new Date().toISOString().split('T')[0];
+    // const today = req.query.mockDate || new Date().toISOString().split('T')[0];
 
     try {
+      const getTodayDate = (mockDate) => {
+        if (mockDate) return mockDate;
+        const now = new Date();
+        return now.toISOString().split('T')[0]; // Safe UTC date
+      };
+
+      const today = getTodayDate(req.query.mockDate);
       // 1. Check if already logged in today
       const { rows: existingLogin } = await pool.query(
         `SELECT * FROM user_logins WHERE user_id = $1 AND login_date = $2`,
@@ -17,10 +24,17 @@ class DailyLoginController {
 
       if (existingLogin.length > 0) {
         // User already logged in today, return existing streak count and 0 points for today
+        const { rows: updatedUserRows } = await pool.query(
+          `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
+          [userId]
+        );
+        const updatedUser = updatedUserRows[0];
         return res.status(200).json({
           message: 'You have already logged in today.',
           streakCount: existingLogin[0].streak_count,
           todayPoints: 0,
+          airdropsEarned: updatedUser.airdrops_earned,
+          airdropsRemaining: updatedUser.airdrops_remaining,
         });
       }
 
@@ -69,11 +83,18 @@ class DailyLoginController {
    WHERE id = $2`,
         [streakCount, userId]
       );
+      const { rows: updatedUserRows } = await pool.query(
+        `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
+        [userId]
+      );
+      const updatedUser = updatedUserRows[0];
 
       return res.status(200).json({
         message: streakCount > 1 ? 'Streak continued!' : 'Streak started.',
         streakCount,
         todayPoints: 2,
+        airdropsEarned: updatedUser.airdrops_earned,
+        airdropsRemaining: updatedUser.airdrops_remaining,
       });
     } catch (error) {
       console.error('❌ Daily login error:', error);

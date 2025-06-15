@@ -57,6 +57,10 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
     (role === 'admin' ? 'Admin Dashboard' : 'Dashboard');
 
   const handleLogout = async () => {
+     if (user?.id) {
+    const localKey = `streak-${user.id}-date`;
+    localStorage.removeItem(localKey);
+  }
     dispatch(logoutAction());
     await logout();
     router.push('/'); 

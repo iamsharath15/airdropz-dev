@@ -206,11 +206,25 @@ class UserController {
       ]);
 
       delete user.password;
+      const safeUser = {
+        id: user.id,
+        email: user.email,
+        user_name: user.user_name,
+        role: user.role,
+        referral_code: user.referral_code,
+        wallet_address: user.wallet_address,
+        daily_login_streak_count: user.daily_login_streak_count,
+        airdrops_earned: user.airdrops_earned,
+        airdrops_remaining: user.airdrops_remaining,
+        profile_image: user.profile_image,
+        is_new_user: user.is_new_user,
+        is_verified: user.is_verified,
+      };
 
       res.status(200).json({
         success: true,
         message: 'Logged in successfully',
-        user,
+        user: safeUser,
       });
     } catch (error) {
       console.error('Error in loginUser:', error);

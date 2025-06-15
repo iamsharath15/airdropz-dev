@@ -11,7 +11,6 @@ interface User {
   airdrops_remaining: number;
   airdrops_earned: number;
   profile_image: string
-
 }
 
 interface AuthState {
@@ -36,8 +35,13 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
     },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+  if (state.user) {
+    state.user = { ...state.user, ...action.payload };
+  }
+},
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, updateUser } = authSlice.actions;
 export default authSlice.reducer;
