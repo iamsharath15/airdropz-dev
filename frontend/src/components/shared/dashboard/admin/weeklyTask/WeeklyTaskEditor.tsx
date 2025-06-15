@@ -314,7 +314,7 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
             </label>
             <Textarea
               placeholder="Short description"
-              value={task.task_description}
+              value={task.task_description || "hi"}
               onChange={(e) => onTaskUpdate({ task_description: e.target.value })}
               className="bg-zinc-900 border-zinc-700 text-white mb-4"
             />

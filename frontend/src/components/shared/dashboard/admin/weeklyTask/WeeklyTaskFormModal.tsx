@@ -285,7 +285,7 @@ const handleCreate = async () => {
               {/* Submit */}
               <Button
                 onClick={handleCreate}
-                className="w-full mt-4 bg-violet-600 hover:bg-violet-700 transition-colors text-white font-semibold cursor-pointer"
+                className="w-full mt-4 bg-[#8373EE]  hover:bg-[#8373EE]/80 transition-colors text-white font-semibold cursor-pointer"
               >
                 Create Weekly Task
               </Button>

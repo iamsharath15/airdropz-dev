@@ -104,27 +104,31 @@ const CreateWeeklyTaskPage = () => {
       setSaving(false);
     }
   };
-const handleDelete = async () => {
-  if (!taskId) return;
+  const handleDelete = async () => {
+    if (!taskId) return;
 
-  const confirmDelete = window.confirm('Are you sure you want to delete this Weekly Task?');
-  if (!confirmDelete) return;
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this Weekly Task?'
+    );
+    if (!confirmDelete) return;
 
-  try {
-    const res = await axios.delete(`http://localhost:8080/api/weeklytask/v1/${taskId}`);
-    if (res.data.success) {
-      toast.success('🗑️ Weekly Task deleted successfully!');
-      // ✅ Redirect to weekly task list page
-      window.location.href = 'http://localhost:3000/dashboard/admin/weeklytask';
-    } else {
-      toast.error('❌ Failed to delete Weekly Task');
+    try {
+      const res = await axios.delete(
+        `http://localhost:8080/api/weeklytask/v1/${taskId}`
+      );
+      if (res.data.success) {
+        toast.success('🗑️ Weekly Task deleted successfully!');
+        // ✅ Redirect to weekly task list page
+        window.location.href =
+          'http://localhost:3000/dashboard/admin/weeklytask';
+      } else {
+        toast.error('❌ Failed to delete Weekly Task');
+      }
+    } catch (error) {
+      console.error('DELETE error:', error);
+      toast.error('❌ Error deleting Weekly Task');
     }
-  } catch (error) {
-    console.error('DELETE error:', error);
-    toast.error('❌ Error deleting Weekly Task');
-  }
-};
-
+  };
 
   return (
     <div className="flex flex-col max:h-screen bg-black text-white">
@@ -132,13 +136,18 @@ const handleDelete = async () => {
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <h1 className="text-xl font-semibold">Edit Weekly Task</h1>
         <div className="flex gap-3">
-<Button variant="destructive" onClick={handleDelete} disabled={saving}>
-  Delete
-</Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={saving}
+            className="cursor-pointer"
+          >
+            Delete
+          </Button>
           <Button
             onClick={handleSaveChanges}
             disabled={saving}
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>

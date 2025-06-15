@@ -9,7 +9,8 @@ interface TaskSectionProps {
 
 }
 
-export const TaskSection: React.FC<TaskSectionProps> = ({ title, tasks,  onTaskClick  }) => {
+export const TaskSection: React.FC<TaskSectionProps> = ({ title, tasks, onTaskClick }) => {
+  
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-6">

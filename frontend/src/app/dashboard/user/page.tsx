@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
           {/* Leaderboard section */}
           <LeaderboardSection />
           {/* My Airdrops section */}
-          <AirdropsSection />
+          {/* <AirdropsSection /> */}
 
           {/* My Task section */}
           <TasksSection />

@@ -73,10 +73,10 @@ const UserTable: React.FC = () => {
   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 ">
     <h2 className="text-2xl font-bold text-white">User Details</h2>
     <div className="flex gap-2">
-      <Button onClick={exportToExcel} className="bg-green-500 hover:bg-green-600 cursor-pointer text-white font-medium rounded-lg px-4 py-2">
+      <Button onClick={exportToExcel} className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer text-white font-medium rounded-lg px-4 py-2">
         Download Excel
       </Button>
-      <Button onClick={exportToPDF} className="bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg px-4 py-2 cursor-pointer">
+      <Button onClick={exportToPDF} className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white font-medium rounded-lg px-4 py-2 cursor-pointer">
         Download PDF
       </Button>
     </div>
