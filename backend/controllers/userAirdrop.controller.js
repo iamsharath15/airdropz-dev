@@ -85,7 +85,36 @@ class UserAirdropController {
     console.error('Error checking airdrop like status:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
+ }
+  
+ static async getTopLikedAirdrops(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        a.id,
+        a.title,
+        a.category,
+        a.preview_image_url,
+        a.type,
+        COUNT(ua.*) AS likes
+      FROM airdrops a
+      JOIN user_airdrops ua ON a.id = ua.airdrop_id
+      GROUP BY a.id
+      ORDER BY likes DESC
+      LIMIT 10;
+    `);
+
+    return res.status(200).json({
+      message: 'Top liked airdrops fetched successfully',
+      data: result.rows,
+    });
+  } catch (err) {
+    console.error('[❌ getTopLikedAirdrops]', err.message);
+    return res.status(500).json({ message: 'Server Error' });
+  }
 }
+
+
 
 }
 

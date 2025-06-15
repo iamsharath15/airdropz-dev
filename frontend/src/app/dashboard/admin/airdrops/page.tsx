@@ -32,7 +32,7 @@ const AirdropsListing = () => {
   useEffect(() => {
     axios
       .get('http://localhost:8080/api/airdrop/v1/')
-      .then((res) => dispatch(setAirdrops(res.data)))
+      .then((res) => dispatch(setAirdrops(res.data.data)))
       .catch((err) => console.error('Failed to fetch airdrops:', err));
   }, [dispatch]);
 

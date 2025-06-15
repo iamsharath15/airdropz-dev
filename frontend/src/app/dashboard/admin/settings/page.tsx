@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import Image from 'next/image';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
+import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,9 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { updateUser } from '@/store/authSlice';
+import { useRoleRedirect } from '@/lib/useRoleRedirect';
 
 interface SettingSectionProps {
   title: string;
@@ -34,14 +38,39 @@ const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => (
 const TABS = ['Account', 'Notification', 'Display', 'Wallet'] as const;
 type Tab = (typeof TABS)[number];
 
+const SkeletonBox = ({ className = '' }) => (
+  <motion.div
+    className={`bg-zinc-800 rounded-md ${className}`}
+    animate={{ opacity: [0.4, 1, 0.4] }}
+    transition={{ duration: 1.5, repeat: Infinity }}
+  />
+);
+
+const SkeletonLoader = () => (
+  <div className="w-full md:w-5/12 mt-6 space-y-6">
+    <SkeletonBox className="w-32 h-6" />
+    <div className="flex gap-4 items-center">
+      <SkeletonBox className="w-24 h-24 rounded-full" />
+      <div className="flex-1 space-y-2">
+        <SkeletonBox className="w-3/4 h-4" />
+        <SkeletonBox className="w-full h-10" />
+      </div>
+    </div>
+    <SkeletonBox className="w-1/2 h-4" />
+    <SkeletonBox className="w-full h-10" />
+    <SkeletonBox className="w-1/2 h-4 mt-4" />
+    <SkeletonBox className="w-full h-10" />
+  </div>
+);
+
 const Settings: React.FC = () => {
+  useRoleRedirect('admin');
   const [activeTab, setActiveTab] = useState<Tab>('Account');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'user1';
   const userEmail = user?.email || 'user@example.com';
   const walletAddress = user?.wallet_address || 'add your wallet';
 
-  // Local state for form data
   const [username, setUsername] = useState(userName);
   const [wallet, setWallet] = useState(walletAddress);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -51,17 +80,17 @@ const Settings: React.FC = () => {
   const [taskReminders, setTaskReminders] = useState(true);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
 
-    const [isLoading, setIsLoading] = useState(true);
-
-useEffect(() => {
+  useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/settings/v1/', {
-          withCredentials: true,
-        });
-
-        const settings = response.data;        
+        const response = await axios.get(
+          'http://localhost:8080/api/settings/v1/',
+          { withCredentials: true }
+        );
+        const settings = response.data;
         setUsername(settings.user_name || '');
         setWallet(settings.wallet_address || '');
         setProfileImageUrl(settings.profile_image || null);
@@ -74,14 +103,13 @@ useEffect(() => {
         setIsLoading(false);
       }
     };
-
     fetchSettings();
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await axios.patch(
+      await axios.patch(
         'http://localhost:8080/api/settings/v1/',
         {
           user_name: username,
@@ -93,20 +121,45 @@ useEffect(() => {
           mode: 'dark',
           language: 'english',
         },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
+      );
+      dispatch(
+        updateUser({
+          user_name: username,
+          profile_image: profileImageUrl ?? undefined,
+          wallet_address: wallet,
+        })
       );
 
-      console.log('Settings updated:', response.data);
+      toast.success('Settings updated successfully!');
     } catch (error) {
       console.error('Error updating settings:', error);
+      toast.error('Failed to update settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
- if (isLoading) {
-    return <div className="text-white p-6">Loading settings...</div>;
+
+  if (isLoading) {
+    return (
+      <div className="text-white flex flex-col items-start rounded-2xl bg-[#151313] p-6 shadow-sm">
+        <nav
+          className="flex overflow-x-auto space-x-4 border-b border-gray-700 w-full"
+          aria-label="Settings Tabs"
+        >
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              className="whitespace-nowrap p-3 font-semibold border-b-4 cursor-not-allowed border-transparent text-gray-600"
+              disabled
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+        <SkeletonLoader />
+      </div>
+    );
   }
 
   return (
@@ -134,14 +187,12 @@ useEffect(() => {
         {activeTab === 'Account' && (
           <SettingSection title="Account Settings">
             <div className="space-y-6 w-full">
-            <ProfilePictureUpload
-  userId={(user?.id ?? '').toString()}
-  userName={username}
-  setProfileImageUrl={setProfileImageUrl}
-  profileImageUrl={profileImageUrl ?? ''}
-/>
-
-
+              <ProfilePictureUpload
+                userId={(user?.id ?? '').toString()}
+                userName={username}
+                setProfileImageUrl={setProfileImageUrl}
+                profileImageUrl={profileImageUrl ?? ''}
+              />
               <div>
                 <Label htmlFor="username" className="text-white mb-4 block">
                   Username
@@ -154,7 +205,6 @@ useEffect(() => {
                   className="border-0 text-black placeholder:text-black bg-white"
                 />
               </div>
-
               <div>
                 <Label htmlFor="email" className="text-white mb-4 block">
                   Email Address
@@ -204,10 +254,7 @@ useEffect(() => {
                   Theme
                 </Label>
                 <Select defaultValue="dark" disabled>
-                  <SelectTrigger
-                    id="theme"
-                    className="bg-white border-gray-800 text-black w-full"
-                  >
+                  <SelectTrigger className="bg-white border-gray-800 text-black w-full">
                     <SelectValue placeholder="Dark Mode" />
                   </SelectTrigger>
                   <SelectContent>
@@ -221,10 +268,7 @@ useEffect(() => {
                   Language
                 </Label>
                 <Select defaultValue="en" disabled>
-                  <SelectTrigger
-                    id="language"
-                    className="bg-white border-gray-800 text-black w-full"
-                  >
+                  <SelectTrigger className="bg-white border-gray-800 text-black w-full">
                     <SelectValue placeholder="English" />
                   </SelectTrigger>
                   <SelectContent>
@@ -263,9 +307,35 @@ useEffect(() => {
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer flex items-center gap-2"
           >
-            {isSaving ? 'Saving...' : 'Save Changes'}
+            {isSaving ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+                  />
+                </svg>
+                Saving...
+              </>
+            ) : (
+              'Save Changes'
+            )}
           </Button>
         </div>
       </div>
@@ -273,18 +343,16 @@ useEffect(() => {
   );
 };
 
-interface NotificationToggleProps {
-  title: string;
-  description: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}
-
-const NotificationToggle: React.FC<NotificationToggleProps> = ({
+const NotificationToggle = ({
   title,
   description,
   checked,
   onChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
 }) => (
   <div className="flex justify-between items-center max-w-md">
     <div className="pr-4">
@@ -299,33 +367,27 @@ const NotificationToggle: React.FC<NotificationToggleProps> = ({
   </div>
 );
 
-interface ProfilePictureUploadProps {
-  userId: string;
-  userName: string;
-  setProfileImageUrl: (url: string) => void;
-  profileImageUrl:string;
-}
-
-const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
+const ProfilePictureUpload = ({
   userId,
   userName,
   setProfileImageUrl,
-  profileImageUrl
+  profileImageUrl,
+}: {
+  userId: string;
+  userName: string;
+  setProfileImageUrl: (url: string) => void;
+  profileImageUrl: string;
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   const initial = userName.charAt(0).toUpperCase();
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setPreviewUrl(URL.createObjectURL(file));
-
     try {
       const url = await uploadImageToS3(file, `profile-pictures/${userId}`);
       setProfileImageUrl(url);
-      console.log('Uploaded to S3:', url);
     } catch (error) {
       console.error('Upload error:', error);
     }
@@ -333,21 +395,21 @@ const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
 
   return (
     <div className="flex items-center gap-4">
-     <div className="w-4/12 rounded-full overflow-hidden flex items-center justify-center text-white text-3xl font-bold">
-  {previewUrl || profileImageUrl ? (
-    <Image
-      width={96}
-      height={96}
-      src={previewUrl || profileImageUrl!}
-      alt="Profile"
-      className="object-cover w-24 h-24 rounded-full border border-gray-500 bg-gray-700"
-    />
-  ) : (
-    <div className="w-24 h-24 border border-gray-500 bg-gray-700 rounded-full flex items-center justify-center">
-      <span>{initial}</span>
-    </div>
-  )}
-</div>
+      <div className="w-4/12 rounded-full overflow-hidden flex items-center justify-center text-white text-3xl font-bold">
+        {previewUrl || profileImageUrl ? (
+          <Image
+            width={96}
+            height={96}
+            src={previewUrl || profileImageUrl}
+            alt="Profile"
+            className="object-cover w-24 h-24 rounded-full border border-gray-500 bg-gray-700"
+          />
+        ) : (
+          <div className="w-24 h-24 border border-gray-500 bg-gray-700 rounded-full flex items-center justify-center">
+            <span>{initial}</span>
+          </div>
+        )}
+      </div>
 
       <div className="w-8/12">
         <Label className="text-white block mb-1">Profile Picture</Label>

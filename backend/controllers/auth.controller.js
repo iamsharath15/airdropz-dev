@@ -391,8 +391,11 @@ class UserController {
         ORDER BY created_at DESC;
       `;
       const result = await pool.query(query);
+      
+      
       return res.status(200).json({
-        success: true,
+          message: 'User fetched successfully',
+        count: result.rows.length,
         data: result.rows,
       });
     } catch (error) {

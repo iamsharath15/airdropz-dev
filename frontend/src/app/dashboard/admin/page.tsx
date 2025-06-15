@@ -1,29 +1,49 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import WelcomeCard from '@/components/shared/dashboard/WelcomeCard';
 import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
 import TasksSection from '@/components/shared/dashboard/TaskSection';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
+import { useRoleRedirect } from '@/lib/useRoleRedirect';
+import axios from 'axios';
 
+type Airdrop = {
+  id: string;
+  title: string;
+  category: string;
+  preview_image_url: string;
+  type: string;
+  likes: string;
+};
 const Dashboard: React.FC = () => {
+  useRoleRedirect('admin');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'User';
-  const role = user?.role;
-  const router = useRouter();
-
-  // Redirect non-admin users to homepage
+  const [airdrops, setAirdrops] = useState<Airdrop[]>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (role !== 'admin') {
-      router.replace('/');
-    }
-  }, [role, router]);
+    const fetchTopLiked = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8080/api/userAirdrop/v1/top-liked',
+          {
+            withCredentials: true, // 👈 Important for sending cookies/session
+          }
+        );
+        console.log('Top liked airdrops:', response.data);
+        setAirdrops(response.data.data || []);
+      } catch (error) {
+        console.error('Failed to load top liked airdrops:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Optionally avoid rendering until user role is validated
-  if (role !== 'admin') return null;
+    fetchTopLiked();
+  }, []);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
@@ -38,7 +58,11 @@ const Dashboard: React.FC = () => {
             ]}
             color="#8373EE"
           />
-          <AirdropsSection />
+          {loading ? (
+            <div className=""></div>
+          ) : (
+            <AirdropsSection airdrops={airdrops} />
+          )}{' '}
           <TasksSection />
           <Leaderboard />
         </div>

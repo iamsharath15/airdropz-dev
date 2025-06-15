@@ -8,5 +8,6 @@ router.post('/:airdropId/like', verifyToken, UserAirdropController.likeAirdrop);
 router.delete('/:airdropId/unlike', verifyToken, UserAirdropController.unlikeAirdrop);
 router.get('/liked', verifyToken, UserAirdropController.getLikedAirdrops);
 router.get('/:airdropId/liked', verifyToken, UserAirdropController.getIsAirdropLikedByUser);
+router.get('/top-liked', verifyToken, UserAirdropController.getTopLikedAirdrops);
 
 export default router;

@@ -10,7 +10,7 @@ interface User {
   daily_login_streak_count: number;
   airdrops_remaining: number;
   airdrops_earned: number;
-  profile_image: string
+  profile_image: string;
 }
 
 interface AuthState {
@@ -27,7 +27,10 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<{ token: string; user: User }>) => {
+    setCredentials: (
+      state,
+      action: PayloadAction<{ token: string; user: User }>
+    ) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
     },
@@ -36,10 +39,10 @@ const authSlice = createSlice({
       state.user = null;
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
-  if (state.user) {
-    state.user = { ...state.user, ...action.payload };
-  }
-},
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+    },
   },
 });
 

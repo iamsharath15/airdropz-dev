@@ -69,77 +69,84 @@ const UserTable: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-white">User Details</h2>
-        <div className="flex gap-2">
-          <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700 text-white">
-            Download Excel
-          </Button>
-          <Button onClick={exportToPDF} className="bg-red-600 hover:bg-red-700 text-white">
-            Download PDF
-          </Button>
-        </div>
-      </div>
-
-      <div className="overflow-auto rounded-lg border border-zinc-700">
-        <table className="min-w-full text-white bg-zinc-900 text-sm">
-          <thead className="bg-zinc-800">
-            <tr>
-              <th className="py-3 px-4 text-left">Username</th>
-              <th className="py-3 px-4 text-left">Email</th>
-              <th className="py-3 px-4 text-left">Airdrops Earned</th>
-              <th className="py-3 px-4 text-left">Login Streak</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedUsers.map((user, idx) => (
-              <tr key={idx} className="border-t border-zinc-700">
-                <td className="py-2 px-4">{user.user_name}</td>
-                <td className="py-2 px-4">{user.email}</td>
-                <td className="py-2 px-4">{user.airdrops_earned}</td>
-                <td className="py-2 px-4">{user.daily_login_streak_count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-
-              {Array.from({ length: totalPages }, (_, i) => (
-                <PaginationItem key={i + 1}>
-                  <button
-                    onClick={() => setPage(i + 1)}
-                    className={`px-3 py-1 rounded ${
-                      page === i + 1 ? 'bg-[#8373EE] text-white' : 'text-white'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                  className={page === totalPages ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+   <div className="p-6 bg-[#111112] rounded-xl">
+  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 ">
+    <h2 className="text-2xl font-bold text-white">User Details</h2>
+    <div className="flex gap-2">
+      <Button onClick={exportToExcel} className="bg-green-500 hover:bg-green-600 cursor-pointer text-white font-medium rounded-lg px-4 py-2">
+        Download Excel
+      </Button>
+      <Button onClick={exportToPDF} className="bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg px-4 py-2 cursor-pointer">
+        Download PDF
+      </Button>
     </div>
+  </div>
+
+  <div className="overflow-auto rounded-2xl shadow-lg border border-zinc-700 bg-zinc-900">
+    <table className="min-w-full text-sm text-white">
+      <thead className="bg-zinc-800">
+        <tr>
+          <th className="py-4 px-6 text-left font-semibold">Username</th>
+          <th className="py-4 px-6 text-left font-semibold">Email</th>
+          <th className="py-4 px-6 text-left font-semibold">Airdrops Earned</th>
+          <th className="py-4 px-6 text-left font-semibold">Login Streak</th>
+        </tr>
+      </thead>
+      <tbody>
+        {paginatedUsers.map((user, idx) => (
+          <tr key={idx} className="border-t border-zinc-700 hover:bg-zinc-800/40 transition-all">
+            <td className="py-3 px-6">{user.user_name}</td>
+            <td className="py-3 px-6">{user.email}</td>
+            <td className="py-3 px-6">{user.airdrops_earned}</td>
+            <td className="py-3 px-6">{user.daily_login_streak_count}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {totalPages > 1 && (
+    <div className="mt-6 flex justify-center">
+      <Pagination>
+        <PaginationContent className="flex gap-1">
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              className={`rounded-lg px-3 py-1 text-white border border-zinc-700 ${
+                page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'
+              }`}
+            />
+          </PaginationItem>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <PaginationItem key={i + 1}>
+              <button
+                onClick={() => setPage(i + 1)}
+                className={`px-3 py-1 rounded-lg border border-zinc-700 ${
+                  page === i + 1
+                    ? 'bg-[#8373EE] text-white font-semibold'
+                    : 'text-white hover:bg-zinc-700'
+                }`}
+              >
+                {i + 1}
+              </button>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              className={`rounded-lg px-3 py-1 text-white border border-zinc-700 ${
+                page === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'
+              }`}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </div>
+  )}
+</div>
+
   );
 };
 

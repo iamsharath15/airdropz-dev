@@ -116,16 +116,15 @@ class AirdropController {
 
     try {
       const fetchResult = await pool.query(
-      `SELECT preview_image_url FROM airdrops WHERE id = $1`,
-      [id]
-    );
+        `SELECT preview_image_url FROM airdrops WHERE id = $1`,
+        [id]
+      );
 
-    if (fetchResult.rows.length === 0) {
-      return res.status(404).json({ error: "Airdrop not found" });
-    }
+      if (fetchResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Airdrop not found' });
+      }
 
-    const imageUrl = fetchResult.rows[0].preview_image_url;
-
+      const imageUrl = fetchResult.rows[0].preview_image_url;
 
       const result = await pool.query(
         `DELETE FROM airdrops WHERE id=$1 RETURNING *`,
@@ -135,10 +134,10 @@ class AirdropController {
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Airdrop not found' });
       }
-       if (imageUrl) {
-      const key = extractKeyFromUrl(imageUrl);
-      await deleteObjectFromS3(key);
-    }
+      if (imageUrl) {
+        const key = extractKeyFromUrl(imageUrl);
+        await deleteObjectFromS3(key);
+      }
       res.json({ message: 'Airdrop deleted successfully' });
     } catch (error) {
       console.error('Delete Airdrop Error:', error);
@@ -157,7 +156,11 @@ class AirdropController {
         ORDER BY a.created_at DESC
       `;
       const result = await pool.query(query);
-      res.json(result.rows);
+      res.json({
+        message: 'Airdrops fetched successfully',
+        count: result.rows.length,
+        data: result.rows,
+      });
     } catch (error) {
       console.error('Fetch Airdrops Error:', error);
       res.status(500).json({ error: 'Internal server error' });

@@ -36,7 +36,7 @@ const pageTitles: Record<string, Record<string, string>> = {
     '/dashboard/admin': 'Admin Dashboard',
     '/dashboard/admin/users': 'Manage User Details',
     '/dashboard/admin/airdrops': 'Manage Airdrops',
-      '/dashboard/admin/airdrops/create/*': 'Create Airdrop',
+    '/dashboard/admin/airdrops/create/*': 'Create Airdrop',
     '/dashboard/admin/weeklytask': 'Manage Weekly Tasks',
     '/dashboard/admin/expertrecommendation': 'Expert Insights',
     '/dashboard/admin/referandearn': 'Referral Analytics',
@@ -51,19 +51,20 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
   // Get user info from redux store
   const user = useSelector((state: RootState) => state.auth.user);
+console.log(user);
 
   const pageTitle =
     pageTitles[role]?.[pathname] ||
     (role === 'admin' ? 'Admin Dashboard' : 'Dashboard');
 
   const handleLogout = async () => {
-     if (user?.id) {
-    const localKey = `streak-${user.id}-date`;
-    localStorage.removeItem(localKey);
-  }
+    if (user?.id) {
+      const localKey = `streak-${user.id}-date`;
+      localStorage.removeItem(localKey);
+    }
     dispatch(logoutAction());
     await logout();
-    router.push('/'); 
+    router.push('/');
   };
 
   const handleAccountSettings = () => {
@@ -73,7 +74,6 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
   const userName = user?.user_name || 'User';
   const userEmail = user?.email || 'user@example.com';
   const userProfile = user?.profile_image;
-
 
   return (
     <header className="h-16 border-b border-[#272727] px-6 flex items-center justify-between bg-black">
@@ -98,24 +98,22 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            
             {userProfile ? (
-  <Image
-    src={userProfile}
-    alt="User Avatar"
-    width={32}
-    height={32}
-    className="rounded-full object-cover w-8 h-8 cursor-pointer"
-  />
-) : (
-  <button
-    aria-label="User menu"
-    className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
-  >
-    {userName.charAt(0).toUpperCase()}
-  </button>
-)}
-
+              <Image
+                src={userProfile}
+                alt="User Avatar"
+                width={32}
+                height={32}
+                className="rounded-full object-cover w-8 h-8 cursor-pointer"
+              />
+            ) : (
+              <button
+                aria-label="User menu"
+                className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
+              >
+                {userName.charAt(0).toUpperCase()}
+              </button>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
@@ -126,20 +124,19 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
               Profile
               <div className="flex">
                 <div className="flex items-center justify-center pr-3">
-                        {userProfile ? (
-  <Image
-    src={userProfile}
-    alt="User Avatar"
-    width={32}
-    height={32}
-    className="rounded-full object-cover w-8 h-8 cursor-pointer"
-  />
-) : (
-                  <div className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold">
-                    {userName.charAt(0).toUpperCase()}
-                      </div>
-                      )}
-
+                  {userProfile ? (
+                    <Image
+                      src={userProfile}
+                      alt="User Avatar"
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover w-8 h-8 cursor-pointer"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold">
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
                 <div className=" flex flex-col items-start justify-center">
                   <div className="mt-1 text-sm font-medium">{userName}</div>

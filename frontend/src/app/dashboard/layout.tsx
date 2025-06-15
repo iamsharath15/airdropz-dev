@@ -20,15 +20,15 @@ export default function DashboardLayout({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = user ? true : false; 
+  const isAuthenticated = user ? true : false;
   const role: 'admin' | 'user' = user?.role === 'admin' ? 'admin' : 'user';
 
   const router = useRouter();
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/'); // Or any other login page URL
+      router.push('/');
     }
   }, [isAuthenticated, router]);
   useEffect(() => {
@@ -49,16 +49,16 @@ const dispatch = useDispatch();
           }
         )
         .then((res) => {
-        const { streakCount, airdropsEarned, airdropsRemaining } = res.data;
+          const { streakCount, airdropsEarned, airdropsRemaining } = res.data;
 
-        // ✅ Update Redux state
-        dispatch(
-          updateUser({
-            daily_login_streak_count: streakCount,
-            airdrops_earned: airdropsEarned,
-            airdrops_remaining: airdropsRemaining,
-          })
-        );
+          // ✅ Update Redux state
+          dispatch(
+            updateUser({
+              daily_login_streak_count: streakCount,
+              airdrops_earned: airdropsEarned,
+              airdrops_remaining: airdropsRemaining,
+            })
+          );
 
           console.log('[🔥 Daily Streak]', res.data.message);
           localStorage.setItem(localKey, today);
@@ -70,7 +70,6 @@ const dispatch = useDispatch();
   }, [isAuthenticated, user?.id, dispatch]);
   return (
     <div className="flex min-h-screen bg-black w-full text-white">
-      {/* Sidebar with role-based dynamic display */}
       <Sidebar
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
@@ -80,13 +79,11 @@ const dispatch = useDispatch();
       />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        {/* Navbar with role-based dynamic display */}
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          role={role} 
+          role={role}
         />
-        
-        {/* Main content area */}
+
         <main className="w-full p-6">{children}</main>
       </div>
     </div>

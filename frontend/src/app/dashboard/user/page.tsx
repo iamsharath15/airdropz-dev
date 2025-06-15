@@ -9,15 +9,16 @@ import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import Calendar from '@/components/shared/Calendar';
+import { useRoleRedirect } from '@/lib/useRoleRedirect';
 
 const Dashboard: React.FC = () => {
+  useRoleRedirect('user');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'User';
   const checkIn = user?.daily_login_streak_count || 1;
   const airdropsEarned = user?.airdrops_earned || 1;
   const airdropsRemaining = user?.airdrops_remaining || 1;
 
-  console.log(user);
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
       {/* Main content */}
