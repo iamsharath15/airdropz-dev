@@ -5,7 +5,7 @@ const FeatureComponents = () => {
     <div className="bg-black w-full flex items-center justify-center flex-col">
       <div className="flex md:flex-row flex-col w-10/12">
         <div className="p-[5%] md:w-6/12 w-full flex items-center justify-center">
-          <div className="bg-amber-300 rounded-xl h-[400px] w-full"></div>
+          <div className="bg-[#2a2929] rounded-xl h-[400px] w-full"></div>
         </div>
         <div className="md:w-6/12 w-full flex items-start justify-center flex-col md:p-[2%] p-[10%]">
           <h1 className="text-white font-bold text-[38px] pb-1">

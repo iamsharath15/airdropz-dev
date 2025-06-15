@@ -16,7 +16,7 @@ export default function LandingRootLayout({
       {showChildren && (
         <>
           <Header />
-          <main className='flex items-center justify-center flex-col w-full pt-[10%]'>
+          <main className='flex items-center justify-center flex-col w-full '>
            {children}
           </main>
           <Footer />

@@ -43,11 +43,9 @@ const FaqPage = () => {
   };
 
   return (
-    <section className="bg-black flex flex-col items-center justify-start min-h-screen p-5 md:p-10">
-      <div className="max-w-[1440px] w-11/12 md:w-9/12 flex flex-col items-center py-16">
-        {/* Header Section */}
-        <motion.div
-          className="w-full text-center"
+    <section className="bg-black flex flex-col items-center justify-start min-h-screen">
+          <motion.div
+          className="w-full text-center bg-gradient-to-b from-[#09090b] via-[#18181b22] to-[#18181b00] py-[10%] pt-[15%]"
           initial="hidden"
           animate={headerControls}
           variants={headerVariant}
@@ -63,6 +61,9 @@ const FaqPage = () => {
             Answers to your questions.
           </motion.p>
         </motion.div>
+      <div className="max-w-[1440px] w-11/12 md:w-9/12 flex flex-col items-center ">
+        {/* Header Section */}
+    
 
         {/* FAQ Categories */}
         <motion.div
