@@ -11,23 +11,39 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
+type BlockType =
+  | 'link'
+  | 'image'
+  | 'description'
+  | 'checklist'
+  | 'highlight'
+  | 'header1';
+
+// Content block structure
+interface ContentBlock {
+  type: BlockType;
+  value: string;
+  link?: string;
+}
+interface AirdropData {
+  title: string;
+  airdrops_banner_title: string;
+  airdrops_banner_description: string;
+  airdrops_banner_subtitle: string;
+  airdrops_date: string;
+  airdrops_banner_image: string;
+  preview_image_url: string;
+  category: string;
+  type: string;
+}
+
 export default function AirdropDetailPage() {
-  const { airdropId } = useParams();
+  const { airdropId } = useParams<{ airdropId: string }>();
   const [liked, setLiked] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [airdropData, setAirdropData] = useState<{
-    title: string;
-    airdrops_banner_title: string;
-    airdrops_banner_description: string;
-    airdrops_banner_subtitle: string;
-    airdrops_date: string;
-    airdrops_banner_image: string;
-    preview_image_url: string;
-    category: string;
-    type: string;
-  }>({
+  const [airdropData, setAirdropData] = useState<AirdropData>({
     title: '',
     airdrops_banner_title: '',
     airdrops_banner_description: '',
@@ -39,66 +55,108 @@ export default function AirdropDetailPage() {
     type: '',
   });
 
-  const [contentBlocks, setContentBlocks] = useState<
-    {
-      type: string;
-      value: string;
-      link?: string;
-    }[]
-  >([]);
+  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
 
   useEffect(() => {
     if (!airdropId) return;
 
     const fetchAirdrop = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/api/airdrop/v1/${airdropId}`,
-          { withCredentials: true }
-        );
+        const res = await axios.get<{
+          title: string;
+          airdrops_banner_title: string;
+          airdrops_banner_description: string;
+          airdrops_banner_subtitle: string;
+          updated_at: string;
+          airdrops_banner_image: string;
+          preview_image_url: string;
+          category: string;
+          type: string;
+          content_blocks: {
+            type: BlockType;
+            value: string;
+            link?: string;
+          }[];
+        }>(`http://localhost:8080/api/airdrop/v1/${airdropId}`, {
+          withCredentials: true,
+        });
 
         const data = res.data;
 
         setAirdropData({
-          title: data.title || '',
-          airdrops_banner_title: data.airdrops_banner_title || '',
-          airdrops_banner_description: data.airdrops_banner_description || '',
-          airdrops_banner_subtitle: data.airdrops_banner_subtitle || '',
-         airdrops_date: new Date(data.updated_at).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }),
-
-          airdrops_banner_image: data.airdrops_banner_image || '',
-          preview_image_url: data.preview_image_url || '',
-          category: data.category || '',
-          type: data.type || '',
+          title: data.title,
+          airdrops_banner_title: data.airdrops_banner_title,
+          airdrops_banner_description: data.airdrops_banner_description,
+          airdrops_banner_subtitle: data.airdrops_banner_subtitle,
+          airdrops_date: new Date(data.updated_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          }),
+          airdrops_banner_image: data.airdrops_banner_image,
+          preview_image_url: data.preview_image_url,
+          category: data.category,
+          type: data.type,
         });
 
-        const formattedBlocks = (data.content_blocks || []).map((block: any) => ({
-          type: block.type,
-          value: block.value,
-          link: block.link || undefined,
-        }));
+        const formattedBlocks: ContentBlock[] = data.content_blocks.map(
+          (block) => ({
+            type: block.type,
+            value: block.value,
+            link: block.link,
+          })
+        );
 
         setContentBlocks(formattedBlocks);
       } catch (error) {
+        console.error('Failed to load airdrop:', error);
         toast.error('Failed to load airdrop.');
-        setAirdropData(null as any);
-        setContentBlocks([]);
       } finally {
         setLoading(false);
       }
     };
-
+    const checkLikedStatus = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/liked`,
+          { withCredentials: true }
+        );
+        setLiked(res.data.liked);
+      } catch (err) {
+        console.error('Failed to check liked status:', err);
+      }
+    };
     fetchAirdrop();
+
+    checkLikedStatus();
   }, [airdropId]);
 
-  const handleLikeClick = () => {
-    setLiked((prev) => !prev);
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 300);
+  const handleLikeClick = async () => {
+    try {
+      setAnimating(true);
+
+      if (liked) {
+        await axios.delete(
+          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/unlike`,
+          { withCredentials: true }
+        );
+        toast.error('Airdrop removed from likes');
+      } else {
+        await axios.post(
+          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/like`,
+          {},
+          { withCredentials: true }
+        );
+        toast.success('Airdrop added to likes');
+      }
+
+      setLiked((prev) => !prev);
+    } catch (error) {
+      toast.error('Action failed. Please try again.');
+      console.error('Like/Unlike Error:', error);
+    } finally {
+      setTimeout(() => setAnimating(false), 300);
+    }
   };
 
   if (loading) return <div className="text-white p-4">Loading...</div>;

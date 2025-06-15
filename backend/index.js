@@ -15,6 +15,7 @@ import userSettingsRoutes from './routes/userSettings.routes.js';
 import streakRoutes from './routes/streak.routes.js';
 import uploadRoutes from './routes/upload.route.js';
 import expertStoriesRoutes from './routes/expertStories.routes.js';
+import userAirdropRoutes from './routes/userAirdropRoutes.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/api/referral/v1", referralRoutes);
 app.use('/api/onboarding/v1', onboardingRoutes)
 app.use('/api/leaderboard/v1', leaderboardRoutes)
 app.use('/api/airdrop/v1', airdropRoutes)
+app.use('/api/userAirdrop/v1', userAirdropRoutes)
 app.use('/api/weeklytask/v1', weeklyTaskRoutes);
 app.use('/api/user-task/v1', userTaskRoutes);
 app.use('/api/settings/v1', userSettingsRoutes);

@@ -158,19 +158,24 @@ const Dropdown = ({
       {label}
     </Button>
 
-    {show && (
-      <div className="absolute right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2">
-        {options.map((option) => (
-          <div
-            key={option}
-            onClick={() => onSelect(option)}
-            className={`px-4 py-2 text-white cursor-pointer hover:bg-white hover:text-black rounded-lg ${
-              activeOption === option ? 'bg-white text-black' : ''
-            }`}
-          >
-            {option}
-          </div>
-        ))}
+     {show && (
+      <div className="absolute space-y-2 right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2 min-w-[120px]">
+        {options.map((option) => {
+          const isActive = activeOption === option;
+          return (
+            <div
+              key={option}
+              onClick={() => onSelect(option)}
+              className={`px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 ${
+                isActive
+                  ? 'bg-[#8373EE] text-white font-semibold'
+                  : 'text-white hover:bg-white hover:text-black'
+              }`}
+            >
+              {option}
+            </div>
+          );
+        })}
       </div>
     )}
   </div>

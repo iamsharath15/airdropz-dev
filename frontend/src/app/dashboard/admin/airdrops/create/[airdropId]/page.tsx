@@ -324,7 +324,7 @@ const CreateAirdropPage = () => {
             <Button
               variant="destructive"
               onClick={handleDelete}
-              className="text-sm sm:text-base px-3"
+              className="text-sm sm:text-base px-3 cursor-pointer"
             >
               <Trash2 className="w-4 h-4 sm:hidden" />
               <span className="hidden sm:inline">Delete</span>
@@ -333,7 +333,7 @@ const CreateAirdropPage = () => {
 
           <Button
             onClick={handleSubmit}
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white text-sm sm:text-base px-3"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white text-sm sm:text-base px-3 cursor-pointer"
           >
             <Save className="w-4 h-4 sm:hidden" />
             <span className="hidden sm:inline">

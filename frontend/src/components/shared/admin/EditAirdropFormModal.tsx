@@ -24,7 +24,6 @@ import axios from 'axios';
 import { Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
-
 type EditAirdropFormModalProps = {
   airdrop: {
     id: string;
@@ -39,7 +38,7 @@ const defaultCategories = ['Solana', 'Ethereum', 'Polygon'];
 
 const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
   console.log(airdrop);
-  
+
   const [open, setOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [name, setName] = useState(airdrop.title);
@@ -60,7 +59,7 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
 
   const handleUpdate = async () => {
     if (!name || !finalCategory) {
-  toast.error('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
 
@@ -103,12 +102,12 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
         { withCredentials: true }
       );
 
-toast.success('Airdrop updated successfully!');
+      toast.success('Airdrop updated successfully!');
       setOpen(false);
       router.refresh();
     } catch (err) {
       console.error('Update failed:', err);
-toast.error('Something went wrong.');
+      toast.error('Something went wrong.');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,7 +121,7 @@ toast.error('Something went wrong.');
         </button>
       </DialogTrigger>
 
-      <DialogContent className="md:w-[950px] bg-[#151313] border-0 text-white w-11/12 max-h-[90vh] rounded-xl">
+      <DialogContent className="overflow-y-auto md:w-[950px] bg-[#151313] border-0 text-white w-11/12 max-h-[90vh] rounded-xl">
         <DialogHeader>
           <DialogTitle>Edit Airdrop</DialogTitle>
         </DialogHeader>
@@ -165,17 +164,16 @@ toast.error('Something went wrong.');
           {/* Form */}
           <div className="md:w-6/12 w-full space-y-4">
             <div className="space-y-2">
-              <Label className=''>Upload Image</Label>
-              <Input   className="text-white file:text-white  file:cursor-pointer"
-
+              <Label className="">Upload Image</Label>
+              <Input
+                className="text-white file:text-white  file:cursor-pointer"
                 type="file"
                 accept="image/*"
-                
                 onChange={handleImageChange}
               />
             </div>
             <div className="space-y-2">
-              <Label className='text-white'>Airdrop Name</Label>
+              <Label className="text-white">Airdrop Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
@@ -189,7 +187,10 @@ toast.error('Something went wrong.');
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue className='text-white placeholder:text-white' placeholder={category} />
+                    <SelectValue
+                      className="text-white placeholder:text-white"
+                      placeholder={category}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {defaultCategories.map((cat) => (
@@ -209,7 +210,7 @@ toast.error('Something went wrong.');
               )}
             </div>
             <div className="space-y-2">
-              <Label className='text-white'>Type</Label>
+              <Label className="text-white">Type</Label>
               <Select
                 value={type}
                 onValueChange={(val) => setType(val as 'Free' | 'Paid')}
@@ -224,7 +225,11 @@ toast.error('Something went wrong.');
               </Select>
             </div>
 
-            <Button onClick={handleUpdate} disabled={isSubmitting} className='cursor-pointer bg-[#8373EE] hover:bg-[#8373EE]/80 text-white'>
+            <Button
+              onClick={handleUpdate}
+              disabled={isSubmitting}
+              className="cursor-pointer bg-[#8373EE] hover:bg-[#8373EE]/80 text-white"
+            >
               {isSubmitting ? 'Updating...' : 'Update Airdrop'}
             </Button>
           </div>

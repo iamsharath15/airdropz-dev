@@ -24,8 +24,14 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 
-// TEMP REDUX SLICE HANDLER — will move to its own file later
-const setCreatedAirdrop = (payload: any) => ({
+type Airdrop = {
+  id: string;
+  title: string;
+  category: string;
+  type: 'Free' | 'Paid';
+  preview_image_url?: string;
+};
+const setCreatedAirdrop = (payload: Airdrop) => ({
   type: 'airdrop/setCreatedAirdrop',
   payload,
 });
@@ -46,7 +52,6 @@ const AirdropFormModal = () => {
   const dispatch = useDispatch();
 
   const finalCategory = isAddingCategory ? customCategory : category;
-
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,7 +147,7 @@ const AirdropFormModal = () => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:w-[950px] bg-[#151313] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center">
+      <DialogContent className="md:w-[950px] bg-[#151313] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center border-0">
         <div className="overflow-y-auto max-h-[80vh] pr-1 scrollable-modal w-full touch-pan-y">
           <DialogHeader>
             <DialogTitle className="text-white">Create New Airdrop</DialogTitle>
@@ -169,12 +174,12 @@ const AirdropFormModal = () => {
                   {name || 'Airdrop Name'}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="bg-purple-700 text-xs px-2 py-1 rounded-md">
-                    #{finalCategory || 'Category'}
+                  <span className="bg-[#8373EE] text-xs px-2 py-1 rounded-lg">
+                    # {finalCategory || 'Category'}
                   </span>
                   {type && (
-                    <span className="bg-purple-500 text-xs px-2 py-1 rounded-md">
-                      {type}
+                    <span className="bg-[#8373EE] text-xs px-2 py-1 rounded-lg">
+                      # {type}
                     </span>
                   )}
                 </div>
@@ -242,7 +247,7 @@ const AirdropFormModal = () => {
 
               {/* Type */}
               <div className="space-y-2">
-                <Label>Type</Label>
+                <Label className="text-white">Type</Label>
                 <Select
                   value={type}
                   onValueChange={(val) => setType(val as 'Free' | 'Paid')}
@@ -257,17 +262,11 @@ const AirdropFormModal = () => {
                 </Select>
               </div>
 
-              {/* Submit */}
-              {/* <Button
+              <Button
+                className="bg-[#8373EE] cursor-pointer hover:bg-[#8373EE]/80"
                 onClick={handleCreate}
-                disabled={createAirdropMutation.status === "pending"}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white mt-4 cursor-pointer"
+                disabled={isSubmitting}
               >
-                {createAirdropMutation.status === "pending"
-                  ? 'Creating...'
-                  : 'Create Airdrop'}
-              </Button> */}
-              <Button onClick={handleCreate} disabled={isSubmitting}>
                 {isSubmitting ? 'Creating...' : 'Create Airdrop'}
               </Button>
             </div>
