@@ -2,8 +2,8 @@
 import React from 'react';
 import WelcomeCard from '@/components/shared/dashboard/WelcomeCard';
 import LeaderboardSection from '@/components/shared/dashboard/LeaderboardSection';
-import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
-import TasksSection from '@/components/shared/dashboard/TaskSection';
+// import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
+// import TasksSection from '@/components/shared/dashboard/TaskSection';
 import WeeklyTask from '@/components/shared/dashboard/WeeklyTask';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
           {/* <AirdropsSection /> */}
 
           {/* My Task section */}
-          <TasksSection />
+          {/* <TasksSection /> */}
         </div>
       </div>
 

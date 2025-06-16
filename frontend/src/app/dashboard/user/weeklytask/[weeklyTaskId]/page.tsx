@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
-import {
-  ArrowLeft,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import WeeklyTaskTemplate from '@/components/shared/dashboard/user/weeklyTaskTemplate';
 import Link from 'next/link';
 
@@ -67,14 +65,14 @@ export default function TaskDetail() {
   return (
     <div className="w-full px-4">
       <div className="flex items-center mb-6">
-           <Link
+        <Link
           href="/dashboard/user/weeklytask"
           className="flex items-center text-white/60 hover:text-white md:text-lg text-sm"
         >
           <ArrowLeft size={20} className="mr-2" />
           Back to airdrops
         </Link>
-    
+
         <h1 className="text-2xl font-bold text-white">Weekly Task</h1>
       </div>
 

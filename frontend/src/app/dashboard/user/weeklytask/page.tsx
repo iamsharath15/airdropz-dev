@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { TaskHeader } from '@/components/shared/dashboard/admin/weeklyTask/TaskHeader';
-import { TaskSection } from '@/components/shared/TaskSection';
 import { TaskDetail } from '@/components/shared/TaskDetail';
 
 import { mockTasks } from '@/app/data/mockTasks';
@@ -105,7 +104,6 @@ export default function WeeklyTaskPage() {
             setSortBy={setSortBy}
           />
 
-          {/* <TaskSection title="My Tasks" tasks={myTasks} onTaskClick={handleTaskClick} /> */}
 
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">

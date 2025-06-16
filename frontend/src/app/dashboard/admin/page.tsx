@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import WelcomeCard from '@/components/shared/dashboard/WelcomeCard';
 import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
-import TasksSection from '@/components/shared/dashboard/TaskSection';
+// import TasksSection from '@/components/shared/dashboard/TaskSection';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
@@ -22,18 +22,25 @@ const Dashboard: React.FC = () => {
   useRoleRedirect('admin');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'User';
+
   const [airdrops, setAirdrops] = useState<Airdrop[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [stats, setStats] = useState({
+    users: 0,
+    airdrops: 0,
+    weekly_signups: 0,
+  });
+
   useEffect(() => {
     const fetchTopLiked = async () => {
       try {
         const response = await axios.get(
           'http://localhost:8080/api/userAirdrop/v1/top-liked',
           {
-            withCredentials: true, // 👈 Important for sending cookies/session
+            withCredentials: true,
           }
         );
-        console.log('Top liked airdrops:', response.data);
         setAirdrops(response.data.data || []);
       } catch (error) {
         console.error('Failed to load top liked airdrops:', error);
@@ -42,8 +49,26 @@ const Dashboard: React.FC = () => {
       }
     };
 
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(
+          'http://localhost:8080/api/admin/v1/stats',
+          { withCredentials: true }
+        );
+        setStats({
+          users: res.data.stats.users || 0,
+          airdrops: res.data.stats.airdrops || 0,
+          weekly_signups: res.data.stats.tasks || 0,
+        });
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+      }
+    };
+
     fetchTopLiked();
+    fetchStats();
   }, []);
+  console.log('stat', stats);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
@@ -52,9 +77,9 @@ const Dashboard: React.FC = () => {
           <WelcomeCard
             name={userName}
             stats={[
-              { label: 'Total Users', value: 1240 },
-              { label: 'Total Airdrops', value: 75 },
-              { label: 'Weekly Signups', value: 124 },
+              { label: 'Total Users', value: stats.users },
+              { label: 'Total Airdrops', value: stats.airdrops },
+              { label: 'Total Tasks', value: stats.weekly_signups },
             ]}
             color="#8373EE"
           />
@@ -63,7 +88,7 @@ const Dashboard: React.FC = () => {
           ) : (
             <AirdropsSection airdrops={airdrops} />
           )}{' '}
-          <TasksSection />
+          {/* <TasksSection /> */}
           <Leaderboard />
         </div>
       </div>

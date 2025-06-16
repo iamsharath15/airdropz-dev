@@ -5,10 +5,17 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectScrollDownButton,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Filter, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  ChevronDown,
+  LayoutGrid,
+  ChevronDownIcon,
+} from 'lucide-react';
 import { useId } from 'react';
 import WeeklyTaskFormModal from './WeeklyTaskFormModal';
 
@@ -19,6 +26,10 @@ interface TaskHeaderProps {
   setSelectedCategory: (category: string) => void;
   sortBy: string;
   setSortBy: (sortBy: string) => void;
+  categories: string[];
+  weeks: number[];
+  selectedWeek: number;
+  setSelectedWeek: (week: number) => void;
 }
 
 export const TaskHeader: React.FC<TaskHeaderProps> = ({
@@ -28,8 +39,11 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
   setSelectedCategory,
   sortBy,
   setSortBy,
+  categories,
+  weeks,
+  setSelectedWeek,
+  selectedWeek,
 }) => {
-  const categories = ['All', 'DeFi', 'GameFi', 'Social', 'Infrastructure'];
   const sortOptions = ['Week', 'Progress', 'Title'];
 
   const inputId = useId();
@@ -57,28 +71,44 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
           value={selectedCategory}
           onValueChange={(value) => setSelectedCategory(value)}
         >
-          <SelectTrigger className="w-full md:w-[160px] text-white">
-            <Filter className="mr-2 h-4 w-4 text-white" />
-            <SelectValue placeholder="Category" className="" />
+          <SelectTrigger
+            hideIcon
+            className="w-full md:w-[160px] cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors "
+          >
+            <div className="flex items-center">
+              <LayoutGrid className="mr-2 h-4 w-4 text-white group-hover:text-black transition-colors" />
+              <SelectValue placeholder="Category" />
+            </div>
+
+            <ChevronDownIcon className="h-4 w-4 text-white group-hover:text-black transition-colors" />
           </SelectTrigger>
+
           <SelectContent>
             {categories.map((category) => (
-              <SelectItem key={category} value={category} className="">
+              <SelectItem key={category} value={category}>
                 {category === 'All' ? 'Category' : category}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
-          <SelectTrigger className="w-full md:w-[160px] text-white">
-            <ChevronDown className="mr-2 h-4 w-4 text-white" />
+        <Select
+          value={selectedWeek.toString()}
+          onValueChange={(val) => setSelectedWeek(Number(val))}
+        >
+          <SelectTrigger hideIcon             className="w-full md:w-[160px] cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors "
+>
+            <Filter className="mr-2 h-4 w-4 text-white group-hover:text-black transition-colors" />
+
+
             <SelectValue placeholder="Sort By" />
+                        <ChevronDownIcon className="h-4 w-4 text-white group-hover:text-black transition-colors" />
+
           </SelectTrigger>
           <SelectContent>
-            {sortOptions.map((option) => (
-              <SelectItem key={option} value={option}>
-                Sort By: {option}
+            {weeks.map((week) => (
+              <SelectItem key={week} value={week.toString()}>
+                Sort by {week === 0 ? 'Week' : `Week ${week}`}
               </SelectItem>
             ))}
           </SelectContent>

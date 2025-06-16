@@ -16,6 +16,7 @@ import streakRoutes from './routes/streak.routes.js';
 import uploadRoutes from './routes/upload.route.js';
 import expertStoriesRoutes from './routes/expertStories.routes.js';
 import userAirdropRoutes from './routes/userAirdropRoutes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 dotenv.config();
 
@@ -42,6 +43,8 @@ app.use('/api/streak/v1', streakRoutes);
 app.use('/api/upload/v1', uploadRoutes);
 app.use('/api/expertStories/v1', expertStoriesRoutes);
 
+
+app.use('/api/admin/v1', adminRoutes);
 
 
 // Test DB connection

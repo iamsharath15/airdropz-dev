@@ -5,7 +5,7 @@ import axios from 'axios';
 import AirdropCard from '@/components/shared/AirdropCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, LayoutGrid, SlidersHorizontal } from 'lucide-react';
+import { Search, LayoutGrid, Filter } from 'lucide-react';
 import AirdropFormModal from '@/components/shared/admin/AirdropFormModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
@@ -97,7 +97,7 @@ const AirdropsListing = () => {
           {/* Type Filter */}
           <Dropdown
             label={`Sort By: ${selectedType}`}
-            icon={<SlidersHorizontal size={18} />}
+            icon={<Filter size={18} />}
             options={['All', 'Free', 'Paid']}
             activeOption={selectedType}
             show={showSortDropdown}
