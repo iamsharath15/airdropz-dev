@@ -44,15 +44,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
 
   return (
     <div className="group relative bg-[#1C1C1E] rounded-2xl p-4 w-full max-w-sm text-white shadow-md transition hover:shadow-lg cursor-pointer">
-
-   
-
       {/* Edit Modal */}
-        <EditWeeklyTaskFormModal
-          task={task}
-          open={openModal}
-          setOpen={setOpenModal}
-        />
+      <EditWeeklyTaskFormModal
+        task={task}
+        open={openModal}
+        setOpen={setOpenModal}
+      />
 
       {/* Card Content */}
       <Link
@@ -67,13 +64,12 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
             alt={task.task_title}
             className="w-full h-32 object-cover rounded-xl"
           />
-      
         </div>
 
         <h3 className="text-base font-semibold mb-1">{task.task_title}</h3>
-    <div className=" bg-[#8373EEs] text-black text-xs font-semibold px-3 py-1 rounded-full ">
-            {task.task_category}
-          </div>
+        <div className=" bg-[#8373EEs] text-black text-xs font-semibold px-3 py-1 rounded-full ">
+          {task.task_category}
+        </div>
         {/* Progress */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">

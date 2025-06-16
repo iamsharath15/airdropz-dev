@@ -59,7 +59,6 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
   const [banner, setBanner] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [categoryOpen, setCategoryOpen] = useState(false);
-
   const sensors = useSensors(useSensor(PointerSensor));
 
   const categories = [
@@ -140,6 +139,24 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
       </div>
     );
   };
+
+const addChecklist = () => {
+  const updatedSubTasks = [...(task.sub_tasks || []), { title: '', description: '', image: null }];
+  onTaskUpdate({
+    ...task,
+    sub_tasks: updatedSubTasks,
+  });
+};
+
+
+const removeChecklist = (index: number) => {
+  const updatedSubTasks = task.sub_tasks.filter((_, i) => i !== index);
+  onTaskUpdate({
+    ...task,
+    sub_tasks: updatedSubTasks,
+  });
+};
+
 
   return (
     <div className="w-full md:w-1/2 p-6 overflow-auto border-r border-zinc-800 bg-black">
@@ -396,7 +413,11 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
           </div>
 
           <div className="flex gap-2 mt-6">
-            <Button variant="outline" className='text-black cursor-pointer' onClick={() => setStep(1)}>
+            <Button
+              variant="outline"
+              className="text-black cursor-pointer"
+              onClick={() => setStep(1)}
+            >
               Back
             </Button>
             <Button
@@ -404,6 +425,102 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
               onClick={() => setStep(3)}
             >
               Next
+            </Button>
+          </div>
+        </>
+      )}
+      {step === 3 && (
+        <>
+          <h2 className="text-lg font-bold mb-4">Step 3: Task Checklist</h2>
+
+          {task.sub_tasks.map((item, index) => (
+            <div
+              key={index}
+              className="space-y-4 border border-zinc-700 p-4 rounded-xl mb-4"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-md font-semibold text-purple-300">
+                  Checklist {index + 1}
+                </h3>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className='cursor-pointer'
+                  onClick={() => removeChecklist(index)}
+                >
+                <Trash2 />
+                </Button>
+              </div>
+
+              {/* Checklist Title */}
+              <div>
+                <label className="block text-sm text-white mb-1">
+                  Checklist Title
+                </label>
+                <Input
+                  placeholder="Enter checklist title"
+                  className="bg-zinc-800 text-white"
+                  value={item.title}
+                  onChange={(e) => {
+                    const updatedSubTasks = [...task.sub_tasks];
+                    updatedSubTasks[index].title = e.target.value;
+                    onTaskUpdate({
+                      ...task,
+                      sub_tasks: updatedSubTasks,
+                    })
+                  }}
+                />
+              </div>
+
+              {/* Checklist Description */}
+              <div>
+                <label className="block text-sm text-white mb-1">
+                  Checklist Description
+                </label>
+               <Textarea
+  placeholder="Enter checklist description"
+  className="bg-zinc-900 border-zinc-700 text-white"
+  value={item.description}
+  onChange={(e) => {
+    const updatedSubTasks = [...task.sub_tasks];
+    updatedSubTasks[index].description = e.target.value;
+    onTaskUpdate({
+      ...task,
+      sub_tasks: updatedSubTasks,
+    });
+  }}
+/>
+
+              </div>
+
+              {/* Verify Image Upload */}
+              <div>
+                <label className="block text-sm text-white mb-1">
+                  Submission type
+                </label>
+              <Input disabled placeholder='Image' />
+
+              </div>
+            </div>
+          ))}
+
+          {/* Add Checklist Button */}
+          <div className="flex justify-start mb-6">
+            <Button
+              className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
+              onClick={addChecklist}
+            >
+              + Add Checklist
+            </Button>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setStep(2)} className='text-black cursor-pointer'>
+              Back
+            </Button>
+            <Button className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer">
+              Create
             </Button>
           </div>
         </>

@@ -21,7 +21,8 @@ const CreateWeeklyTaskPage = () => {
     task_description: '',
     task_banner_image: '',
     week: '',
-    tasks:[]
+    tasks: [],
+    sub_tasks: []
     // add other fields as needed (checklists, content blocks, etc.)
   });
 
@@ -65,7 +66,8 @@ console.log('last',taskData);
         end_time: taskData.end_time,
         task_description: taskData.task_description,
         week: taskData.week,
-        tasks:taskData.tasks
+        tasks: taskData.tasks,
+        sub_tasks: taskData.sub_tasks
       };
 
       // ✅ Handle and upload image if it's a File

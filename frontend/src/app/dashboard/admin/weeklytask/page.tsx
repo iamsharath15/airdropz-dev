@@ -26,7 +26,6 @@ export default function WeeklyTaskPage() {
 
     fetchWeeklyTasks();
   }, []);
-console.log("hi",weeklyTasks);
 
   const filterTasks = (tasks: any[]) => {
     return tasks.filter((task) => {

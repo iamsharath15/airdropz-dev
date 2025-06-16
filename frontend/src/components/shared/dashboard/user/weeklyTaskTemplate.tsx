@@ -5,16 +5,11 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Clock, Upload, Users } from 'lucide-react';
 import Image from 'next/image';
 
-interface TaskItem {
-  id: string;
-  title: string;
-  completed: boolean;
-  description?: string;
-}
 
 
 
 const WeeklyTaskTemplate = ({ task }: { task: any }) => {
+  
   const taskList = task?.sub_tasks || [];
 
 const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(() => {
@@ -34,7 +29,7 @@ const toggleTask = (taskId: string) => {
 
 
   return (
-    <div className="w-full lg:w-7/12 p-[1%]">
+    <div className="w-full p-[1%]">
       <div className="flex flex-col xl:flex-row gap-6">
         {/* Left Panel */}
         <div className="xl:w-2/3 w-full space-y-6 bg-[#151313]">
@@ -107,69 +102,73 @@ const toggleTask = (taskId: string) => {
             </div>
 
             {/* Example Task */}
-            {task.tasks.map((block, i) => {
-              switch (block.type) {
-                case 'description':
-                  return (
-                    <div
-                      className="py-[1%] flex items-center justify-start w-full"
-                      key={i}
-                    >
-                      <p className="text-left font-medium text-white/80 text-sm">
-                        {block.value}
-                      </p>
-                    </div>
-                  );
-                case 'checklist':
-                  const items = block.value.split('\n').filter(Boolean);
-                  return (
-                    <div
-                      className="py-[1%] flex itesms-center justify-start w-full"
-                      key={i}
-                    >
-                      <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
-                        {items.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                case 'link':
-                  return (
-                    <div
-                      className="py-[1%] gap-2 flex itesms-center justify-start w-full"
-                      key={i}
-                    >  <div className="w-6 h-6 bg-[#8373EE] rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                      <p className="text-white md:text-lg text-sm font-normalt">
-                        {block.value}{' '}
-                        <a
-                          href={block.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-purple-400 underline"
-                        >
-                          Link
-                        </a>
-                      </p>
-                    </div>
-                  );
-                case 'header1':
-                  return (
-                    <div
-                      className="py-[2%] flex itesms-center justify-start w-full"
-                      key={i}
-                    >
-                      <h1 className="text-white md:text-2xl text-xl font-medium text-left ">
-                        {block.value}
-                      </h1>
-                    </div>
-                  );
-                default:
-                  return null;
-              }
-            })}
+          {/* Example Task */}
+{Array.isArray(task.tasks) &&
+  task.tasks.map((block, i) => {
+    switch (block.type) {
+      case 'description':
+        return (
+          <div
+            className="py-[1%] flex items-center justify-start w-full"
+            key={i}
+          >
+            <p className="text-left font-medium text-white/80 text-sm">
+              {block.value}
+            </p>
+          </div>
+        );
+      case 'checklist':
+        const items = block.value.split('\n').filter(Boolean);
+        return (
+          <div
+            className="py-[1%] flex items-center justify-start w-full"
+            key={i}
+          >
+            <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
+              {items.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      case 'link':
+        return (
+          <div
+            className="py-[1%] gap-2 flex items-center justify-start w-full"
+            key={i}
+          >
+            <div className="w-6 h-6 bg-[#8373EE] rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            <p className="text-white md:text-lg text-sm font-normal">
+              {block.value}{' '}
+              <a
+                href={block.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-400 underline"
+              >
+                Link
+              </a>
+            </p>
+          </div>
+        );
+      case 'header1':
+        return (
+          <div
+            className="py-[2%] flex items-center justify-start w-full"
+            key={i}
+          >
+            <h1 className="text-white md:text-2xl text-xl font-medium text-left">
+              {block.value}
+            </h1>
+          </div>
+        );
+      default:
+        return null;
+    }
+  })}
+
           </div>
         </div>
 

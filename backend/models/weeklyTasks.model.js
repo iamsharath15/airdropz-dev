@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import pool from '../config/db.js';
 
 export async function createWeeklyTasksTables() {
   try {
@@ -35,9 +35,11 @@ export async function createWeeklyTasksTables() {
       -- Sub Tasks
       CREATE TABLE IF NOT EXISTS sub_tasks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        task_id UUID REFERENCES tasks(id) ON DELETE CASCADE,
+  weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
+        description TEXT,
         hyperlink TEXT,
+        completed BOOLEAN DEFAULT FALSE, 
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       );
@@ -56,7 +58,7 @@ export async function createWeeklyTasksTables() {
       -- Indexes
       CREATE INDEX IF NOT EXISTS idx_weekly_tasks_week ON weekly_tasks(week);
       CREATE INDEX IF NOT EXISTS idx_tasks_weekly_task_id ON tasks(weekly_task_id);
-      CREATE INDEX IF NOT EXISTS idx_sub_tasks_task_id ON sub_tasks(task_id);
+      CREATE INDEX IF NOT EXISTS idx_sub_tasks_task_id ON sub_tasks(weekly_task_id);
       CREATE INDEX IF NOT EXISTS idx_user_sub_tasks_user_id ON user_sub_tasks(user_id);
     `;
 
@@ -96,9 +98,11 @@ export async function createWeeklyTasksTables() {
 
     await pool.query(createTriggersQuery);
 
-    console.log("✅ Tables created: weekly_tasks, tasks, sub_tasks, user_sub_tasks (with triggers)");
+    console.log(
+      '✅ Tables created: weekly_tasks, tasks, sub_tasks, user_sub_tasks (with triggers)'
+    );
   } catch (error) {
-    console.error("❌ Error creating weekly task tables:", error);
+    console.error('❌ Error creating weekly task tables:', error);
     throw error;
   }
 }

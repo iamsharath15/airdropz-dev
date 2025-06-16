@@ -12,7 +12,8 @@ class WeeklyTaskController {
       end_time,
       task_banner_image,
       task_description,
-      tasks=[],
+      tasks = [],
+      sub_tasks= []
     } = req.body;
 
     try {
@@ -43,14 +44,16 @@ class WeeklyTaskController {
         [weeklyTaskId, type, value, link || null]
       );
     }
+    for (const sub of sub_tasks) {
+      const { title, description, hyperlink, completed } = sub;
+      await client.query(
+        `INSERT INTO sub_tasks (
+          weekly_task_id, title, description, hyperlink, completed
+        ) VALUES ($1, $2, $3, $4, $5);`,
+        [weeklyTaskId, title, description || null, hyperlink || null, completed]
+      );
+    }
 
-
-      // for (const task of tasks) {
-      //   const taskRes = await client.query(
-      //     `INSERT INTO tasks (weekly_task_id, title, description)
-      //      VALUES ($1, $2, $3) RETURNING id;`,
-      //     [weeklyTaskId, task.title, task.description]
-      //   );
 
       //   for (const sub of task.sub_tasks || []) {
       //     await client.query(
@@ -75,34 +78,48 @@ class WeeklyTaskController {
   }
 
   // 2. GET ALL Weekly Tasks with nested Tasks and Sub-Tasks
-  static async getAll(req, res) {
-    try {
-      const result = await pool.query(`
-        SELECT 
-          wt.*,
-          COALESCE(
-            json_agg(
-              json_build_object(
-                'id', t.id,
-                'type', t.type,
-                'value', t.value,
-                'link', t.link
-              )
-            ) FILTER (WHERE t.id IS NOT NULL),
-            '[]'
-          ) AS tasks
-        FROM weekly_tasks wt
-        LEFT JOIN tasks t ON t.weekly_task_id = wt.id
-        GROUP BY wt.id
-        ORDER BY wt.created_at DESC;
-      `);
+static async getAll(req, res) {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        wt.*,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', t.id,
+              'type', t.type,
+              'value', t.value,
+              'link', t.link
+            )
+          ) FILTER (WHERE t.id IS NOT NULL),
+          '[]'
+        ) AS tasks,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', st.id,
+              'title', st.title,
+              'description', st.description,
+              'hyperlink', st.hyperlink,
+              'completed', st.completed
+            )
+          ) FILTER (WHERE st.id IS NOT NULL),
+          '[]'
+        ) AS sub_tasks
+      FROM weekly_tasks wt
+      LEFT JOIN tasks t ON t.weekly_task_id = wt.id
+      LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
+      GROUP BY wt.id
+      ORDER BY wt.created_at DESC;
+    `);
 
-      res.status(200).json({ success: true, data: result.rows });
-    } catch (error) {
-      console.error('❌ getAll error:', error);
-      res.status(500).json({ success: false, message: 'Failed to fetch weekly tasks' });
-    }
+    res.status(200).json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error('❌ getAll error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch weekly tasks' });
   }
+}
+
 
 
   // 3. GET one Weekly Task by ID
@@ -116,7 +133,7 @@ static async getById(req, res) {
         wt.*,
         COALESCE(
           json_agg(
-            json_build_object(
+            DISTINCT jsonb_build_object(
               'id', t.id,
               'type', t.type,
               'value', t.value,
@@ -124,9 +141,22 @@ static async getById(req, res) {
             )
           ) FILTER (WHERE t.id IS NOT NULL),
           '[]'
-        ) AS tasks
+        ) AS tasks,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', st.id,
+              'title', st.title,
+              'description', st.description,
+              'hyperlink', st.hyperlink,
+              'completed', st.completed
+            )
+          ) FILTER (WHERE st.id IS NOT NULL),
+          '[]'
+        ) AS sub_tasks
       FROM weekly_tasks wt
       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
+      LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
       WHERE wt.id = $1
       GROUP BY wt.id;
       `,
@@ -145,6 +175,7 @@ static async getById(req, res) {
 }
 
 
+
   //4. UPDATE a Weekly Task (only main fields, not nested for simplicity)
 // 4. UPDATE a Weekly Task along with its nested tasks
 // 4. UPDATE a Weekly Task along with its nested tasks, and return full updated data
@@ -159,6 +190,8 @@ static async update(req, res) {
     task_banner_image,
     task_description,
     tasks = [],
+        sub_tasks = [],
+
   } = req.body;
 
   const client = await pool.connect();
@@ -198,6 +231,7 @@ static async update(req, res) {
 
     // Delete old tasks
     await client.query(`DELETE FROM tasks WHERE weekly_task_id = $1`, [id]);
+    await client.query(`DELETE FROM sub_tasks WHERE weekly_task_id = $1`, [id]);
 
     // Insert new tasks
     for (const task of tasks) {
@@ -208,15 +242,22 @@ static async update(req, res) {
         [id, type, value || '', link || null]
       );
     }
-
+   for (const sub of sub_tasks) {
+      const { title, description, hyperlink, completed } = sub;
+      await client.query(
+        `INSERT INTO sub_tasks (weekly_task_id, title, description, hyperlink, completed)
+         VALUES ($1, $2, $3, $4, $5);`,
+        [id, title, description || null, hyperlink || null, completed]
+      );
+    }
     // Fetch full updated weekly task including tasks
-    const fullData = await client.query(
+  const fullData = await client.query(
       `
       SELECT 
         wt.*,
         COALESCE(
           json_agg(
-            json_build_object(
+            DISTINCT jsonb_build_object(
               'id', t.id,
               'type', t.type,
               'value', t.value,
@@ -224,14 +265,28 @@ static async update(req, res) {
             )
           ) FILTER (WHERE t.id IS NOT NULL),
           '[]'
-        ) AS tasks
+        ) AS tasks,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', st.id,
+              'title', st.title,
+              'description', st.description,
+              'hyperlink', st.hyperlink,
+              'completed', st.completed
+            )
+          ) FILTER (WHERE st.id IS NOT NULL),
+          '[]'
+        ) AS sub_tasks
       FROM weekly_tasks wt
       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
+      LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
       WHERE wt.id = $1
       GROUP BY wt.id;
       `,
       [id]
     );
+
 
     await client.query('COMMIT');
     res.status(200).json({ success: true, data: fullData.rows[0] });
