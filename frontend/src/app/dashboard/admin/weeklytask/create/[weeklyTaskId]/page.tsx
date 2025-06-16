@@ -21,6 +21,7 @@ const CreateWeeklyTaskPage = () => {
     task_description: '',
     task_banner_image: '',
     week: '',
+    tasks:[]
     // add other fields as needed (checklists, content blocks, etc.)
   });
 
@@ -51,6 +52,7 @@ const CreateWeeklyTaskPage = () => {
   const handleTaskUpdate = (updates: any) => {
     setTaskData((prev: any) => ({ ...prev, ...updates }));
   };
+console.log('last',taskData);
 
   const handleSaveChanges = async () => {
     try {
@@ -63,6 +65,7 @@ const CreateWeeklyTaskPage = () => {
         end_time: taskData.end_time,
         task_description: taskData.task_description,
         week: taskData.week,
+        tasks:taskData.tasks
       };
 
       // ✅ Handle and upload image if it's a File
@@ -91,6 +94,7 @@ const CreateWeeklyTaskPage = () => {
         `http://localhost:8080/api/weeklytask/v1/${taskId}`,
         payload
       );
+console.log(response);
 
       if (response.data.success) {
         toast.success('✅ Weekly Task updated successfully!');

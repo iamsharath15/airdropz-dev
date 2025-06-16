@@ -11,6 +11,7 @@ import {
   FileText,
   CheckSquare,
   Link2,
+  Heading1,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,8 @@ import {
 } from '@dnd-kit/sortable';
 import SortableItem from '@/components/shared/SortableItem';
 import StepProgress from '@/components/shared/StepProgress';
+import { arrayMove } from '@dnd-kit/sortable';
+
 type WeeklyTaskEditorProps = {
   task: any;
   onTaskUpdate: (updates: any) => void;
@@ -53,17 +56,11 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
   onTaskUpdate,
 }) => {
   const [step, setStep] = useState(1);
-const [banner, setBanner] = useState<File | null>(null);
-const [previewUrl, setPreviewUrl] = useState<string>('');
-
+  const [banner, setBanner] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const [contentBlocks, setContentBlocks] = useState<any[]>([]);
   const sensors = useSensors(useSensor(PointerSensor));
-
-  const [checklists, setChecklists] = useState([
-    { title: '', description: '', image: null },
-  ]);
 
   const categories = [
     'Marketing',
@@ -74,11 +71,13 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
   ];
 
   const addBlock = (type: string) => {
-    setContentBlocks((prev) => [...prev, { type, value: '', link: '' }]);
+    const newBlocks = [...(task.tasks || []), { type, value: '', link: '' }];
+    onTaskUpdate({ tasks: newBlocks });
   };
 
   const removeBlock = (index: number) => {
-    setContentBlocks((prev) => prev.filter((_, i) => i !== index));
+    const newBlocks = (task.tasks || []).filter((_, i) => i !== index);
+    onTaskUpdate({ tasks: newBlocks });
   };
 
   const renderBlock = (block: any, index: number) => {
@@ -88,9 +87,9 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
           <Textarea
             value={block.value}
             onChange={(e) => {
-              const updated = [...contentBlocks];
+              const updated = [...task.tasks];
               updated[index].value = e.target.value;
-              setContentBlocks(updated);
+              onTaskUpdate({ tasks: updated });
             }}
             placeholder={
               block.type === 'checklist'
@@ -106,9 +105,9 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
               placeholder="Link title"
               value={block.value}
               onChange={(e) => {
-                const updated = [...contentBlocks];
+                const updated = [...task.tasks];
                 updated[index].value = e.target.value;
-                setContentBlocks(updated);
+                onTaskUpdate({ tasks: updated });
               }}
               className="bg-zinc-800 text-white"
             />
@@ -116,10 +115,24 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
               placeholder="URL"
               value={block.link}
               onChange={(e) => {
-                const updated = [...contentBlocks];
+                const updated = [...task.tasks];
                 updated[index].link = e.target.value;
-                setContentBlocks(updated);
+                onTaskUpdate({ tasks: updated });
               }}
+              className="bg-zinc-800 text-white"
+            />
+          </>
+        )}
+        {block.type === 'header1' && (
+          <>
+            <Input
+              value={block.value}
+              onChange={(e) => {
+                const updated = [...task.tasks];
+                updated[index].value = e.target.value;
+                onTaskUpdate({ tasks: updated });
+              }}
+              placeholder="header1"
               className="bg-zinc-800 text-white"
             />
           </>
@@ -128,68 +141,53 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
     );
   };
 
-  const addChecklist = () => {
-    setChecklists((prev) => [
-      ...prev,
-      { title: '', description: '', image: null },
-    ]);
-  };
-
-  const removeChecklist = (index: number) => {
-    setChecklists((prev) => prev.filter((_, i) => i !== index));
-  };
-
   return (
     <div className="w-full md:w-1/2 p-6 overflow-auto border-r border-zinc-800 bg-black">
       <div className="mb-6">
         <StepProgress progress={step} />
       </div>
 
+      {/* Step 1: Task Details */}
       {step === 1 && (
         <div className="space-y-4">
           <h2 className="text-lg font-bold mb-4">
             Step 1: Weekly Task Details
           </h2>
 
+          {/* Banner Upload */}
           <div>
-  <label className="block text-sm text-white mb-4">Task Banner Image</label>
+            <label className="block text-sm text-white mb-4">
+              Task Banner Image
+            </label>
+            <label className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
+              {previewUrl ? (
+                <Image
+                  src={previewUrl}
+                  alt="Banner preview"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  width={1920}
+                  height={1080}
+                />
+              ) : (
+                <span className="text-zinc-500">Click to upload banner</span>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const preview = URL.createObjectURL(file);
+                    setPreviewUrl(preview);
+                    onTaskUpdate({ task_banner_image: file });
+                  }
+                }}
+              />
+            </label>
+          </div>
 
-  <label className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
-    {/* Image Preview */}
-    {previewUrl ? (
-      <Image
-        src={previewUrl}
-        alt="Banner preview"
-        className="absolute inset-0 w-full h-full object-cover"
-        width={1920}
-        height={1080}
-      />
-    ) : (
-      <span className="text-zinc-500">Click to upload banner</span>
-    )}
-    {/* Hidden File Input */}
-   <input
-  type="file"
-  accept="image/*"
-  className="hidden"
-  onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setPreviewUrl(preview); // for UI preview (optional)
-
-      // ✅ This must be included to update `taskData`
-      onTaskUpdate({
-        task_banner_image: file,
-      });
-    }
-  }}
-/>
-
-  </label>
-</div>
-
-
+          {/* Title */}
           <div>
             <label className="block text-sm text-white mb-1">Task Title</label>
             <Input
@@ -200,6 +198,7 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
             />
           </div>
 
+          {/* Dates */}
           <div className="space-y-2">
             <label className="block text-sm text-white mb-1">
               Choose Date:
@@ -263,7 +262,7 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
             </div>
           </div>
 
-          {/* Category Dropdown */}
+          {/* Category */}
           <div>
             <label className="block text-sm text-white mb-1">Category</label>
             <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
@@ -308,14 +307,17 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
             </Popover>
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm text-white mb-3">
               Task Description
             </label>
             <Textarea
               placeholder="Short description"
-              value={task.task_description || "hi"}
-              onChange={(e) => onTaskUpdate({ task_description: e.target.value })}
+              value={task.task_description || ''}
+              onChange={(e) =>
+                onTaskUpdate({ task_description: e.target.value })
+              }
               className="bg-zinc-900 border-zinc-700 text-white mb-4"
             />
           </div>
@@ -329,11 +331,10 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
         </div>
       )}
 
+      {/* Step 2: Add / Reorder Blocks */}
       {step === 2 && (
         <>
           <h2 className="text-lg font-bold mb-4">Step 2: Content & Reorder</h2>
-
-          {/* 🔽 ADD YOUR CUSTOM TEXT HERE */}
           <p className="text-sm text-zinc-400 mb-4">
             Add content blocks like descriptions, checklists, and links. Drag
             and drop to reorder them.
@@ -346,17 +347,18 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
               if (active.id !== over?.id) {
                 const oldIndex = parseInt(active.id);
                 const newIndex = parseInt(over!.id);
-                setContentBlocks((blocks) =>
-                  arrayMove(blocks, oldIndex, newIndex)
-                );
+                const reordered = arrayMove(task.tasks, oldIndex, newIndex);
+                onTaskUpdate({ tasks: reordered });
               }
             }}
           >
             <SortableContext
-              items={contentBlocks.map((_, i) => i.toString())}
+              items={(task.tasks || []).map((_: any, i: number) =>
+                i.toString()
+              )}
               strategy={verticalListSortingStrategy}
             >
-              {contentBlocks.map((block, index) => (
+              {(task.tasks || []).map((block: any, index: number) => (
                 <SortableItem key={index} id={index.toString()}>
                   <div className="border border-zinc-700 rounded-lg p-4 mb-4 relative">
                     <button
@@ -377,6 +379,7 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
               { icon: <FileText />, type: 'description' },
               { icon: <CheckSquare />, type: 'checklist' },
               { icon: <Link2 />, type: 'link' },
+              { icon: <Heading1 />, type: 'header1' },
             ].map((tool) => (
               <Tooltip key={tool.type}>
                 <TooltipTrigger asChild>
@@ -393,110 +396,14 @@ const [previewUrl, setPreviewUrl] = useState<string>('');
           </div>
 
           <div className="flex gap-2 mt-6">
-            <Button variant="outline" onClick={() => setStep(1)}>
+            <Button variant="outline" className='text-black cursor-pointer' onClick={() => setStep(1)}>
               Back
             </Button>
             <Button
-              className="bg-[#8373EE] hover:bg-[#8373EE]/80"
+              className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
               onClick={() => setStep(3)}
             >
               Next
-            </Button>
-          </div>
-        </>
-      )}
-      {step === 3 && (
-        <>
-          <h2 className="text-lg font-bold mb-4">Step 3: Task Checklist</h2>
-
-          {checklists.map((item, index) => (
-            <div
-              key={index}
-              className="space-y-4 border border-zinc-700 p-4 rounded-xl mb-4"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-md font-semibold text-purple-300">
-                  Checklist {index + 1}
-                </h3>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeChecklist(index)}
-                >
-                  Delete
-                </Button>
-              </div>
-
-              {/* Checklist Title */}
-              <div>
-                <label className="block text-sm text-white mb-1">
-                  Checklist Title
-                </label>
-                <Input
-                  placeholder="Enter checklist title"
-                  className="bg-zinc-800 text-white"
-                  value={item.title}
-                  onChange={(e) => {
-                    const newList = [...checklists];
-                    newList[index].title = e.target.value;
-                    setChecklists(newList);
-                  }}
-                />
-              </div>
-
-              {/* Checklist Description */}
-              <div>
-                <label className="block text-sm text-white mb-1">
-                  Checklist Description
-                </label>
-                <Textarea
-                  placeholder="Enter checklist description"
-                  className="bg-zinc-900 border-zinc-700 text-white"
-                  value={item.description}
-                  onChange={(e) => {
-                    const newList = [...checklists];
-                    newList[index].description = e.target.value;
-                    setChecklists(newList);
-                  }}
-                />
-              </div>
-
-              {/* Verify Image Upload */}
-              <div>
-                <label className="block text-sm text-white mb-1">
-                  Verify Image
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const newList = [...checklists];
-                    newList[index].image = e.target.files?.[0] || null;
-                    setChecklists(newList);
-                  }}
-                  className="text-white"
-                />
-              </div>
-            </div>
-          ))}
-
-          {/* Add Checklist Button */}
-          <div className="flex justify-start mb-6">
-            <Button
-              className="bg-[#8373EE] hover:bg-[#8373EE]/80"
-              onClick={addChecklist}
-            >
-              + Add Checklist
-            </Button>
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setStep(2)}>
-              Back
-            </Button>
-            <Button className="bg-[#8373EE] hover:bg-[#8373EE]/80">
-              Create
             </Button>
           </div>
         </>

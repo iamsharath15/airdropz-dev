@@ -25,10 +25,11 @@ export async function createWeeklyTasksTables() {
       CREATE TABLE IF NOT EXISTS tasks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
-        title TEXT NOT NULL,
-        description TEXT,
-        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+        type TEXT NOT NULL CHECK (type IN ('description', 'image', 'checklist', 'link', 'highlight', 'header1')),
+      value TEXT,
+      link TEXT,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       );
 
       -- Sub Tasks

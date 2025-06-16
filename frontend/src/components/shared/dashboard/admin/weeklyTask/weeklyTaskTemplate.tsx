@@ -116,6 +116,95 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
             </div>
 
             {/* Example Task */}
+              {task.tasks.map((block, i) => {
+                        switch (block.type) {
+                          case 'description':
+                            return (
+                              <div
+                                className="py-[2%] flex items-center justify-start w-full"
+                                key={i}
+                              >
+                                <p className="text-left font-medium text-white md:text-lg text-sm">
+                                  {block.value}
+                                </p>
+                              </div>
+                            );
+                          case 'image':
+                            return block.value?.trim() ? (
+                              <Image
+                                key={i}
+                                src={block.value}
+                                alt={`Content ${i}`}
+                                width={1920}
+                                height={1080}
+                                className="mb-4 rounded-xl object-contain"
+                                unoptimized
+                              />
+                            ) : (
+                              <div
+                                key={i}
+                                className="w-full h-48 bg-zinc-800 rounded-xl mb-4"
+                              />
+                            );
+                          case 'checklist':
+                            const items = block.value.split('\n').filter(Boolean);
+                            return (
+                              <div
+                                className="py-[1%] flex itesms-center justify-start w-full"
+                                key={i}
+                              >
+                                <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
+                                  {items.map((item, idx) => (
+                                    <li key={idx}>{item}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            );
+                          case 'link':
+                            return (
+                              <div
+                                className="py-[1%] flex itesms-center justify-start w-full"
+                                key={i}
+                              >
+                                <p className="text-white md:text-lg text-sm font-medium">
+                                  {block.value}{' '}
+                                  <a
+                                    href={block.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-purple-400 underline"
+                                  >
+                                    Link
+                                  </a>
+                                </p>
+                              </div>
+                            );
+                          case 'highlight':
+                            return (
+                              <div
+                                className="bg-[#111112] my-[2%] py-[2%] px-[10%] rounded-2xl w-full"
+                                key={i}
+                              >
+                                <p className="text-center text-white md:text-2xl text-xl font-medium ">
+                                  {block.value}
+                                </p>
+                              </div>
+                            );
+                          case 'header1':
+                            return (
+                              <div
+                                className="py-[1%] flex itesms-center justify-start w-full"
+                                key={i}
+                              >
+                                <h1 className="text-white md:text-2xl text-xl font-medium text-left ">
+                                  {block.value}
+                                </h1>
+                              </div>
+                            );
+                          default:
+                            return null;
+                        }
+                      })}
             <div className="space-y-6 mt-6">
               <div>
                 <h4 className="text-lg font-semibold text-white mb-4">
