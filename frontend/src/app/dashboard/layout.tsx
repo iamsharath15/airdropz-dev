@@ -78,7 +78,7 @@ export default function DashboardLayout({
         role={role}
       />
 
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col w-full overflow-hidden min-w-11/12">
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           role={role}

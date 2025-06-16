@@ -1,3 +1,4 @@
+// v1 done
 import { Card, CardContent } from '@/components/ui/card';
 import React from 'react';
 
@@ -8,9 +9,9 @@ interface StatItem {
 }
 
 interface WelcomeCardProps {
-  name: string; // "User 1" or "Admin"
+  name: string;
   stats: StatItem[];
-  color?: string; // Optional background color
+  color?: string;
 }
 
 const WelcomeCard: React.FC<WelcomeCardProps> = ({

@@ -12,7 +12,7 @@ import {
   setSelectedCategory,
   setSelectedType,
 } from '@/store/airdropsSlice';
-import UserAirdropCard from '@/components/shared/UserAirdropCard';
+import AirdropCard from '@/components/shared/AirdropCard';
 
 const AirdropsListing = () => {
   const dispatch = useDispatch();
@@ -112,7 +112,7 @@ const AirdropsListing = () => {
       <h2 className="text-2xl font-bold mb-6 px-[2%]">Top Airdropz</h2>
       <div className="flex flex-wrap">
         {filteredAirdrops.map((airdrop) => (
-          <UserAirdropCard
+          <AirdropCard
             key={airdrop.id}
             airdrop={{
               id: airdrop.id,

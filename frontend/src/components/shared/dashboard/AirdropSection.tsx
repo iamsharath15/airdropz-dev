@@ -1,17 +1,18 @@
 'use client';
 import React, { useRef } from 'react';
 import AirdropCard from '../AirdropCard';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Airdrop = {
   id: string;
   title: string;
   category: string;
   preview_image_url: string;
-  type: string;
+  type: 'Free' | 'Paid';
   likes: string;
 };
 
-const SectionHeader = ({
+const AidropHeader = ({
   title,
   onPrev,
   onNext,
@@ -23,21 +24,33 @@ const SectionHeader = ({
   <div className="flex justify-between items-center mb-4">
     <h2 className="text-xl font-bold text-white">{title}</h2>
     <div className="flex gap-2">
-      <button onClick={onPrev} className="text-gray-400 hover:text-white" aria-label="Scroll Left">
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
+      <button
+        onClick={onPrev}
+        className="text-white/80 hover:text-[#8373EE] cursor-pointer "
+        aria-label="Scroll Left"
+      >
+        <ChevronLeft />
       </button>
-      <button onClick={onNext} className="text-gray-400 hover:text-white" aria-label="Scroll Right">
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
+      <button
+        onClick={onNext}
+        className="text-white/80 hover:text-[#8373EE] cursor-pointer"
+        aria-label="Scroll Right"
+      >
+        <ChevronRight />
       </button>
     </div>
   </div>
 );
 
-const AirdropsSection = ({ airdrops }: { airdrops: Airdrop[] }) => {
+const AirdropsSection = ({
+  airdrops,
+  title = 'Top Airdrops',
+  emptyMessage = 'No airdrops to show yet.',
+}: {
+  airdrops: Airdrop[];
+  title?: string;
+  emptyMessage?: string;
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -48,18 +61,16 @@ const AirdropsSection = ({ airdrops }: { airdrops: Airdrop[] }) => {
   };
 
   return (
-    <section className="mb-6 md:mb-8 px-4">
-      <SectionHeader
-        title="Top Liked Airdrops"
-        onPrev={() => scroll('left')}
-        onNext={() => scroll('right')}
-      />
+    <section className="mb-6 md:mb-8">
+      <AidropHeader title={title} onPrev={() => scroll('left')} onNext={() => scroll('right')} />
       {airdrops.length === 0 ? (
-        <p className="text-gray-400">No liked airdrops yet.</p>
+        <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+          <p className="text-white/80 text-lg font-medium">{emptyMessage}</p>
+        </div>
       ) : (
         <div
           ref={scrollRef}
-          className="flex flex-row -m-2 gap-4 overflow-x-scroll scroll-smooth scrollbar-hide"
+          className="flex flex-row -m-2 w-full gap-4 overflow-x-scroll scroll-smooth scrollbar-hide"
         >
           {airdrops.map((airdrop) => (
             <AirdropCard key={airdrop.id} airdrop={airdrop} />
@@ -69,5 +80,6 @@ const AirdropsSection = ({ airdrops }: { airdrops: Airdrop[] }) => {
     </section>
   );
 };
+
 
 export default AirdropsSection;

@@ -15,7 +15,7 @@ type Airdrop = {
   title: string;
   category: string;
   preview_image_url: string;
-  type: string;
+  type: 'Free' | 'Paid';
   likes: string;
 };
 const Dashboard: React.FC = () => {
@@ -68,7 +68,6 @@ const Dashboard: React.FC = () => {
     fetchTopLiked();
     fetchStats();
   }, []);
-  console.log('stat', stats);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
@@ -86,7 +85,7 @@ const Dashboard: React.FC = () => {
           {loading ? (
             <div className=""></div>
           ) : (
-            <AirdropsSection airdrops={airdrops} />
+            <AirdropsSection airdrops={airdrops}  />
           )}{' '}
           {/* <TasksSection /> */}
           <Leaderboard />

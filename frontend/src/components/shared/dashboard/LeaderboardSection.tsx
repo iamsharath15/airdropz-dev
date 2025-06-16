@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -9,6 +11,29 @@ interface LeaderboardUser {
   user_name: string;
   points: number;
 }
+
+const useUsersPerPage = () => {
+  const [usersPerPage, setUsersPerPage] = useState(3); // default desktop
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setUsersPerPage(1); // mobile
+      } else if (width < 1024) {
+        setUsersPerPage(2); // tablet
+      } else {
+        setUsersPerPage(3); // desktop
+      }
+    };
+
+    handleResize(); // run initially
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return usersPerPage;
+};
 
 const SectionHeader = ({
   title,
@@ -22,31 +47,19 @@ const SectionHeader = ({
   <div className="flex justify-between items-center mb-4">
     <h2 className="text-xl font-bold text-white">{title}</h2>
     <div className="flex gap-2">
-      <button onClick={onPrev} className="text-gray-400 cursor-pointer hover:text-[#8373EE]">
-        <svg
-          className="w-5 h-5"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+      <button
+        onClick={onPrev}
+        className="text-gray-400 cursor-pointer hover:text-[#8373EE]"
+      >
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polyline points="15 18 9 12 15 6" />
         </svg>
       </button>
-      <button onClick={onNext} className="text-gray-400  cursor-pointer hover:text-[#8373EE]">
-        <svg
-          className="w-5 h-5"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+      <button
+        onClick={onNext}
+        className="text-gray-400 cursor-pointer hover:text-[#8373EE]"
+      >
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>
@@ -61,7 +74,7 @@ const LeaderboardItem = ({
   user: LeaderboardUser;
   rank: number;
 }) => (
-  <div className="bg-[#151313] rounded-xl p-4 flex items-start justify-center gap-4 w-4/12 flex-col">
+  <div className="bg-[#151313] rounded-xl p-4 flex flex-col gap-4 w-full md:w-1/2 lg:w-1/3">
     <div className="flex flex-row gap-4">
       <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#8373EE]">
         {user.user_name.charAt(0)}
@@ -80,22 +93,23 @@ const LeaderboardItem = ({
           height={15}
         />
         {rank} Rank
-      </div>{' '}
+      </div>
       <div className="flex items-center gap-2 text-white text-sm">
-          <Image
+        <Image
           src="https://cdn.lootcrate.me/svg/airdrop.svg"
           alt="Airdropz Icon"
           width={15}
           height={15}
         />
-        {user.points} Airdropz</div>
+        {user.points} Airdropz
+      </div>
     </div>
   </div>
 );
 
 const LeaderboardSection = () => {
+  const usersPerPage = useUsersPerPage(); // 👈 responsive value
   const [pageIndex, setPageIndex] = useState(0);
-  const usersPerPage = 3;
 
   const {
     data: leaderboardData,
@@ -109,7 +123,13 @@ const LeaderboardSection = () => {
       return res.data.data;
     },
   });
-
+  useEffect(() => {
+    if (!leaderboardData) return;
+    const totalPages = Math.ceil(leaderboardData.length / usersPerPage);
+    if (pageIndex >= totalPages) {
+      setPageIndex(totalPages - 1);
+    }
+  }, [usersPerPage, leaderboardData, pageIndex]);
   const handlePrev = () => {
     setPageIndex((prev) => Math.max(prev - 1, 0));
   };
@@ -151,7 +171,7 @@ const LeaderboardSection = () => {
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      <div className="flex flex-row overflow-x-auto gap-4">
+      <div className="flex flex-row overflow-scroll gap-4">
         {usersToDisplay.map((user) => (
           <LeaderboardItem key={user.user_id} user={user} rank={user.rank} />
         ))}
