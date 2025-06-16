@@ -9,6 +9,7 @@ import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import axios from 'axios';
+import { BarChart2 } from 'lucide-react';
 
 type Airdrop = {
   id: string;
@@ -31,6 +32,8 @@ const Dashboard: React.FC = () => {
     airdrops: 0,
     weekly_signups: 0,
   });
+
+  const [showMobileLeaderboard, setShowMobileLeaderboard] = useState(false);
 
   useEffect(() => {
     const fetchTopLiked = async () => {
@@ -85,12 +88,37 @@ const Dashboard: React.FC = () => {
           {loading ? (
             <div className=""></div>
           ) : (
-            <AirdropsSection airdrops={airdrops}  />
+            <AirdropsSection
+              airdrops={airdrops}
+              title="Top Liked Airdrops"
+              emptyMessage="No airdrops found."
+            />
           )}{' '}
           {/* <TasksSection /> */}
-          <Leaderboard />
         </div>
       </div>
+      <div className=" fixed bottom-4 right-4 z-50 flex flex-col gap-3">
+        <button
+          className="p-3 bg-[#8373EE] hover:bg-[#8373EE]/80 rounded-full shadow-lg cursor-pointer"
+          onClick={() => setShowMobileLeaderboard(true)}
+        >
+          <BarChart2 className="text-white w-6 h-6" />
+        </button>
+      </div>
+
+      {showMobileLeaderboard && (
+        <div className="fixed inset-0 z-40 bg-black/90 flex flex-col items-center justify-center p-4">
+          <button
+            onClick={() => setShowMobileLeaderboard(false)}
+            className="absolute top-4 right-4 text-white text-2xl"
+          >
+            ✕
+          </button>
+          <div className="w-full max-w-md">
+            <Leaderboard />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

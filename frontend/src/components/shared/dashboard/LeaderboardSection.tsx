@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface LeaderboardUser {
   id: string;
@@ -49,19 +50,15 @@ const SectionHeader = ({
     <div className="flex gap-2">
       <button
         onClick={onPrev}
-        className="text-gray-400 cursor-pointer hover:text-[#8373EE]"
+        className="text-white/80 cursor-pointer hover:text-[#8373EE]"
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
+        <ChevronLeft />
       </button>
       <button
         onClick={onNext}
-        className="text-gray-400 cursor-pointer hover:text-[#8373EE]"
+        className="text-white/80 cursor-pointer hover:text-[#8373EE]"
       >
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
+        <ChevronRight />
       </button>
     </div>
   </div>

@@ -60,27 +60,26 @@ const AirdropsListing = () => {
 
   return (
     <div className="mb-8">
-      {/* Header: Search + Filters */}
-      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-        {/* Search */}
-        <div className="relative w-full max-w-md">
+      <div className="flex justify-between items-center mb-6 flex-row gap-4">
+        <div className="relative md:w-4/12 w-6/12 ">
           <Search
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
-            size={18}
-          />
+            size={16}
+          />{' '}
           <Input
             placeholder="Search Airdropz"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-black border-white text-white py-6 rounded-lg placeholder:text-white"
+            className="pl-10 bg-black text-sm border-white text-white py-4 rounded-lg placeholder:text-white"
           />
         </div>
 
         {/* Right Filters */}
-        <div className="flex gap-4 relative">
+        <div className="flex gap-2 w-6/12 items-center justify-end">
           <AirdropFormModal />
 
           {/* Category Filter */}
+          
           <Dropdown
             label={selectedCategory}
             icon={<LayoutGrid size={18} />}
@@ -158,7 +157,7 @@ const Dropdown = ({
       {label}
     </Button>
 
-     {show && (
+    {show && (
       <div className="absolute space-y-2 right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2 min-w-[120px]">
         {options.map((option) => {
           const isActive = activeOption === option;

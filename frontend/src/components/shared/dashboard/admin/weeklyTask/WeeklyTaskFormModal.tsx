@@ -50,46 +50,55 @@ const WeeklyTaskFormModal = () => {
     setWeekOptions((prev) => [...prev, nextWeek]);
     setWeek(nextWeek);
   };
-const handleCreate = async () => {
-  if (!title || !week || !startDate || !endDate || !category) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  try {
-    const payload = {
-      task_title: title,
-      task_category: category,
-      week: parseInt(week),
-      start_time: startDate.toISOString(),
-      end_time: endDate.toISOString(),
-    };
-
-    const response = await axios.post('http://localhost:8080/api/weeklytask/v1', payload);
-
-    if ((response.status === 200 || response.status === 201) && response.data?.id) {
-      const weeklyTaskId = response.data.id;
-
-      // Reset form
-      setOpen(false);
-      setTitle('');
-      setCategory('');
-      setWeek('');
-      setStartDate(undefined);
-      setEndDate(undefined);
-
-      // Navigate to the created weekly task page
-      router.push(`/dashboard/admin/weeklytask/create/${weeklyTaskId}`);
-    } else {
-      alert('Something went wrong. Please try again.');
+  const handleCreate = async () => {
+    if (!title || !week || !startDate || !endDate || !category) {
+      alert('Please fill in all fields');
+      return;
     }
-  } catch (error: any) {
-    console.error('Error creating weekly task:', error);
-    alert(`❌ Error: ${error.response?.data?.message || error.message}`);
-  }
-};
 
+    try {
+      const payload = {
+        task_title: title,
+        task_category: category,
+        week: parseInt(week),
+        start_time: startDate.toISOString(),
+        end_time: endDate.toISOString(),
+      };
 
+      const response = await axios.post(
+        'http://localhost:8080/api/weeklytask/v1',
+        payload
+      );
+
+      if (
+        (response.status === 200 || response.status === 201) &&
+        response.data?.id
+      ) {
+        const weeklyTaskId = response.data.id;
+
+        // Reset form
+        setOpen(false);
+        setTitle('');
+        setCategory('');
+        setWeek('');
+        setStartDate(undefined);
+        setEndDate(undefined);
+
+        // Navigate to the created weekly task page
+        router.push(`/dashboard/admin/weeklytask/create/${weeklyTaskId}`);
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error('Error creating weekly task:', error);
+        alert(`Error: ${error.response?.data?.message || error.message}`);
+      } else {
+        console.error('Unexpected error:', error);
+        alert('An unexpected error occurred');
+      }
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -99,7 +108,7 @@ const handleCreate = async () => {
           className="gap-2 text-white border-white bg-black cursor-pointer"
         >
           <Plus size={18} />
-          New Weekly Task
+          <span className="hidden md:inline  text-sm ">Add Task</span>
         </Button>
       </DialogTrigger>
 

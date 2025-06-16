@@ -138,12 +138,12 @@ const AirdropFormModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
+         <Button
           variant="outline"
           className="gap-2 text-white border-white bg-black cursor-pointer"
         >
           <Plus size={18} />
-          New Airdrop
+          <span className="hidden md:inline  text-sm ">Add Airdrop</span>
         </Button>
       </DialogTrigger>
 

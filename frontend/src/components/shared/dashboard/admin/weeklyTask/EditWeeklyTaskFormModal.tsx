@@ -86,13 +86,19 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
         end_time: endDate.toISOString(),
       };
 
-      await axios.put(`http://localhost:8080/api/weeklytask/v1/${task.id}`, payload);
+      await axios.put(
+        `http://localhost:8080/api/weeklytask/v1/${task.id}`,
+        payload
+      );
       toast.success('✅ Weekly task updated!');
       setOpen(false);
       router.refresh();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`❌ ${err?.response?.data?.message || err.message}`);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(`❌ ${err.response?.data?.message || err.message}`);
+      } else {
+        toast.error('❌ An unexpected error occurred');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -131,71 +137,70 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
               <div className="space-y-2">
                 <Label>Category</Label>
                 <Select value={category} onValueChange={setCategory}>
-  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700">
-    <SelectValue placeholder="Select category" />
-  </SelectTrigger>
-  <SelectContent className="bg-[#1F1F1F] text-white">
-    {categories.map((cat) => (
-      <SelectItem key={cat} value={cat}>
-        {cat}
-      </SelectItem>
-    ))}
+                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1F1F1F] text-white">
+                    {categories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
 
-    <div className="border-t border-gray-600 my-1" />
+                    <div className="border-t border-gray-600 my-1" />
 
-    {!showCategoryInput ? (
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowCategoryInput(true);
-        }}
-        className="w-full px-2 py-2 text-sm text-violet-400 text-left hover:bg-[#2A2A2A]"
-      >
-        ➕ Add New Category
-      </button>
-    ) : (
-      <div className="px-3 py-2 space-y-2">
-        <input
-          value={newCategoryInput}
-          onChange={(e) => setNewCategoryInput(e.target.value)}
-          placeholder="New category"
-          className="w-full px-2 py-1 text-sm bg-[#2A2A2A] border border-gray-600 rounded text-white"
-        />
-        <div className="flex justify-between gap-2">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              const trimmed = newCategoryInput.trim();
-              if (trimmed && !categories.includes(trimmed)) {
-                setCategories((prev) => [...prev, trimmed]);
-                setCategory(trimmed);
-              }
-              setShowCategoryInput(false);
-              setNewCategoryInput('');
-            }}
-            className="text-sm text-violet-400 hover:underline"
-          >
-            ✅ Add
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowCategoryInput(false);
-              setNewCategoryInput('');
-            }}
-            className="text-sm text-gray-400 hover:underline"
-          >
-            ❌ Cancel
-          </button>
-        </div>
-      </div>
-    )}
-  </SelectContent>
-</Select>
-
+                    {!showCategoryInput ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowCategoryInput(true);
+                        }}
+                        className="w-full px-2 py-2 text-sm text-violet-400 text-left hover:bg-[#2A2A2A]"
+                      >
+                        ➕ Add New Category
+                      </button>
+                    ) : (
+                      <div className="px-3 py-2 space-y-2">
+                        <input
+                          value={newCategoryInput}
+                          onChange={(e) => setNewCategoryInput(e.target.value)}
+                          placeholder="New category"
+                          className="w-full px-2 py-1 text-sm bg-[#2A2A2A] border border-gray-600 rounded text-white"
+                        />
+                        <div className="flex justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const trimmed = newCategoryInput.trim();
+                              if (trimmed && !categories.includes(trimmed)) {
+                                setCategories((prev) => [...prev, trimmed]);
+                                setCategory(trimmed);
+                              }
+                              setShowCategoryInput(false);
+                              setNewCategoryInput('');
+                            }}
+                            className="text-sm text-violet-400 hover:underline"
+                          >
+                            ✅ Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowCategoryInput(false);
+                              setNewCategoryInput('');
+                            }}
+                            className="text-sm text-gray-400 hover:underline"
+                          >
+                            ❌ Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Week */}
@@ -230,7 +235,10 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                 <Label>Start Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full text-white bg-[#1A1A1A] border border-gray-700">
+                    <Button
+                      variant="outline"
+                      className="w-full text-white bg-[#1A1A1A] border border-gray-700"
+                    >
                       {startDate ? format(startDate, 'PPP') : 'Pick a date'}
                     </Button>
                   </PopoverTrigger>
@@ -250,7 +258,10 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                 <Label>End Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full text-white bg-[#1A1A1A] border border-gray-700">
+                    <Button
+                      variant="outline"
+                      className="w-full text-white bg-[#1A1A1A] border border-gray-700"
+                    >
                       {endDate ? format(endDate, 'PPP') : 'Pick a date'}
                     </Button>
                   </PopoverTrigger>

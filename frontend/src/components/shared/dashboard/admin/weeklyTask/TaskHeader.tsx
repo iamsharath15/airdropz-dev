@@ -5,17 +5,10 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectScrollDownButton,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Search,
-  Filter,
-  ChevronDown,
-  LayoutGrid,
-  ChevronDownIcon,
-} from 'lucide-react';
+import { Search, Filter, LayoutGrid, ChevronDownIcon } from 'lucide-react';
 import { useId } from 'react';
 import WeeklyTaskFormModal from './WeeklyTaskFormModal';
 
@@ -37,34 +30,30 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
-  sortBy,
-  setSortBy,
   categories,
   weeks,
   setSelectedWeek,
   selectedWeek,
 }) => {
-  const sortOptions = ['Week', 'Progress', 'Title'];
-
   const inputId = useId();
 
   return (
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
-      <div className="relative w-full md:max-w-md">
+    <div className="flex flex-row items-start md:items-center justify-between gap-4 mb-8">
+      <div className="relative md:w-4/12 w-6/12 ">
         <Search
           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
-          size={18}
+          size={16}
         />{' '}
         <Input
           id={inputId}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search Task"
-          className="pl-10 bg-black border-white text-white py-6 rounded-lg placeholder:text-white"
+          className="pl-10 bg-black text-sm border-white text-white py-4 rounded-lg placeholder:text-white"
         />
       </div>
 
-      <div className="flex gap-4 w-full md:w-auto">
+      <div className="flex gap-2 w-6/12 items-center justify-end">
         <WeeklyTaskFormModal />
 
         <Select
@@ -73,14 +62,17 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
         >
           <SelectTrigger
             hideIcon
-            className="w-full md:w-[160px] cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors "
+            className="w-auto text-sm  cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors"
           >
-            <div className="flex items-center">
-              <LayoutGrid className="mr-2 h-4 w-4 text-white group-hover:text-black transition-colors" />
-              <SelectValue placeholder="Category" />
-            </div>
+            <div className="flex items-center gap-2">
+              <LayoutGrid className="h-4 w-4 text-white group-hover:text-black transition-colors" />
 
-            <ChevronDownIcon className="h-4 w-4 text-white group-hover:text-black transition-colors" />
+              <span className="hidden md:inline">
+                <SelectValue placeholder="Category" />
+              </span>
+
+              <ChevronDownIcon className="hidden md:inline h-4 w-4 text-white group-hover:text-black transition-colors" />
+            </div>
           </SelectTrigger>
 
           <SelectContent>
@@ -96,15 +88,25 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
           value={selectedWeek.toString()}
           onValueChange={(val) => setSelectedWeek(Number(val))}
         >
-          <SelectTrigger hideIcon             className="w-full md:w-[160px] cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors "
->
-            <Filter className="mr-2 h-4 w-4 text-white group-hover:text-black transition-colors" />
+          <SelectTrigger
+            hideIcon
+            className="w-auto cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors"
+          >
+            {/* Icon only on mobile, icon + label on desktop */}
+            <div className="flex items-center gap-2">
+              {/* Filter Icon: always visible */}
+              <Filter className="h-4 w-4 text-white group-hover:text-black transition-colors" />
 
+              {/* Label: hidden on mobile, visible on md+ */}
+              <span className="hidden md:inline">
+                <SelectValue placeholder="Sort By" />
+              </span>
 
-            <SelectValue placeholder="Sort By" />
-                        <ChevronDownIcon className="h-4 w-4 text-white group-hover:text-black transition-colors" />
-
+              {/* Chevron: hidden on mobile, visible on md+ */}
+              <ChevronDownIcon className="hidden md:inline h-4 w-4 text-white group-hover:text-black transition-colors" />
+            </div>
           </SelectTrigger>
+
           <SelectContent>
             {weeks.map((week) => (
               <SelectItem key={week} value={week.toString()}>

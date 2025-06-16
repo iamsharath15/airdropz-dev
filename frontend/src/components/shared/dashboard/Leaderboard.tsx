@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 type LeaderboardUser = {
   id: number;
@@ -34,14 +35,13 @@ const Leaderboard = () => {
   const [showFull, setShowFull] = useState(false);
   const [page, setPage] = useState(1);
 
-  const {
-    data,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['leaderboard', showFull, page],
     queryFn: () =>
-      fetchLeaderboard(showFull ? page : 1, showFull ? fullLimit : previewLimit),
+      fetchLeaderboard(
+        showFull ? page : 1,
+        showFull ? fullLimit : previewLimit
+      ),
   });
 
   const disablePrev = page === 1;
@@ -83,16 +83,14 @@ const Leaderboard = () => {
                 <div className="w-6 h-6 bg-white rounded-full" />
                 <span className="text-white">{user.user_name}</span>
               </div>
-              <div className="w-24 text-right flex justify-end items-center">
-                <span className="text-yellow-500 mr-1">+ {user.points}</span>
-                <svg
-                  className="w-4 h-4 text-yellow-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                </svg>
+              <div className="w-24 text-right flex justify-end items-center pr-4">
+                <span className="text-yellow-500 pr-3">+ {user.points}</span>
+                <Image
+                  src="https://cdn.lootcrate.me/svg/airdrop.svg"
+                  alt="Airdrop Logo"
+                  width={18}
+                  height={18}
+                />
               </div>
             </div>
           ))}
@@ -111,14 +109,16 @@ const Leaderboard = () => {
         {/* Pagination Controls for Full View */}
         {showFull && (
           <div className="flex justify-between mt-4">
-            <Button className='text-black hover:bg-[#8373EE] cursor-pointer'
+            <Button
+              className="text-black hover:bg-[#8373EE] cursor-pointer"
               variant="outline"
               disabled={disablePrev}
               onClick={() => setPage((prev) => prev - 1)}
             >
               Prev
             </Button>
-            <Button className='text-black hover:bg-[#8373EE] cursor-pointer'
+            <Button
+              className="text-black hover:bg-[#8373EE] cursor-pointer"
               variant="outline"
               disabled={disableNext}
               onClick={() => setPage((prev) => prev + 1)}

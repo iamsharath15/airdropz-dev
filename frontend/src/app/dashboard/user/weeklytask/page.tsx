@@ -2,29 +2,42 @@
 
 import { useEffect, useState } from 'react';
 import { TaskHeader } from '@/components/shared/dashboard/admin/weeklyTask/TaskHeader';
-import { TaskDetail } from '@/components/shared/TaskDetail';
-
-import { mockTasks } from '@/app/data/mockTasks';
 import axios from 'axios';
 import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-
+interface WeeklyTask {
+  id: string;
+  task_title: string;
+  task_category: string;
+  week: number;
+}
 export default function WeeklyTaskPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Week');
-  const [selectedTask, setSelectedTask] = useState<any>(null);
-  const [weeklyTasks, setWeeklyTasks] = useState<any[]>([]);
+  const [weeklyTasks, setWeeklyTasks] = useState<WeeklyTask[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [weeks, setWeeks] = useState<number[]>([]);
+  const [selectedWeek, setSelectedWeek] = useState<number>(0); // 0 = All
 
   useEffect(() => {
     const fetchWeeklyTasks = async () => {
       try {
-        const response = await axios.get(
+        const response = await axios.get<{ data: WeeklyTask[] }>(
           'http://localhost:8080/api/weeklytask/v1'
         );
-        console.log('Weekly Tasks Data:', response.data.data);
-        setWeeklyTasks(response.data.data || []);
+        const tasks = response.data.data || [];
+        setWeeklyTasks(tasks);
+        const uniqueCategories = Array.from(
+          new Set(tasks.map((task) => task.task_category).filter(Boolean))
+        );
+        setCategories(['All', ...uniqueCategories]);
+        const uniqueWeeks = Array.from(
+          new Set(tasks.map((task) => task.week))
+        ).sort((a, b) => a - b);
+
+        setWeeks([0, ...uniqueWeeks]);
       } catch (error) {
         console.error('Error fetching weekly tasks:', error);
       }
@@ -33,43 +46,22 @@ export default function WeeklyTaskPage() {
     fetchWeeklyTasks();
   }, []);
 
-  const filterTasks = (tasks: any[]) => {
+  const filterTasks = (tasks: WeeklyTask[]) => {
     return tasks.filter((task) => {
-      const matchesSearch =
-        task.task_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.task_description.toLowerCase().includes(searchQuery.toLowerCase());
-
+      const matchesSearch = task.task_title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategory === 'All' || task.category === selectedCategory;
+        selectedCategory === 'All' || task.task_category === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      const matchesWeek = selectedWeek === 0 || task.week === selectedWeek;
+
+      return matchesSearch && matchesCategory && matchesWeek;
     });
   };
-  // const sortTasks = (tasks: any[]) => {
-  //   return [...tasks].sort((a, b) => {
-  //     switch (sortBy) {
-  //       case 'Week':
-  //         return a.week.localeCompare(b.week);
-  //       case 'Progress':
-  //         return b.progress - a.progress;
-  //       case 'Title':
-  //         return a.title.localeCompare(b.title);
-  //       default:
-  //         return 0;
-  //     }
-  //   });
-  // };
 
-  const handleTaskClick = (task: any) => {
-    setSelectedTask(task);
-  };
-
-  const handleBackToTasks = () => {
-    setSelectedTask(null);
-  };
-  //const myTasks = sortTasks(filterTasks(mockTasks.myTasks));
-  // const weeklyTasks = sortTasks(filterTasks(mockTasks.weeklyTasks));
   const filteredAndSortedTasks = filterTasks(weeklyTasks);
+
   const getTimeLeftString = (endTime: string): string => {
     const now = new Date();
     const end = new Date(endTime);
@@ -102,8 +94,11 @@ export default function WeeklyTaskPage() {
             setSelectedCategory={setSelectedCategory}
             sortBy={sortBy}
             setSortBy={setSortBy}
+            categories={categories}
+            weeks={weeks}
+            selectedWeek={selectedWeek}
+            setSelectedWeek={setSelectedWeek}
           />
-
 
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
@@ -130,13 +125,15 @@ export default function WeeklyTaskPage() {
                     className="w-full block"
                   >
                     <div className="relative mb-4 rounded-xl overflow-hidden">
-                      <Image
-                        width={1920}
-                        height={1080}
-                        src={task.task_banner_image}
-                        alt={task.task_title}
-                        className="w-full h-32 object-cover rounded-xl"
-                      />
+                      {task.task_banner_image && (
+                        <Image
+                          width={1920}
+                          height={1080}
+                          src={task.task_banner_image}
+                          alt={task.task_title}
+                          className="w-full h-32 object-cover rounded-xl"
+                        />
+                      )}
                     </div>
 
                     <h3 className="text-base font-semibold mb-1">
