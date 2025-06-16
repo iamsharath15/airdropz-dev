@@ -190,7 +190,7 @@ static async update(req, res) {
     task_banner_image,
     task_description,
     tasks = [],
-        sub_tasks = [],
+    sub_tasks = [],
 
   } = req.body;
 
@@ -299,9 +299,6 @@ static async update(req, res) {
   }
 }
 
-
-
-
   // 5. DELETE a Weekly Task and cascade delete tasks/sub-tasks
  static async delete(req, res) {
     const { id } = req.params;
@@ -332,7 +329,70 @@ static async update(req, res) {
     } finally {
       client.release();
     }
+ }
+  
+  static async userTaskCheckList(req, res) {
+    const user_id = req.user.userId; 
+  const { weekly_task_id } = req.params; 
+  const { sub_task_id, image_url } = req.body;
+  const client = await pool.connect();
+  
+
+  // 1. Basic validation
+  if (!sub_task_id || !image_url || !weekly_task_id) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
+
+  try {
+    const query = `
+      INSERT INTO user_sub_tasks (
+        user_id,
+        sub_task_id,
+        weekly_task_id,
+        sub_task_image,
+        is_completed,
+        completed_at
+      )
+      VALUES ($1, $2, $3, $4, true, NOW())
+      ON CONFLICT (user_id, sub_task_id)
+      DO UPDATE SET
+        sub_task_image = EXCLUDED.sub_task_image,
+        is_completed = true,
+        completed_at = NOW();
+    `;
+
+    await client.query(query, [user_id, sub_task_id, weekly_task_id, image_url]);
+
+    return res.status(200).json({ success: true, message: 'Task marked as completed' });
+  } catch (error) {
+    console.error('❌ Error in userTaskCheckList:', error);
+    return res.status(500).json({ success: false, message: 'Failed to update task checklist' });
+  } finally {
+    client.release();
+  }
+}
+static async getUserTaskStatus(req, res) {
+  const user_id = req.user.userId; // from auth middleware
+  const { weekly_task_id } = req.params;
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `SELECT sub_task_id, is_completed, sub_task_image, completed_at
+       FROM user_sub_tasks
+       WHERE user_id = $1 AND weekly_task_id = $2`,
+      [user_id, weekly_task_id]
+    );
+
+    return res.status(200).json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("❌ Error in getUserTaskStatus:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch user task status" });
+  } finally {
+    client.release();
+  }
+}
+
 }
 
 export default WeeklyTaskController;

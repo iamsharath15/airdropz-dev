@@ -35,7 +35,7 @@ export async function createWeeklyTasksTables() {
       -- Sub Tasks
       CREATE TABLE IF NOT EXISTS sub_tasks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
+        weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
         description TEXT,
         hyperlink TEXT,
@@ -48,8 +48,10 @@ export async function createWeeklyTasksTables() {
       CREATE TABLE IF NOT EXISTS user_sub_tasks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID NOT NULL,
+        weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
         sub_task_id UUID REFERENCES sub_tasks(id) ON DELETE CASCADE,
         is_completed BOOLEAN DEFAULT false,
+        sub_task_image TEXT NOT NUll,
         completed_at TIMESTAMPTZ,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, sub_task_id)

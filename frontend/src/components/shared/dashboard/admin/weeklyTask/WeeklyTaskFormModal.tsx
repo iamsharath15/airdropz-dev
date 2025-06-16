@@ -28,6 +28,8 @@ import {
 } from '@/components/ui/popover';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 
 const WeeklyTaskFormModal = () => {
   const router = useRouter();
@@ -44,6 +46,7 @@ const WeeklyTaskFormModal = () => {
   const [category, setCategory] = useState('');
   const [showCategoryInput, setShowCategoryInput] = useState(false);
   const [newCategoryInput, setNewCategoryInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddWeek = () => {
     const nextWeek = (weekOptions.length + 1).toString();
@@ -55,6 +58,7 @@ const WeeklyTaskFormModal = () => {
       alert('Please fill in all fields');
       return;
     }
+    setIsLoading(true);
 
     try {
       const payload = {
@@ -75,19 +79,22 @@ const WeeklyTaskFormModal = () => {
         response.data?.id
       ) {
         const weeklyTaskId = response.data.id;
+        toast.success('Weekly Task created successfully!');
+
+        await new Promise((resolve) => setTimeout(resolve, 3000));
 
         // Reset form
-        setOpen(false);
         setTitle('');
         setCategory('');
         setWeek('');
         setStartDate(undefined);
         setEndDate(undefined);
+        // Close modal after a short delay
+        router.push(`/dashboard/admin/weeklytask/create/${weeklyTaskId}`);
 
         // Navigate to the created weekly task page
-        router.push(`/dashboard/admin/weeklytask/create/${weeklyTaskId}`);
       } else {
-        alert('Something went wrong. Please try again.');
+        toast.error('Something went wrong. Please try again.');
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -97,11 +104,13 @@ const WeeklyTaskFormModal = () => {
         console.error('Unexpected error:', error);
         alert('An unexpected error occurred');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(val) => !isLoading && setOpen(val)}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -121,9 +130,7 @@ const WeeklyTaskFormModal = () => {
           </DialogHeader>
 
           <div className="flex flex-col gap-6 mt-6">
-            {/* Form */}
             <div className="w-full space-y-5">
-              {/* Title */}
               <div className="space-y-2">
                 <Label className="text-sm text-gray-300">Task Title</Label>
                 <Input
@@ -133,8 +140,6 @@ const WeeklyTaskFormModal = () => {
                   className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500 placeholder:text-gray-400"
                 />
               </div>
-              {/* Category */}
-              {/* Category */}
               <div className="space-y-2">
                 <Label className="text-sm text-gray-300">Category</Label>
                 <Select value={category} onValueChange={setCategory}>
@@ -294,9 +299,53 @@ const WeeklyTaskFormModal = () => {
               {/* Submit */}
               <Button
                 onClick={handleCreate}
-                className="w-full mt-4 bg-[#8373EE]  hover:bg-[#8373EE]/80 transition-colors text-white font-semibold cursor-pointer"
+                disabled={isLoading}
+                className="w-full mt-4 bg-[#8373EE] hover:bg-[#8373EE]/80 transition-colors text-white font-semibold cursor-pointer"
               >
-                Create Weekly Task
+                <AnimatePresence mode="wait" initial={false}>
+                  {isLoading ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <svg
+                        className="animate-spin h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        ></path>
+                      </svg>
+                      Creating...
+                    </motion.div>
+                  ) : (
+                    <motion.span
+                      key="create"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      Create Weekly Task
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </Button>
             </div>
           </div>

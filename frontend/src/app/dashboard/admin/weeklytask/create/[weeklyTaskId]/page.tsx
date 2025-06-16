@@ -8,6 +8,17 @@ import WeeklyTaskEditor from '@/components/shared/dashboard/admin/weeklyTask/Wee
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction
+} from '@/components/ui/alert-dialog';
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
@@ -53,7 +64,6 @@ const CreateWeeklyTaskPage = () => {
   const handleTaskUpdate = (updates: any) => {
     setTaskData((prev: any) => ({ ...prev, ...updates }));
   };
-console.log('last',taskData);
 
   const handleSaveChanges = async () => {
     try {
@@ -96,16 +106,15 @@ console.log('last',taskData);
         `http://localhost:8080/api/weeklytask/v1/${taskId}`,
         payload
       );
-console.log(response);
 
       if (response.data.success) {
-        toast.success('✅ Weekly Task updated successfully!');
+        toast.success('Weekly Task updated successfully!');
       } else {
-        toast.error('❌ Failed to update Weekly Task');
+        toast.error('Failed to update Weekly Task');
       }
     } catch (error) {
       console.error('PUT error:', error);
-      toast.error('❌ Error while saving changes');
+      toast.error('Error while saving changes');
     } finally {
       setSaving(false);
     }
@@ -113,26 +122,20 @@ console.log(response);
   const handleDelete = async () => {
     if (!taskId) return;
 
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this Weekly Task?'
-    );
-    if (!confirmDelete) return;
-
     try {
       const res = await axios.delete(
         `http://localhost:8080/api/weeklytask/v1/${taskId}`
       );
       if (res.data.success) {
-        toast.success('🗑️ Weekly Task deleted successfully!');
-        // ✅ Redirect to weekly task list page
+        toast.success('Weekly Task deleted successfully!');
         window.location.href =
           'http://localhost:3000/dashboard/admin/weeklytask';
       } else {
-        toast.error('❌ Failed to delete Weekly Task');
+        toast.error('Failed to delete Weekly Task');
       }
     } catch (error) {
       console.error('DELETE error:', error);
-      toast.error('❌ Error deleting Weekly Task');
+      toast.error('Error deleting Weekly Task');
     }
   };
 
@@ -142,14 +145,33 @@ console.log(response);
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <h1 className="text-xl font-semibold">Edit Weekly Task</h1>
         <div className="flex gap-3">
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={saving}
-            className="cursor-pointer"
-          >
-            Delete
-          </Button>
+       <AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive" disabled={saving} className='cursor-pointer bg-red-500 hover:bg-red-500/80'>
+      Delete
+    </Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent className="bg-[#0F0F0F] text-white border border-zinc-800">
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone. It will permanently delete this Weekly Task.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
+        Cancel
+      </AlertDialogCancel>
+      <AlertDialogAction
+        onClick={handleDelete}
+        className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
+      >
+        Yes, Delete
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
           <Button
             onClick={handleSaveChanges}
             disabled={saving}

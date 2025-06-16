@@ -5,28 +5,25 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Clock, Upload, Users } from 'lucide-react';
 import Image from 'next/image';
 
-
-
-
 const WeeklyTaskTemplate = ({ task }: { task: any }) => {
-  
   const taskList = task?.sub_tasks || [];
 
-const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(() => {
-  const initialState: Record<string, boolean> = {};
-  if (task?.sub_tasks?.length > 0) {
-    initialState[task.sub_tasks[0].id] = true; // auto-expand first
-  }
-  return initialState;
-});
+  const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(
+    () => {
+      const initialState: Record<string, boolean> = {};
+      if (task?.sub_tasks?.length > 0) {
+        initialState[task.sub_tasks[0].id] = true; // auto-expand first
+      }
+      return initialState;
+    }
+  );
 
-const toggleTask = (taskId: string) => {
-  setExpandedTasks((prev) => ({
-    ...prev,
-    [taskId]: !prev[taskId],
-  }));
-};
-
+  const toggleTask = (taskId: string) => {
+    setExpandedTasks((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
 
   return (
     <div className="w-full p-[1%]">
@@ -102,73 +99,72 @@ const toggleTask = (taskId: string) => {
             </div>
 
             {/* Example Task */}
-          {/* Example Task */}
-{Array.isArray(task.tasks) &&
-  task.tasks.map((block, i) => {
-    switch (block.type) {
-      case 'description':
-        return (
-          <div
-            className="py-[1%] flex items-center justify-start w-full"
-            key={i}
-          >
-            <p className="text-left font-medium text-white/80 text-sm">
-              {block.value}
-            </p>
-          </div>
-        );
-      case 'checklist':
-        const items = block.value.split('\n').filter(Boolean);
-        return (
-          <div
-            className="py-[1%] flex items-center justify-start w-full"
-            key={i}
-          >
-            <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
-              {items.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        );
-      case 'link':
-        return (
-          <div
-            className="py-[1%] gap-2 flex items-center justify-start w-full"
-            key={i}
-          >
-            <div className="w-6 h-6 bg-[#8373EE] rounded-full flex items-center justify-center">
-              <span className="text-white text-xs">✓</span>
-            </div>
-            <p className="text-white md:text-lg text-sm font-normal">
-              {block.value}{' '}
-              <a
-                href={block.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-400 underline"
-              >
-                Link
-              </a>
-            </p>
-          </div>
-        );
-      case 'header1':
-        return (
-          <div
-            className="py-[2%] flex items-center justify-start w-full"
-            key={i}
-          >
-            <h1 className="text-white md:text-2xl text-xl font-medium text-left">
-              {block.value}
-            </h1>
-          </div>
-        );
-      default:
-        return null;
-    }
-  })}
-
+            {/* Example Task */}
+            {Array.isArray(task.tasks) &&
+              task.tasks.map((block, i) => {
+                switch (block.type) {
+                  case 'description':
+                    return (
+                      <div
+                        className="py-[1%] flex items-center justify-start w-full"
+                        key={i}
+                      >
+                        <p className="text-left font-medium text-white/80 text-sm">
+                          {block.value}
+                        </p>
+                      </div>
+                    );
+                  case 'checklist':
+                    const items = block.value.split('\n').filter(Boolean);
+                    return (
+                      <div
+                        className="py-[1%] flex items-center justify-start w-full"
+                        key={i}
+                      >
+                        <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
+                          {items.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  case 'link':
+                    return (
+                      <div
+                        className="py-[1%] gap-2 flex items-center justify-start w-full"
+                        key={i}
+                      >
+                        <div className="w-6 h-6 bg-[#8373EE] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <p className="text-white md:text-lg text-sm font-normal">
+                          {block.value}{' '}
+                          <a
+                            href={block.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-purple-400 underline"
+                          >
+                            Link
+                          </a>
+                        </p>
+                      </div>
+                    );
+                  case 'header1':
+                    return (
+                      <div
+                        className="py-[2%] flex items-center justify-start w-full"
+                        key={i}
+                      >
+                        <h1 className="text-white md:text-2xl text-xl font-medium text-left">
+                          {block.value}
+                        </h1>
+                      </div>
+                    );
+                  default:
+                    return null;
+                }
+              })}
           </div>
         </div>
 
@@ -183,16 +179,18 @@ const toggleTask = (taskId: string) => {
               <div key={index} className=" bg-black rounded-lg">
                 <button
                   onClick={() => toggleTask(task.id)}
-  className="w-full p-4 flex justify-between items-start text-left hover:bg-gray-750 transition-colors rounded-lg cursor-pointer space-x-4"
+                  className="w-full p-4 flex justify-between items-start text-left hover:bg-gray-750 transition-colors rounded-lg cursor-pointer space-x-4"
                 >
-                  <span className="text-white text-sm  ">Task {index + 1}: {task.title}</span>
+                  <span className="text-white text-sm  ">
+                    Task {index + 1}: {task.title}
+                  </span>
                   <div className="p-[2%] flex items-center justify-center">
-                      {expandedTasks[task.id] ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                  )}
-                </div>
+                    {expandedTasks[task.id] ? (
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                  </div>
                 </button>
 
                 {expandedTasks[task.id] && (
@@ -203,20 +201,20 @@ const toggleTask = (taskId: string) => {
                       </p>
                     )}
 
-                      <div>
-                        <h4 className="text-white text-sm mb-3">
-                          File submissions
-                        </h4>
-                        <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-gray-400 text-sm">
-                            Drag or browse from device
-                          </p>
-                        </div>
-                        <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700">
-                          Submit
-                        </Button>
+                    <div>
+                      <h4 className="text-white text-sm mb-3">
+                        File submissions
+                      </h4>
+                      <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-400 text-sm">
+                          Drag or browse from device
+                        </p>
                       </div>
+                      <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700">
+                        Submit
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
