@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock,Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Users } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
@@ -52,14 +52,29 @@ const WeeklyTaskTemplate = ({
     }
     onFileUpload(file, subTaskId);
   };
+  const getTimeLeftString = (endTime?: string): string => {
+    if (!endTime) return '';
+    const now = new Date();
+    const end = new Date(endTime);
+    const diffMs = end.getTime() - now.getTime();
+
+    if (diffMs <= 0) return 'Ended';
+
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(hours / 24);
+    const remHours = hours % 24;
+
+    return days > 0
+      ? `${days} day${days > 1 ? 's' : ''} ${remHours}h left`
+      : `${remHours} hour${remHours !== 1 ? 's' : ''} left`;
+  };
+                    const timeLeft = getTimeLeftString(task.end_time);
 
   return (
-    <div className="w-full p-[1%]">
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Left Panel */}
-        <div className="xl:w-2/3 w-full space-y-6 bg-[#151313]">
-          {/* Banner */}
-          <div className="relative rounded-xl overflow-hidden">
+    <div className="w-full pt-[2%]">
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="lg:w-2/3 w-full space-y-6 bg-[#151313] rounded-xl ">
+          <div className="rounded-xl overflow-hidden">
             {task.task_banner_image ? (
               <Image
                 src={
@@ -67,17 +82,15 @@ const WeeklyTaskTemplate = ({
                     ? task.task_banner_image
                     : URL.createObjectURL(task.task_banner_image)
                 }
-                alt="Task Banner"
-                className="w-full h-64 lg:h-80 object-cover rounded-lg"
+                alt="Task Banner Image"
+                className="w-full object-cover rounded-lg bg-gray-400"
                 width={1920}
                 height={1080}
               />
             ) : (
-              <div className="w-full h-64 lg:h-80 bg-gray-400 rounded-lg relative" />
+              <div className="w-full h-64 lg:h-80 bg-gray-400 rounded-lg" />
             )}
           </div>
-
-          {/* Task Info Section */}
           <div className="p-4">
             <h3 className="text-xl lg:text-2xl font-bold text-white mb-4">
               {task.task_title || 'Untitled Task'}
@@ -89,7 +102,7 @@ const WeeklyTaskTemplate = ({
                 </div>
                 <div className="bg-[#8373EE] px-3 py-1 rounded-full">
                   <p className="text-white text-sm">
-                    #{task.task_category || 'Uncategorized'}
+                    # {task.task_category || 'Uncategorized'}
                   </p>
                 </div>
               </div>
@@ -101,14 +114,7 @@ const WeeklyTaskTemplate = ({
                 <div className="flex items-center gap-2 text-white text-sm">
                   <Clock className="w-4 h-4" />
                   <span>
-                    Dates:{' '}
-                    {task.start_time
-                      ? new Date(task.start_time).toDateString()
-                      : 'Start'}{' '}
-                    -{' '}
-                    {task.end_time
-                      ? new Date(task.end_time).toDateString()
-                      : 'End'}
+                  {timeLeft}
                   </span>
                 </div>
               </div>
@@ -172,7 +178,7 @@ const WeeklyTaskTemplate = ({
         </div>
 
         {/* Right Panel */}
-        <div className="xl:w-1/3 w-full bg-[#151313] p-6 rounded-xl h-fit">
+        <div className="lg:w-1/3 w-full bg-[#151313] p-6 rounded-xl h-fit">
           <h3 className="text-lg font-semibold text-white mb-6">
             Task Checklist
           </h3>

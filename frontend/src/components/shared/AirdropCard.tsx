@@ -20,7 +20,6 @@ type AirdropCardProps = {
 const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isAdmin = userRole === 'admin';
-  console.log('isAdmin', isAdmin);
 
   return (
 

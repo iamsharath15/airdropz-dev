@@ -11,6 +11,8 @@ import {
 import { Search, Filter, LayoutGrid, ChevronDownIcon } from 'lucide-react';
 import { useId } from 'react';
 import WeeklyTaskFormModal from './WeeklyTaskFormModal';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 
 interface TaskHeaderProps {
   searchQuery: string;
@@ -36,6 +38,8 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
   selectedWeek,
 }) => {
   const inputId = useId();
+ const userRole = useSelector((state: RootState) => state.auth.user?.role);
+  const isAdmin = userRole === 'admin';
 
   return (
     <div className="flex flex-row items-start md:items-center justify-between gap-4 mb-8">
@@ -54,7 +58,9 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
       </div>
 
       <div className="flex gap-2 w-6/12 items-center justify-end">
-        <WeeklyTaskFormModal />
+                {isAdmin &&  <WeeklyTaskFormModal />}
+
+       
 
         <Select
           value={selectedCategory}

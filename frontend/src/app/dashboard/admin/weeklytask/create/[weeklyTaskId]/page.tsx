@@ -17,7 +17,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogCancel,
-  AlertDialogAction
+  AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 
 const CreateWeeklyTaskPage = () => {
@@ -33,7 +33,7 @@ const CreateWeeklyTaskPage = () => {
     task_banner_image: '',
     week: '',
     tasks: [],
-    sub_tasks: []
+    sub_tasks: [],
     // add other fields as needed (checklists, content blocks, etc.)
   });
 
@@ -77,7 +77,7 @@ const CreateWeeklyTaskPage = () => {
         task_description: taskData.task_description,
         week: taskData.week,
         tasks: taskData.tasks,
-        sub_tasks: taskData.sub_tasks
+        sub_tasks: taskData.sub_tasks,
       };
 
       // ✅ Handle and upload image if it's a File
@@ -145,32 +145,37 @@ const CreateWeeklyTaskPage = () => {
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <h1 className="text-xl font-semibold">Edit Weekly Task</h1>
         <div className="flex gap-3">
-       <AlertDialog>
-  <AlertDialogTrigger asChild>
-    <Button variant="destructive" disabled={saving} className='cursor-pointer bg-red-500 hover:bg-red-500/80'>
-      Delete
-    </Button>
-  </AlertDialogTrigger>
-  <AlertDialogContent className="bg-[#0F0F0F] text-white border border-zinc-800">
-    <AlertDialogHeader>
-      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-      <AlertDialogDescription>
-        This action cannot be undone. It will permanently delete this Weekly Task.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
-        Cancel
-      </AlertDialogCancel>
-      <AlertDialogAction
-        onClick={handleDelete}
-        className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
-      >
-        Yes, Delete
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                disabled={saving}
+                className="cursor-pointer bg-red-500 hover:bg-red-500/80"
+              >
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-[#0F0F0F] text-white border border-zinc-800">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. It will permanently delete this
+                  Weekly Task.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
+                >
+                  Yes, Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <Button
             onClick={handleSaveChanges}

@@ -3,11 +3,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CalendarOff } from 'lucide-react';
 import WeeklyTaskTemplate from '@/components/shared/dashboard/user/weeklyTaskTemplate';
 import Link from 'next/link';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface TaskData {
   id: string;
@@ -28,6 +41,7 @@ export default function TaskDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
+  const [animating, setAnimating] = useState(false);
 
   const fetchTask = async () => {
     try {
@@ -58,7 +72,7 @@ export default function TaskDetail() {
 
       // Upload to S3
       const image_url = await uploadImageToS3(file, `sub_tasks/${subTaskId}`);
-console.log(image_url);
+      console.log(image_url);
 
       // Send to backend
       const response = await axios.post(
@@ -73,14 +87,14 @@ console.log(image_url);
       );
 
       if (response.data.success) {
-        toast.success('✅ Task marked as completed!');
-        await fetchTask(); // Re-fetch to update UI
+        toast.success('Task marked as completed!');
+        await fetchTask();
       } else {
-        toast.error('❌ Failed to complete task.');
+        toast.error('Failed to complete task.');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('❌ Upload failed');
+      toast.error(' Upload failed');
     } finally {
       setUploadingTaskId(null);
     }
@@ -97,20 +111,80 @@ console.log(image_url);
   if (!taskData) {
     return <div className="text-white px-4 py-6">No data found.</div>;
   }
+  const handleRemoveTask = async () => {
+    if (!weeklyTaskId) return;
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:8080/api/user-task/v1/remove/${weeklyTaskId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Task removed from My Tasks');
+      } else {
+        toast.error(response.data.message || 'Failed to remove task.');
+      }
+    } catch (error) {
+      console.error('Error removing task:', error);
+      toast.error('Something went wrong while removing the task.');
+    }
+  };
 
   return (
     <div className="w-full px-4">
-      <div className="flex items-center mb-6">
+      <div className="flex flex-row items-center justify-between border-b border-[#111112] px-5 sm:px-6 sm:py-4 py-2 bg-[#111112] shadow-sm rounded-2xl gap-3 sm:gap-0">
         <Link
           href="/dashboard/user/weeklytask"
           className="flex items-center text-white/60 hover:text-white md:text-lg text-sm"
         >
           <ArrowLeft size={20} className="mr-2" />
-          Back to airdrops
+          Back to Weekly Task
         </Link>
-        <h1 className="text-2xl font-bold text-white ml-4">Weekly Task</h1>
-      </div>
 
+        <motion.div
+          whileTap={{ scale: 1.3 }}
+          animate={animating ? { scale: [1, 1.3, 1] } : {}}
+          transition={{ duration: 0.3 }}
+        >
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                className={`cursor-pointer md:p-2 p-1 rounded-full transition-all hover:bg-[#8373EE]/40
+              bg-white/30
+            `}
+              >
+                <CalendarOff
+                  className="w-5 h-5"
+                  // fill={liked ? '#8373EE' : 'none'}
+                  // color={liked ? '#8373EE' : 'white'}
+                />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-black text-white border border-zinc-800">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove this task?</AlertDialogTitle>
+                <AlertDialogDescription className="text-white/80">
+                  This will remove the task from My Tasks.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleRemoveTask}
+                  className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
+                >
+                  Yes, Remove
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </motion.div>
+      </div>
       <WeeklyTaskTemplate
         task={taskData}
         onFileUpload={handleFileUpload}

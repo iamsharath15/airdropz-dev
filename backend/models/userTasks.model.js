@@ -9,13 +9,11 @@ export async function createUserTasksTable() {
       CREATE TABLE IF NOT EXISTS user_tasks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-        task_id UUID REFERENCES tasks(id) ON DELETE CASCADE,
-        is_completed BOOLEAN DEFAULT false,
-        completed_at TIMESTAMPTZ,
+        weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       );
 
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_task_unique ON user_tasks(user_id, task_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_user_task_unique ON user_tasks(user_id, weekly_task_id);
     `;
 
     await pool.query(createTableQuery);
