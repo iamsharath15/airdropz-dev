@@ -131,8 +131,8 @@ const WeeklyTaskFormModal = () => {
 
           <div className="flex flex-col gap-6 mt-6">
             <div className="w-full space-y-5">
-              <div className="space-y-2">
-                <Label className="text-sm text-gray-300">Task Title</Label>
+              <div className="space-y-2 p-1">
+                <Label className="text-sm text-white/80 font-semibold">Task Title</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -140,10 +140,10 @@ const WeeklyTaskFormModal = () => {
                   className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500 placeholder:text-gray-400"
                 />
               </div>
-              <div className="space-y-2">
-                <Label className="text-sm text-gray-300">Category</Label>
+              <div className="space-y-2 p-1">
+                <Label className="text-sm text-white/80 font-semibold">Category</Label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500">
+                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700  w-full">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1F1F1F] text-white border border-gray-700 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
@@ -195,9 +195,9 @@ const WeeklyTaskFormModal = () => {
                               setNewCategoryInput('');
                               setShowCategoryInput(false);
                             }}
-                            className="text-sm text-violet-400 hover:text-violet-500"
+                            className="text-sm text-gray-400 hover:text-violet-500 cursor-pointer"
                           >
-                            ✅ Add
+                            Add
                           </button>
                           <button
                             onClick={(e) => {
@@ -205,9 +205,9 @@ const WeeklyTaskFormModal = () => {
                               setShowCategoryInput(false);
                               setNewCategoryInput('');
                             }}
-                            className="text-sm text-gray-400 hover:text-red-400"
+                            className="text-sm text-gray-400 hover:text-red-400 cursor-pointer"
                           >
-                            ❌ Cancel
+                            Cancel
                           </button>
                         </div>
                       </div>
@@ -216,11 +216,10 @@ const WeeklyTaskFormModal = () => {
                 </Select>
               </div>
 
-              {/* Week */}
-              <div className="space-y-2">
-                <Label className="text-sm text-gray-300">Week</Label>
+              <div className="space-y-2 p-1">
+                <Label className="text-sm text-white/80 font-semibold">Week</Label>
                 <Select value={week} onValueChange={setWeek}>
-                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700 focus:ring-2 focus:ring-violet-500">
+                  <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700 w-full">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
                   <SelectContent
@@ -252,12 +251,12 @@ const WeeklyTaskFormModal = () => {
 
               {/* Start Date */}
               <div className="space-y-2">
-                <Label className="text-sm text-gray-300">Start Date</Label>
+                <Label className="text-sm text-white/80 font-semibold">Start Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white border border-gray-700 hover:bg-[#262626]"
+                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white hover:text-white border border-gray-700 hover:bg-[#262626] cursor-pointer"
                     >
                       {startDate ? format(startDate, 'PPP') : 'Pick a date'}
                     </Button>
@@ -275,12 +274,12 @@ const WeeklyTaskFormModal = () => {
 
               {/* End Date */}
               <div className="space-y-2">
-                <Label className="text-sm text-gray-300">End Date</Label>
+                <Label className="text-sm text-white/80 font-semibold">End Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white border border-gray-700 hover:bg-[#262626]"
+                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white hover:text-white border border-gray-700 hover:bg-[#262626] cursor-pointer"
                     >
                       {endDate ? format(endDate, 'PPP') : 'Pick a date'}
                     </Button>

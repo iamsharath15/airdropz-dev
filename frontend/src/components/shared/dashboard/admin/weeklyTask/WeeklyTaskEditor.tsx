@@ -140,40 +140,48 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
     );
   };
 
-const addChecklist = () => {
-  const updatedSubTasks = [...(task.sub_tasks || []), { title: '', description: '', image: null }];
-  onTaskUpdate({
-    ...task,
-    sub_tasks: updatedSubTasks,
-  });
-};
+  const addChecklist = () => {
+    const updatedSubTasks = [
+      ...(task.sub_tasks || []),
+      { title: '', description: '', image: null },
+    ];
+    onTaskUpdate({
+      ...task,
+      sub_tasks: updatedSubTasks,
+    });
+  };
 
+  const removeChecklist = (index: number) => {
+    const updatedSubTasks = task.sub_tasks.filter((_, i) => i !== index);
+    onTaskUpdate({
+      ...task,
+      sub_tasks: updatedSubTasks,
+    });
+  };
+  const totalSteps = 3;
 
-const removeChecklist = (index: number) => {
-  const updatedSubTasks = task.sub_tasks.filter((_, i) => i !== index);
-  onTaskUpdate({
-    ...task,
-    sub_tasks: updatedSubTasks,
-  });
-};
-
+  const progressPercent = (step / totalSteps) * 100;
 
   return (
-    <div className="w-full md:w-1/2 p-6 overflow-auto border-r border-zinc-800 bg-black">
+    <div className="w-full p-6 overflow-auto md:border-t-0 md:border-r border-t border-zinc-800 bg-black">
       <div className="mb-6">
-        <StepProgress progress={step} />
+        <StepProgress progress={progressPercent} />
       </div>
 
-      {/* Step 1: Task Details */}
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold mb-4">
+          <h2 className="text-lg font-bold mb-1 text-white">
             Step 1: Weekly Task Details
           </h2>
+          <p className="text-sm text-white/80 mb-4">
+            Provide basic details about this weekly task, including title,
+            banner image, duration, category, and a short description. This
+            helps users understand what the task is about.
+          </p>
 
           {/* Banner Upload */}
           <div>
-            <label className="block text-sm text-white mb-4">
+            <label className="block text-sm text-white mb-3 font-semibold">
               Task Banner Image
             </label>
             <label className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
@@ -206,7 +214,9 @@ const removeChecklist = (index: number) => {
 
           {/* Title */}
           <div>
-            <label className="block text-sm text-white mb-1">Task Title</label>
+            <label className="block text-sm text-white mb-3 font-semibold">
+              Task Title
+            </label>
             <Input
               placeholder="Title"
               value={task.task_title}
@@ -217,16 +227,16 @@ const removeChecklist = (index: number) => {
 
           {/* Dates */}
           <div className="space-y-2">
-            <label className="block text-sm text-white mb-1">
+            <label className="block text-sm text-white mb-3 font-semibold">
               Choose Date:
             </label>
-            <div className="flex gap-4">
+            <div className="flex gap-4 w-full">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      'w-full justify-start text-left font-normal bg-zinc-800 text-white',
+                      'justify-start text-left font-normal bg-zinc-800 text-white w-6/12 overflow-hidden cursor-pointer',
                       !task.start_time && 'text-muted-foreground'
                     )}
                   >
@@ -254,11 +264,11 @@ const removeChecklist = (index: number) => {
                   <Button
                     variant="outline"
                     className={cn(
-                      'w-full justify-start text-left font-normal bg-zinc-800 text-white',
+                      'w-6/12 justify-start text-left font-normal bg-zinc-800 text-white cursor-pointer overflow-hidden',
                       !task.end_time && 'text-muted-foreground'
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-1 h-4 w-4" />
                     {task.end_time
                       ? format(new Date(task.end_time), 'PPP')
                       : 'End Date'}
@@ -281,13 +291,15 @@ const removeChecklist = (index: number) => {
 
           {/* Category */}
           <div>
-            <label className="block text-sm text-white mb-1">Category</label>
+            <label className="block text-sm text-white mb-3 font-semibold">
+              Category
+            </label>
             <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    'w-full justify-between bg-zinc-800 text-white',
+                    'w-full justify-between bg-zinc-800 text-white cursor-pointer',
                     !task.task_category && 'text-muted-foreground'
                   )}
                 >
@@ -326,7 +338,7 @@ const removeChecklist = (index: number) => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm text-white mb-3">
+            <label className="block text-sm text-white mb-3 font-semibold">
               Task Description
             </label>
             <Textarea
@@ -341,20 +353,21 @@ const removeChecklist = (index: number) => {
 
           <Button
             onClick={() => setStep(2)}
-            className="bg-[#8373EE] hover:bg-[#8373EE]/80"
+            className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
           >
             Next
           </Button>
         </div>
       )}
 
-      {/* Step 2: Add / Reorder Blocks */}
       {step === 2 && (
         <>
-          <h2 className="text-lg font-bold mb-4">Step 2: Content & Reorder</h2>
+          <h2 className="text-lg font-bold mb-1 text-white">
+            Step 2: Structure Your Weekly Task Content
+          </h2>
           <p className="text-sm text-zinc-400 mb-4">
-            Add content blocks like descriptions, checklists, and links. Drag
-            and drop to reorder them.
+            Add and organize content blocks such as descriptions, checklists,
+            links, and headings. Drag and drop to reorder them as needed.
           </p>
 
           <DndContext
@@ -379,7 +392,7 @@ const removeChecklist = (index: number) => {
                 <SortableItem key={index} id={index.toString()}>
                   <div className="border border-zinc-700 rounded-lg p-4 mb-4 relative">
                     <button
-                      className="absolute top-2 right-2 text-white bg-black hover:bg-red-400 p-1 rounded-md"
+                      className="absolute top-2 right-2 text-white bg-black hover:bg-red-400 p-1 rounded-md cursor-pointer"
                       onClick={() => removeBlock(index)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -401,7 +414,7 @@ const removeChecklist = (index: number) => {
               <Tooltip key={tool.type}>
                 <TooltipTrigger asChild>
                   <Button
-                    className="bg-[#8373EE] hover:bg-[#8373EE]/80"
+                    className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
                     onClick={() => addBlock(tool.type)}
                   >
                     {tool.icon}
@@ -431,7 +444,14 @@ const removeChecklist = (index: number) => {
       )}
       {step === 3 && (
         <>
-          <h2 className="text-lg font-bold mb-4">Step 3: Task Checklist</h2>
+          <h2 className="text-lg font-bold mb-4">
+            Step 3: Define Task Checklist
+          </h2>
+          <p className="text-sm text-zinc-400 mb-4">
+            Create the checklist users need to complete for this weekly task.
+            Add titles, descriptions, and choose the submission type for each
+            item.
+          </p>
 
           {task.sub_tasks.map((item, index) => (
             <div
@@ -445,16 +465,16 @@ const removeChecklist = (index: number) => {
                 <Button
                   variant="destructive"
                   size="sm"
-                  className='cursor-pointer'
+                  className=" text-white bg-black hover:bg-red-400 p-1 rounded-md cursor-pointer"
                   onClick={() => removeChecklist(index)}
                 >
-                <Trash2 />
+                  <Trash2 />
                 </Button>
               </div>
 
               {/* Checklist Title */}
               <div>
-                <label className="block text-sm text-white mb-1">
+                <label className="block text-sm text-white mb-3 font-semibold">
                   Checklist Title
                 </label>
                 <Input
@@ -467,39 +487,37 @@ const removeChecklist = (index: number) => {
                     onTaskUpdate({
                       ...task,
                       sub_tasks: updatedSubTasks,
-                    })
+                    });
                   }}
                 />
               </div>
 
               {/* Checklist Description */}
               <div>
-                <label className="block text-sm text-white mb-1">
+                <label className="block text-sm text-white mb-3 font-semibold">
                   Checklist Description
                 </label>
-               <Textarea
-  placeholder="Enter checklist description"
-  className="bg-zinc-900 border-zinc-700 text-white"
-  value={item.description}
-  onChange={(e) => {
-    const updatedSubTasks = [...task.sub_tasks];
-    updatedSubTasks[index].description = e.target.value;
-    onTaskUpdate({
-      ...task,
-      sub_tasks: updatedSubTasks,
-    });
-  }}
-/>
-
+                <Textarea
+                  placeholder="Enter checklist description"
+                  className="bg-zinc-900 border-zinc-700 text-white"
+                  value={item.description || ' '}
+                  onChange={(e) => {
+                    const updatedSubTasks = [...task.sub_tasks];
+                    updatedSubTasks[index].description = e.target.value;
+                    onTaskUpdate({
+                      ...task,
+                      sub_tasks: updatedSubTasks,
+                    });
+                  }}
+                />
               </div>
 
               {/* Verify Image Upload */}
               <div>
-                <label className="block text-sm text-white mb-1">
+                <label className="block text-sm text-white mb-3 font-semibold">
                   Submission type
                 </label>
-              <Input disabled placeholder='Image' />
-
+                <Input disabled placeholder="Image" />
               </div>
             </div>
           ))}
@@ -516,11 +534,12 @@ const removeChecklist = (index: number) => {
 
           {/* Navigation Buttons */}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setStep(2)} className='text-black cursor-pointer'>
+            <Button
+              variant="outline"
+              onClick={() => setStep(2)}
+              className="text-black cursor-pointer"
+            >
               Back
-            </Button>
-            <Button className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer">
-              Create
             </Button>
           </div>
         </>

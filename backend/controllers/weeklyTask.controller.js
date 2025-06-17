@@ -394,7 +394,7 @@ static async getUserTaskStatus(req, res) {
 }
 static async getWeeklyTaskWithUserProgress(req, res) {
   const user_id = req.user.userId; // Auth middleware should set this
-  const { id } = req.params; // weekly_task_id
+  const { weekly_task_id } = req.params; 
   const client = await pool.connect();
 
   try {
@@ -402,6 +402,15 @@ static async getWeeklyTaskWithUserProgress(req, res) {
       `
       SELECT 
         wt.*,
+
+        -- Total users who started the task
+        (
+          SELECT COUNT(DISTINCT ut.user_id)
+          FROM user_tasks ut
+          WHERE ut.weekly_task_id = wt.id
+        ) AS total_users_started,
+
+        -- Tasks for this weekly task
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
@@ -413,20 +422,22 @@ static async getWeeklyTaskWithUserProgress(req, res) {
           ) FILTER (WHERE t.id IS NOT NULL),
           '[]'
         ) AS tasks,
+
+        -- Sub-tasks and user's completion data
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
               'id', st.id,
               'title', st.title,
               'description', st.description,
-              'sub_task_image', st.sub_task_image,
+              'sub_task_image', COALESCE(ust.sub_task_image, st.sub_task_image),
               'completed', COALESCE(ust.is_completed, false),
-              'sub_task_image', ust.sub_task_image,
               'completed_at', ust.completed_at
             )
           ) FILTER (WHERE st.id IS NOT NULL),
           '[]'
         ) AS sub_tasks
+
       FROM weekly_tasks wt
       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
       LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
@@ -435,21 +446,22 @@ static async getWeeklyTaskWithUserProgress(req, res) {
       WHERE wt.id = $1
       GROUP BY wt.id;
       `,
-      [id, user_id]
+      [weekly_task_id, user_id]
     );
 
     if (!result.rows.length) {
       return res.status(404).json({ success: false, message: "Weekly task not found" });
     }
 
-    res.status(200).json({ success: true, data: result.rows[0] });
+    return res.status(200).json({ success: true, data: result.rows[0] });
   } catch (error) {
     console.error("❌ getWeeklyTaskWithUserProgress error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch weekly task" });
+    return res.status(500).json({ success: false, message: "Failed to fetch weekly task" });
   } finally {
     client.release();
   }
 }
+
 
 
 }

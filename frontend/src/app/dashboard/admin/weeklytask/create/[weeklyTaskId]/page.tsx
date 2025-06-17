@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import WeeklyTaskTemplate from '@/components/shared/dashboard/admin/weeklyTask/weeklyTaskTemplate';
+import WeeklyTaskTemplate from '@/components/shared/dashboard/weeklyTaskTemplate';
 import WeeklyTaskEditor from '@/components/shared/dashboard/admin/weeklyTask/WeeklyTaskEditor';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
@@ -19,6 +19,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import { Save, Trash2 } from 'lucide-react';
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
@@ -80,7 +81,6 @@ const CreateWeeklyTaskPage = () => {
         sub_tasks: taskData.sub_tasks,
       };
 
-      // ✅ Handle and upload image if it's a File
       let bannerImage = taskData.task_banner_image;
       if (bannerImage instanceof File) {
         bannerImage = await uploadImageToS3(
@@ -89,7 +89,7 @@ const CreateWeeklyTaskPage = () => {
         );
       }
 
-      payload.task_banner_image = bannerImage; // ✅ Now it's a string URL
+      payload.task_banner_image = bannerImage;
 
       console.log('Sending payload:', payload);
       // Optional: Include other fields if available
@@ -149,10 +149,10 @@ const CreateWeeklyTaskPage = () => {
             <AlertDialogTrigger asChild>
               <Button
                 variant="destructive"
-                disabled={saving}
-                className="cursor-pointer bg-red-500 hover:bg-red-500/80"
+                className="text-sm sm:text-base px-3 cursor-pointer bg-red-500 hover:bg-red-500/80"
               >
-                Delete
+                <Trash2 className="w-4 h-4 sm:hidden" />
+                <span className="hidden sm:inline">Delete</span>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-[#0F0F0F] text-white border border-zinc-800">
@@ -182,17 +182,27 @@ const CreateWeeklyTaskPage = () => {
             disabled={saving}
             className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer"
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            <Save className="w-4 h-4 sm:hidden" />
+            <span className="hidden sm:inline">
+              {saving ? 'Update' : 'Create'}
+            </span>
           </Button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex lg:flex-row flex-col overflow-hidden">
+      <div className="flex lg:flex-row flex-col-reverse overflow-hidden ">
         {!loading ? (
           <>
-            <WeeklyTaskEditor task={taskData} onTaskUpdate={handleTaskUpdate} />
-            <WeeklyTaskTemplate task={taskData} />
+            <div className="flex lg:w-4/12 w-full">
+              <WeeklyTaskEditor
+                task={taskData}
+                onTaskUpdate={handleTaskUpdate}
+              />
+            </div>
+            <div className="flex lg:w-8/12 w-full p-2">
+              <WeeklyTaskTemplate task={taskData} />
+            </div>
           </>
         ) : (
           <div className="p-6 text-center w-full">Loading...</div>
@@ -202,3 +212,6 @@ const CreateWeeklyTaskPage = () => {
   );
 };
 export default CreateWeeklyTaskPage;
+//  task={taskData}
+//         onFileUpload={handleFileUpload}
+//         uploadingTaskId={uploadingTaskId}

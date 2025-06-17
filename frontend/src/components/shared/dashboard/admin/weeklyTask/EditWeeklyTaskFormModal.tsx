@@ -124,7 +124,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
             <div className="space-y-5">
               {/* Title */}
               <div className="space-y-2">
-                <Label>Task Title</Label>
+                <Label className='text-sm text-white/80 font-semibold'>Task Title</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -135,7 +135,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label>Category</Label>
+                <Label className='text-sm text-white/80 font-semibold'>Category</Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700">
                     <SelectValue placeholder="Select category" />
@@ -183,7 +183,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                             }}
                             className="text-sm text-violet-400 hover:underline"
                           >
-                            ✅ Add
+                            Add
                           </button>
                           <button
                             type="button"
@@ -194,7 +194,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                             }}
                             className="text-sm text-gray-400 hover:underline"
                           >
-                            ❌ Cancel
+                            Cancel
                           </button>
                         </div>
                       </div>
@@ -205,7 +205,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
 
               {/* Week */}
               <div className="space-y-2">
-                <Label>Week</Label>
+                <Label className='text-sm text-white/80 font-semibold'>Week</Label>
                 <Select value={week} onValueChange={setWeek}>
                   <SelectTrigger className="bg-[#1A1A1A] text-white border border-gray-700">
                     <SelectValue placeholder="Select week" />
@@ -237,7 +237,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full text-white bg-[#1A1A1A] border border-gray-700"
+                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white hover:text-white border border-gray-700 hover:bg-[#262626] cursor-pointer"
                     >
                       {startDate ? format(startDate, 'PPP') : 'Pick a date'}
                     </Button>
@@ -260,7 +260,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full text-white bg-[#1A1A1A] border border-gray-700"
+                      className="w-full justify-start text-left font-normal bg-[#1A1A1A] text-white hover:text-white border border-gray-700 hover:bg-[#262626] cursor-pointer"
                     >
                       {endDate ? format(endDate, 'PPP') : 'Pick a date'}
                     </Button>

@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Users } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  CloudUpload,
+  Upload,
+  Users,
+} from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
@@ -15,6 +23,9 @@ const WeeklyTaskTemplate = ({
   uploadingTaskId: string | null;
 }) => {
   const taskList = task?.sub_tasks || [];
+  const [previewImages, setPreviewImages] = useState<
+    Record<string, string | null>
+  >({});
 
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(
     () => {
@@ -42,6 +53,14 @@ const WeeklyTaskTemplate = ({
       ...prev,
       [subTaskId]: file,
     }));
+
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewImages((prev) => ({
+        ...prev,
+        [subTaskId]: url,
+      }));
+    }
   };
 
   const handleSubmit = (subTaskId: string) => {
@@ -68,7 +87,7 @@ const WeeklyTaskTemplate = ({
       ? `${days} day${days > 1 ? 's' : ''} ${remHours}h left`
       : `${remHours} hour${remHours !== 1 ? 's' : ''} left`;
   };
-                    const timeLeft = getTimeLeftString(task.end_time);
+  const timeLeft = getTimeLeftString(task.end_time);
 
   return (
     <div className="w-full pt-[2%]">
@@ -92,7 +111,7 @@ const WeeklyTaskTemplate = ({
             )}
           </div>
           <div className="p-4">
-            <h3 className="text-xl lg:text-2xl font-bold text-white mb-4">
+            <h3 className="text-xl lg:text-2xl font-semibold text-white mb-4">
               {task.task_title || 'Untitled Task'}
             </h3>
             <div className="flex flex-col gap-4 mb-4">
@@ -109,29 +128,38 @@ const WeeklyTaskTemplate = ({
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-white text-sm">
                   <Users className="w-4 h-4" />
-                  <span>20 Total Users</span>
+                  {task.total_users_started ? (
+                    <span>{task.total_users_started}</span>
+                  ) : (
+                    <span>0</span>
+                  )}
                 </div>
+
                 <div className="flex items-center gap-2 text-white text-sm">
                   <Clock className="w-4 h-4" />
-                  <span>
-                  {timeLeft}
-                  </span>
+                  <span>{timeLeft}</span>
                 </div>
+              </div>
+              <div className="flex flex-col">
+                <h4 className="text-lg font-semibold text-white mb-2">
+                  Description
+                </h4>
+                <p className="text-white/80 text-sm ">
+                  {task.task_description || 'No description added.'}
+                </p>
               </div>
             </div>
 
-            {/* Task Content Blocks */}
             {Array.isArray(task.tasks) &&
               task.tasks.map((block: any, i: number) => {
                 switch (block.type) {
                   case 'description':
                     return (
-                      <p
-                        key={i}
-                        className="text-white/80 text-sm font-medium py-2"
-                      >
-                        {block.value}
-                      </p>
+                      <div className="flex flex-col" key={i}>
+                        <p className="text-white/80 text-sm font-medium py-1">
+                          {block.value}
+                        </p>
+                      </div>
                     );
                   case 'checklist':
                     return (
@@ -149,26 +177,33 @@ const WeeklyTaskTemplate = ({
                     );
                   case 'link':
                     return (
-                      <p key={i} className="text-white text-sm">
-                        {block.value}{' '}
-                        <a
-                          href={block.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-purple-400 underline"
-                        >
-                          Link
-                        </a>
-                      </p>
+                      <div
+                        className="flex gap-2 py-2 items-center justify-start"
+                        key={i}
+                      >
+                        <div className=" bg-[#8373EE] rounded-full flex items-center justify-center p-1">
+                          <Check size={15} />
+                        </div>
+                        <p className="text-white text-sm">
+                          {block.value} :{' '}
+                          <a
+                            href={block.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-purple-400 underline"
+                          >
+                            Link
+                          </a>
+                        </p>
+                      </div>
                     );
                   case 'header1':
                     return (
-                      <h1
-                        key={i}
-                        className="text-white text-xl md:text-2xl font-semibold py-4"
-                      >
-                        {block.value}
-                      </h1>
+                      <div className="flex flex-col" key={i}>
+                        <h1 className="text-xl md:text-2xl font-semibold py-2">
+                          {block.value}
+                        </h1>
+                      </div>
                     );
                   default:
                     return null;
@@ -179,7 +214,7 @@ const WeeklyTaskTemplate = ({
 
         {/* Right Panel */}
         <div className="lg:w-1/3 w-full bg-[#151313] p-6 rounded-xl h-fit">
-          <h3 className="text-lg font-semibold text-white mb-6">
+          <h3 className="md:text-lg text-sm font-semibold text-white mb-4">
             Task Checklist
           </h3>
           <div className="space-y-3">
@@ -187,9 +222,9 @@ const WeeklyTaskTemplate = ({
               <div key={index} className="bg-black rounded-lg">
                 <button
                   onClick={() => toggleTask(task.id)}
-                  className="w-full p-4 flex justify-between items-start text-left hover:bg-gray-750 rounded-lg space-x-4"
+                  className="w-full p-4 flex justify-between items-start text-left hover:bg-black rounded-lg space-x-4 cursor-pointer"
                 >
-                  <span className="text-white text-sm">
+                  <span className="text-white text-sm font-semibold">
                     Task {index + 1}: {task.title}
                   </span>
                   {expandedTasks[task.id] ? (
@@ -202,7 +237,7 @@ const WeeklyTaskTemplate = ({
                 {expandedTasks[task.id] && (
                   <div className="px-4 pb-4">
                     {task.description && (
-                      <p className="text-gray-400 text-sm mb-4">
+                      <p className="text-white/80 font-semibold text-sm mb-2">
                         {task.description}
                       </p>
                     )}
@@ -228,25 +263,45 @@ const WeeklyTaskTemplate = ({
                             if (file) handleFileChange(task.id, file);
                           }}
                           onDragOver={(e) => e.preventDefault()}
-                          className="w-full border border-dashed border-gray-500 rounded-md p-4 mb-2 text-center text-white"
+                          className="w-full  flex items-center justify-center border border-dashed border-[#8373EE] rounded-md p-4 mb-2 text-center text-white cursor-pointer"
+                          onClick={() =>
+                            document
+                              .getElementById(`file-input-${task.id}`)
+                              ?.click()
+                          }
                         >
-                          Drag & Drop file here or use the file picker below
+                          <CloudUpload
+                            size={30}
+                            className="text-[#8373EE]/60 py-[15%]"
+                          />
+
+                          {/* Hidden file input, triggers when div is clicked */}
+                          <input
+                            id={`file-input-${task.id}`}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0] || null;
+                              handleFileChange(task.id, file);
+                            }}
+                          />
+                          {previewImages[task.id] && (
+                            <Image
+                              width={1920}
+                              height={1080}
+                              src={previewImages[task.id]!}
+                              alt="Selected Preview"
+                              className="w-full  rounded-lg "
+                            />
+                          )}
                         </div>
-
-                        {/* File picker */}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="w-full text-sm text-white mb-2"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null;
-                            handleFileChange(task.id, file);
-                          }}
-                        />
-
+                        <p className="mb-2 text-white/80 text-sm">
+                          * Drag or browser from device
+                        </p>
                         <button
                           onClick={() => handleSubmit(task.id)}
-                          className="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+                          className="w-full mt-2 bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer text-white py-2 rounded-lg"
                           disabled={uploadingTaskId === task.id}
                         >
                           {uploadingTaskId === task.id

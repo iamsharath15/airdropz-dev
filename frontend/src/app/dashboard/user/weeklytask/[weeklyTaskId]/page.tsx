@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, CalendarOff } from 'lucide-react';
-import WeeklyTaskTemplate from '@/components/shared/dashboard/user/weeklyTaskTemplate';
+import WeeklyTaskTemplate from '@/components/shared/dashboard/weeklyTaskTemplate';
 import Link from 'next/link';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { toast } from 'sonner';
