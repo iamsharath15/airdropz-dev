@@ -1,79 +1,69 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { X, Play, Pause } from "lucide-react";
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  potential: string;
-  risk: string;
-}
-
-interface Story {
-  id: number;
-  name: string;
-  avatar: string;
-  color: string;
-  tasks: Task[];
-}
+import { useState, useEffect, useRef } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { X, Play, Pause, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import axios from 'axios';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { toast } from 'sonner';
 
 interface StoryCarouselProps {
   stories: Story[];
+  setStories: React.Dispatch<React.SetStateAction<Story[]>>;
 }
 
-const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
+interface StoryItem {
+  id: number;
+  image: string;
+  link: string;
+}
+
+interface Story {
+  cover_id: number;
+  cover_name: string;
+  cover_image: string;
+  stories: StoryItem[];
+}
+
+const STORY_DURATION = 5000;
+
+const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories, setStories }) => {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const STORY_DURATION = 5000;
-
-  const currentTask = selectedStory?.tasks[currentTaskIndex];
+  const currentStory = selectedStory?.stories[currentIndex];
 
   useEffect(() => {
-    if (!selectedStory || !isPlaying) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      return;
-    }
+    if (!selectedStory || !isPlaying) return;
 
     intervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          if (
-            selectedStory &&
-            currentTaskIndex < selectedStory.tasks.length - 1
-          ) {
-            setCurrentTaskIndex((i) => i + 1);
+          if (currentIndex < (selectedStory.stories.length || 0) - 1) {
+            setCurrentIndex((i) => i + 1);
             return 0;
           } else {
             closeStory();
             return 0;
           }
         }
-        return prev + (100 / (STORY_DURATION / 100));
+        return prev + 100 / (STORY_DURATION / 100);
       });
     }, 100);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [selectedStory, isPlaying, currentTaskIndex]);
+  }, [selectedStory, isPlaying, currentIndex]);
 
   const openStory = (story: Story) => {
     setSelectedStory(story);
-    setCurrentTaskIndex(0);
+    setCurrentIndex(0);
     setProgress(0);
     setIsPlaying(true);
   };
@@ -81,7 +71,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
   const closeStory = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     setSelectedStory(null);
-    setCurrentTaskIndex(0);
+    setCurrentIndex(0);
     setProgress(0);
     setIsPlaying(false);
   };
@@ -91,203 +81,189 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({ stories }) => {
     setIsPlaying((prev) => !prev);
   };
 
-  const goToNextTask = () => {
-    if (
-      selectedStory &&
-      currentTaskIndex < selectedStory.tasks.length - 1
-    ) {
-      setCurrentTaskIndex((i) => i + 1);
+  const goToNext = () => {
+    if (selectedStory && currentIndex < selectedStory.stories.length - 1) {
+      setCurrentIndex((i) => i + 1);
       setProgress(0);
     }
   };
 
-  const goToPrevTask = () => {
-    if (currentTaskIndex > 0) {
-      setCurrentTaskIndex((i) => i - 1);
+  const goToPrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((i) => i - 1);
       setProgress(0);
     }
   };
+
+
+
 
   return (
     <>
-      <div className="flex gap-4">
-        {stories.map((story) => (
+      <div className="flex gap-4 flex-wrap">
+         {stories.length === 0 ? (
+    <p className="text-gray-400 text-sm bg-red-600">Stories will be added soon.</p>
+  ) : (
+        stories.map((story,index) => (
           <div
-            key={story.id}
-            onClick={() => openStory(story)}
-            className="flex flex-col items-center cursor-pointer group"
+            key={index}
+            className="relative flex flex-col items-center cursor-pointer group"
           >
+         
+          
+
             <div
-              className={`w-20 h-20 rounded-full bg-gradient-to-br ${story.color} p-1 mb-2 group-hover:scale-105 transition-transform relative`}
+              onClick={() => openStory(story)}
+              className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 mb-2 group-hover:scale-105 transition-transform relative"
             >
-              <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center">
-                <span className="text-2xl">{story.avatar}</span>
+              <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
+                <Image
+                  src={story.cover_image}
+                  alt={story.cover_name}
+                  width={80}
+                  height={80}
+                />
               </div>
-              {story.tasks?.length > 1 && (
-                <div className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                  {story.tasks.length}
-                </div>
-              )}
+              {/* {story.stories.length > 1 && (
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+                  {story.stories.length}
+                </span>
+              )} */}
             </div>
             <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
-              {story.name}
+              {story.cover_name}
             </span>
+
           </div>
-        ))}
+        )))}
       </div>
 
-      <Dialog
-        open={!!selectedStory}
-        onOpenChange={(open) => {
-          if (!open) closeStory();
-        }}
-      >
-        <DialogContent
-          className="bg-gray-900 border-gray-700 max-w-md p-0"
-          onPointerDownOutside={(e) => e.preventDefault()}
-        >
-          <DialogHeader className="sr-only">
-            <DialogTitle>{selectedStory?.name || "Story"}</DialogTitle>
-            <DialogDescription>
-              Task {currentTaskIndex + 1} of {selectedStory?.tasks.length || 0}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedStory && currentTask && (
-            <div className="relative">
-              {/* Progress bars */}
-              <div className="flex gap-1 p-4 pb-2">
-                {selectedStory.tasks.map((_, index) => (
-                  <div
-                    key={index}
-                    className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden"
-                  >
-                    <div
-                      className="h-full bg-white transition-all duration-100"
-                      style={{
-                        width:
-                          index < currentTaskIndex
-                            ? "100%"
-                            : index === currentTaskIndex
-                            ? `${progress}%`
-                            : "0%",
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 pb-2">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-full bg-gradient-to-br ${selectedStory.color} p-0.5`}
-                  >
-                    <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center">
-                      <span className="text-lg">{selectedStory.avatar}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium">
-                      {selectedStory.name}
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      Task {currentTaskIndex + 1} of{" "}
-                      {selectedStory.tasks.length}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePlayPause();
-                    }}
-                    className="text-gray-400 hover:text-white w-8 h-8 p-0"
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-4 h-4" />
-                    ) : (
-                      <Play className="w-4 h-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      closeStory();
-                    }}
-                    className="text-gray-400 hover:text-white w-8 h-8 p-0"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Clickable navigation areas */}
-              <div
-                className="absolute left-0 top-0 w-1/3 h-full z-10 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToPrevTask();
-                }}
-              />
-              <div
-                className="absolute right-0 top-0 w-1/3 h-full z-10 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToNextTask();
-                }}
-              />
-
-              {/* Task Content */}
-              <div className="p-6">
+     <Dialog open={!!selectedStory} onOpenChange={(open) => !open && closeStory()}>
+  <DialogTitle></DialogTitle>
+  <DialogContent
+    className="bg-gray-900 border-gray-700 max-w-md p-0"
+    onPointerDownOutside={(e) => e.preventDefault()}
+  >
+    {selectedStory && (
+      selectedStory.stories.length === 0 ? (
+        <div className="p-6 text-center text-white flex flex-col items-center">
+          <p className="text-gray-400 mb-4">
+            Stories will be added soon. Come back later.
+          </p>
+          <Button onClick={closeStory} variant="outline">
+            Close
+          </Button>
+        </div>
+      ) : currentStory && (
+        <div className="relative flex flex-col items-center">
+          <div className="flex gap-1 p-4 pb-2 w-full">
+            {selectedStory.stories.map((_, i) => (
+              <div key={i} className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
                 <div
-                  className={`w-32 h-32 rounded-full bg-gradient-to-br ${selectedStory.color} p-2 mx-auto mb-6`}
-                >
-                  <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center">
-                    <span className="text-4xl">{selectedStory.avatar}</span>
-                  </div>
+                  className="h-full bg-white transition-all duration-100"
+                  style={{
+                    width:
+                      i < currentIndex
+                        ? '100%'
+                        : i === currentIndex
+                        ? `${progress}%`
+                        : '0%',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-between items-center p-4 w-full">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
+                <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
+                  <Image
+                    src={selectedStory.cover_image}
+                    alt="cover"
+                    width={100}
+                    height={100}
+                  />
                 </div>
-
-                <div className="text-center space-y-4">
-                  <h4 className="text-xl font-bold text-white">
-                    {currentTask.title}
-                  </h4>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {currentTask.description}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="bg-gray-800 rounded-lg p-4">
-                      <p className="text-sm text-gray-400">Potential</p>
-                      <p className="text-lg font-bold text-green-400">
-                        {currentTask.potential}
-                      </p>
-                    </div>
-                    <div className="bg-gray-800 rounded-lg p-4">
-                      <p className="text-sm text-gray-400">Risk Level</p>
-                      <p className="text-lg font-bold text-yellow-400">
-                        {currentTask.risk}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white mt-6">
-                    Start Task
-                  </Button>
-                </div>
+              </div>
+              <div>
+                <h3 className="text-white font-medium">{selectedStory.cover_name}</h3>
+                <p className="text-gray-400 text-sm">
+                  Task {currentIndex + 1} of {selectedStory.stories.length}
+                </p>
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlayPause();
+                }}
+                className="text-gray-400 hover:text-white"
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeStory();
+                }}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div
+            className="absolute left-0 w-1/12 h-full z-10 cursor-pointer flex items-center justify-start px-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToPrev();
+            }}
+          >
+            <ChevronLeft className="w-6 h-6 text-white" />
+          </div>
+          <div
+            className="absolute right-0 w-1/12 h-full z-10 cursor-pointer flex items-center justify-end px-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              goToNext();
+            }}
+          >
+            <ChevronRight className="w-6 h-6 text-white" />
+          </div>
+
+          <div className="w-full flex flex-col items-center relative">
+            <Image
+              src={currentStory.image}
+              alt="story"
+              width={400}
+              height={600}
+              className="rounded-lg object-contain"
+            />
+            <a
+              href={currentStory.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-6/12 bg-purple-600 hover:bg-purple-700 text-white text-center mt-4 py-2 rounded-md"
+            >
+              Visit Link
+            </a>
+
+          
+          </div>
+        </div>
+      )
+    )}
+  </DialogContent>
+</Dialog>
+
     </>
   );
 };
