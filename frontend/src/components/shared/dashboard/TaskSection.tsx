@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 const tasks = [
@@ -78,7 +79,7 @@ const TaskItem = ({ task }: { task: typeof tasks[0] }) => (
     <div className="mb-4">
       <div className="w-full h-40 bg-gray-800 rounded-lg mb-3 overflow-hidden flex items-center justify-center">
         {/* Use image if available */}
-        <img
+        <Image width={1920} height={1080}
           src={task.image}
           alt={task.title}
           className="object-cover w-full h-full"

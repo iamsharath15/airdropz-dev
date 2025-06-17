@@ -45,21 +45,21 @@ class WeeklyTaskController {
       );
     }
     for (const sub of sub_tasks) {
-      const { title, description, hyperlink, completed } = sub;
+      const { title, description, sub_task_image, completed } = sub;
       await client.query(
         `INSERT INTO sub_tasks (
-          weekly_task_id, title, description, hyperlink, completed
+          weekly_task_id, title, description, sub_task_image, completed
         ) VALUES ($1, $2, $3, $4, $5);`,
-        [weeklyTaskId, title, description || null, hyperlink || null, completed]
+        [weeklyTaskId, title, description || null, sub_task_image || null, completed]
       );
     }
 
 
       //   for (const sub of task.sub_tasks || []) {
       //     await client.query(
-      //       `INSERT INTO sub_tasks (task_id, title, hyperlink)
+      //       `INSERT INTO sub_tasks (task_id, title, sub_task_image)
       //        VALUES ($1, $2, $3);`,
-      //       [taskRes.rows[0].id, sub.title, sub.hyperlink]
+      //       [taskRes.rows[0].id, sub.title, sub.sub_task_image]
       //     );
       //   }
       // }
@@ -100,7 +100,7 @@ static async getAll(req, res) {
               'id', st.id,
               'title', st.title,
               'description', st.description,
-              'hyperlink', st.hyperlink,
+              'sub_task_image', st.sub_task_image,
               'completed', st.completed
             )
           ) FILTER (WHERE st.id IS NOT NULL),
@@ -148,7 +148,7 @@ static async getById(req, res) {
               'id', st.id,
               'title', st.title,
               'description', st.description,
-              'hyperlink', st.hyperlink,
+              'sub_task_image', st.sub_task_image,
               'completed', st.completed
             )
           ) FILTER (WHERE st.id IS NOT NULL),
@@ -243,11 +243,11 @@ static async update(req, res) {
       );
     }
    for (const sub of sub_tasks) {
-      const { title, description, hyperlink, completed } = sub;
+      const { title, description, sub_task_image, completed } = sub;
       await client.query(
-        `INSERT INTO sub_tasks (weekly_task_id, title, description, hyperlink, completed)
+        `INSERT INTO sub_tasks (weekly_task_id, title, description, sub_task_image, completed)
          VALUES ($1, $2, $3, $4, $5);`,
-        [id, title, description || null, hyperlink || null, completed]
+        [id, title, description || null, sub_task_image || null, completed]
       );
     }
     // Fetch full updated weekly task including tasks
@@ -272,7 +272,7 @@ static async update(req, res) {
               'id', st.id,
               'title', st.title,
               'description', st.description,
-              'hyperlink', st.hyperlink,
+              'sub_task_image', st.sub_task_image,
               'completed', st.completed
             )
           ) FILTER (WHERE st.id IS NOT NULL),
@@ -392,6 +392,65 @@ static async getUserTaskStatus(req, res) {
     client.release();
   }
 }
+static async getWeeklyTaskWithUserProgress(req, res) {
+  const user_id = req.user.userId; // Auth middleware should set this
+  const { id } = req.params; // weekly_task_id
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+      SELECT 
+        wt.*,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', t.id,
+              'type', t.type,
+              'value', t.value,
+              'link', t.link
+            )
+          ) FILTER (WHERE t.id IS NOT NULL),
+          '[]'
+        ) AS tasks,
+        COALESCE(
+          json_agg(
+            DISTINCT jsonb_build_object(
+              'id', st.id,
+              'title', st.title,
+              'description', st.description,
+              'sub_task_image', st.sub_task_image,
+              'completed', COALESCE(ust.is_completed, false),
+              'sub_task_image', ust.sub_task_image,
+              'completed_at', ust.completed_at
+            )
+          ) FILTER (WHERE st.id IS NOT NULL),
+          '[]'
+        ) AS sub_tasks
+      FROM weekly_tasks wt
+      LEFT JOIN tasks t ON t.weekly_task_id = wt.id
+      LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
+      LEFT JOIN user_sub_tasks ust 
+        ON ust.sub_task_id = st.id AND ust.user_id = $2
+      WHERE wt.id = $1
+      GROUP BY wt.id;
+      `,
+      [id, user_id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: "Weekly task not found" });
+    }
+
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("❌ getWeeklyTaskWithUserProgress error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch weekly task" });
+  } finally {
+    client.release();
+  }
+}
+
 
 }
 

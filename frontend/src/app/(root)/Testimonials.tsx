@@ -2,6 +2,12 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+type Testimonial = {
+  name: string;
+  title: string;
+  image: string;
+  review: string;
+};
 
 const testimonialsTop = [
   {
@@ -45,7 +51,7 @@ const testimonialsBottom = [
   },
 ];
 
-const TestimonialCard = ({ testimonial }: { testimonial: any }) => (
+const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
   <div className="bg-[#111] text-white rounded-2xl p-6 w-[320px] mx-3 shrink-0">
     <div className="flex items-center gap-3 mb-3">
       <Image

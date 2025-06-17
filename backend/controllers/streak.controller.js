@@ -5,17 +5,15 @@ class DailyLoginController {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
-    // Use mockDate from query param for testing, fallback to today
-    // const today = req.query.mockDate || new Date().toISOString().split('T')[0];
+    const getTodayDate = (mockDate) => {
+      if (mockDate) return mockDate;
+      const now = new Date();
+      return now.toISOString().split('T')[0];
+    };
+
+    const today = getTodayDate(req.query.mockDate);
 
     try {
-      const getTodayDate = (mockDate) => {
-        if (mockDate) return mockDate;
-        const now = new Date();
-        return now.toISOString().split('T')[0]; // Safe UTC date
-      };
-
-      const today = getTodayDate(req.query.mockDate);
       // 1. Check if already logged in today
       const { rows: existingLogin } = await pool.query(
         `SELECT * FROM user_logins WHERE user_id = $1 AND login_date = $2`,
@@ -23,28 +21,35 @@ class DailyLoginController {
       );
 
       if (existingLogin.length > 0) {
-        // User already logged in today, return existing streak count and 0 points for today
+        const { rows: totalLoginCountRows } = await pool.query(
+          `SELECT COUNT(*) FROM user_logins WHERE user_id = $1`,
+          [userId]
+        );
+        const totalLogins = parseInt(totalLoginCountRows[0].count);
+
         const { rows: updatedUserRows } = await pool.query(
           `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
           [userId]
         );
         const updatedUser = updatedUserRows[0];
+
         return res.status(200).json({
           message: 'You have already logged in today.',
           streakCount: existingLogin[0].streak_count,
           todayPoints: 0,
+          totalLogins,
           airdropsEarned: updatedUser.airdrops_earned,
           airdropsRemaining: updatedUser.airdrops_remaining,
         });
       }
 
-      // 2. Get the most recent previous login (not today)
+      // 2. Get most recent previous login (not today)
       const { rows: lastLoginRows } = await pool.query(
         `SELECT * FROM user_logins WHERE user_id = $1 ORDER BY login_date DESC LIMIT 1`,
         [userId]
       );
 
-      let streakCount = 1; // default streak if no previous login or gap >1 day
+      let streakCount = 1;
 
       if (lastLoginRows.length > 0) {
         const lastLoginDate = new Date(lastLoginRows[0].login_date);
@@ -53,13 +58,11 @@ class DailyLoginController {
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays === 1) {
-          // Last login was yesterday → continue streak
           streakCount = lastLoginRows[0].streak_count + 1;
         }
-        // else if diffDays > 1 streak resets to 1
       }
 
-      // 3. Insert today's login with streak count, avoid duplicates by ON CONFLICT DO NOTHING
+      // 3. Insert today's login
       await pool.query(
         `INSERT INTO user_logins (user_id, login_date, streak_count)
          VALUES ($1, $2, $3)
@@ -67,7 +70,14 @@ class DailyLoginController {
         [userId, today, streakCount]
       );
 
-      // 4. Update leaderboard points (+2 for daily login)
+      // 4. Fetch updated total login count after insert
+      const { rows: totalLoginCountRows } = await pool.query(
+        `SELECT COUNT(*) FROM user_logins WHERE user_id = $1`,
+        [userId]
+      );
+      const totalLogins = parseInt(totalLoginCountRows[0].count);
+
+      // 5. Update leaderboard and user points
       await pool.query(
         `UPDATE leaderboard SET points = points + 2 WHERE user_id = $1`,
         [userId]
@@ -75,14 +85,15 @@ class DailyLoginController {
 
       await pool.query(
         `UPDATE users 
-   SET 
-     daily_login_streak_count = $1,
-     last_login = NOW(),
-     airdrops_earned = airdrops_earned + 2,
-     airdrops_remaining = airdrops_remaining + 2
-   WHERE id = $2`,
+         SET 
+           daily_login_streak_count = $1,
+           last_login = NOW(),
+           airdrops_earned = airdrops_earned + 2,
+           airdrops_remaining = airdrops_remaining + 2
+         WHERE id = $2`,
         [streakCount, userId]
       );
+
       const { rows: updatedUserRows } = await pool.query(
         `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
         [userId]
@@ -93,6 +104,7 @@ class DailyLoginController {
         message: streakCount > 1 ? 'Streak continued!' : 'Streak started.',
         streakCount,
         todayPoints: 2,
+        totalLogins,
         airdropsEarned: updatedUser.airdrops_earned,
         airdropsRemaining: updatedUser.airdrops_remaining,
       });

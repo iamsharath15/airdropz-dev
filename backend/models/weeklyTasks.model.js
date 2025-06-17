@@ -38,7 +38,7 @@ export async function createWeeklyTasksTables() {
         weekly_task_id UUID REFERENCES weekly_tasks(id) ON DELETE CASCADE,
         title TEXT NOT NULL,
         description TEXT,
-        hyperlink TEXT,
+        sub_task_image TEXT,
         completed BOOLEAN DEFAULT FALSE, 
         created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP

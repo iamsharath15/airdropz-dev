@@ -1,28 +1,56 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Clock, Upload, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock,Users } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
-const WeeklyTaskTemplate = ({ task }: { task: any }) => {
+const WeeklyTaskTemplate = ({
+  task,
+  onFileUpload,
+  uploadingTaskId,
+}: {
+  task: any;
+  onFileUpload: (file: File, subTaskId: string) => void;
+  uploadingTaskId: string | null;
+}) => {
   const taskList = task?.sub_tasks || [];
 
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(
     () => {
       const initialState: Record<string, boolean> = {};
       if (task?.sub_tasks?.length > 0) {
-        initialState[task.sub_tasks[0].id] = true; // auto-expand first
+        initialState[task.sub_tasks[0].id] = true;
       }
       return initialState;
     }
   );
+
+  const [selectedFiles, setSelectedFiles] = useState<
+    Record<string, File | null>
+  >({});
 
   const toggleTask = (taskId: string) => {
     setExpandedTasks((prev) => ({
       ...prev,
       [taskId]: !prev[taskId],
     }));
+  };
+
+  const handleFileChange = (subTaskId: string, file: File | null) => {
+    setSelectedFiles((prev) => ({
+      ...prev,
+      [subTaskId]: file,
+    }));
+  };
+
+  const handleSubmit = (subTaskId: string) => {
+    const file = selectedFiles[subTaskId];
+    if (!file) {
+      toast.error('Please select a file before submitting.');
+      return;
+    }
+    onFileUpload(file, subTaskId);
   };
 
   return (
@@ -52,29 +80,27 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
           {/* Task Info Section */}
           <div className="p-4">
             <h3 className="text-xl lg:text-2xl font-bold text-white mb-4">
-              {task.task_title || 'Untitled Task'}{' '}
+              {task.task_title || 'Untitled Task'}
             </h3>
-            <div className="flex w-full flex-col items-start gap-4 mb-4">
+            <div className="flex flex-col gap-4 mb-4">
               <div className="flex gap-4">
-                <div className="bg-[#8373EE] px-3 py-1 rounded-full ">
-                  <p className="text-white text-sm"> Week 02</p>{' '}
+                <div className="bg-[#8373EE] px-3 py-1 rounded-full">
+                  <p className="text-white text-sm">Week 02</p>
                 </div>
-                <div className="bg-[#8373EE] px-3 py-1 rounded-full ">
+                <div className="bg-[#8373EE] px-3 py-1 rounded-full">
                   <p className="text-white text-sm">
-                    {' '}
-                    # {task.task_category || 'Uncategorized'}
-                  </p>{' '}
+                    #{task.task_category || 'Uncategorized'}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-white text-sm">
                   <Users className="w-4 h-4" />
-                  <span>20 Total Uses</span>
+                  <span>20 Total Users</span>
                 </div>
                 <div className="flex items-center gap-2 text-white text-sm">
                   <Clock className="w-4 h-4" />
                   <span>
-                    {' '}
                     Dates:{' '}
                     {task.start_time
                       ? new Date(task.start_time).toDateString()
@@ -88,78 +114,55 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
               </div>
             </div>
 
-            {/* Description */}
-            <div>
-              <h4 className="text-lg font-semibold text-white mb-3">
-                Description
-              </h4>
-              <p className="text-gray-300 leading-relaxed">
-                {task.task_description || 'No description added.'}
-              </p>
-            </div>
-
-            {/* Example Task */}
-            {/* Example Task */}
+            {/* Task Content Blocks */}
             {Array.isArray(task.tasks) &&
-              task.tasks.map((block, i) => {
+              task.tasks.map((block: any, i: number) => {
                 switch (block.type) {
                   case 'description':
                     return (
-                      <div
-                        className="py-[1%] flex items-center justify-start w-full"
+                      <p
                         key={i}
+                        className="text-white/80 text-sm font-medium py-2"
                       >
-                        <p className="text-left font-medium text-white/80 text-sm">
-                          {block.value}
-                        </p>
-                      </div>
+                        {block.value}
+                      </p>
                     );
                   case 'checklist':
-                    const items = block.value.split('\n').filter(Boolean);
                     return (
-                      <div
-                        className="py-[1%] flex items-center justify-start w-full"
+                      <ul
                         key={i}
+                        className="list-disc list-inside text-white text-sm mb-4"
                       >
-                        <ul className="list-disc list-inside text-white font-medium mb-4 md:text-lg text-sm">
-                          {items.map((item, idx) => (
+                        {block.value
+                          .split('\n')
+                          .filter(Boolean)
+                          .map((item: string, idx: number) => (
                             <li key={idx}>{item}</li>
                           ))}
-                        </ul>
-                      </div>
+                      </ul>
                     );
                   case 'link':
                     return (
-                      <div
-                        className="py-[1%] gap-2 flex items-center justify-start w-full"
-                        key={i}
-                      >
-                        <div className="w-6 h-6 bg-[#8373EE] rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                        <p className="text-white md:text-lg text-sm font-normal">
-                          {block.value}{' '}
-                          <a
-                            href={block.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-purple-400 underline"
-                          >
-                            Link
-                          </a>
-                        </p>
-                      </div>
+                      <p key={i} className="text-white text-sm">
+                        {block.value}{' '}
+                        <a
+                          href={block.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 underline"
+                        >
+                          Link
+                        </a>
+                      </p>
                     );
                   case 'header1':
                     return (
-                      <div
-                        className="py-[2%] flex items-center justify-start w-full"
+                      <h1
                         key={i}
+                        className="text-white text-xl md:text-2xl font-semibold py-4"
                       >
-                        <h1 className="text-white md:text-2xl text-xl font-medium text-left">
-                          {block.value}
-                        </h1>
-                      </div>
+                        {block.value}
+                      </h1>
                     );
                   default:
                     return null;
@@ -168,29 +171,26 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
           </div>
         </div>
 
-        {/* Right Panel - Task Checklist */}
+        {/* Right Panel */}
         <div className="xl:w-1/3 w-full bg-[#151313] p-6 rounded-xl h-fit">
           <h3 className="text-lg font-semibold text-white mb-6">
-            Task checklist
+            Task Checklist
           </h3>
-
           <div className="space-y-3">
-            {taskList.map((task, index) => (
-              <div key={index} className=" bg-black rounded-lg">
+            {taskList.map((task: any, index: number) => (
+              <div key={index} className="bg-black rounded-lg">
                 <button
                   onClick={() => toggleTask(task.id)}
-                  className="w-full p-4 flex justify-between items-start text-left hover:bg-gray-750 transition-colors rounded-lg cursor-pointer space-x-4"
+                  className="w-full p-4 flex justify-between items-start text-left hover:bg-gray-750 rounded-lg space-x-4"
                 >
-                  <span className="text-white text-sm  ">
+                  <span className="text-white text-sm">
                     Task {index + 1}: {task.title}
                   </span>
-                  <div className="p-[2%] flex items-center justify-center">
-                    {expandedTasks[task.id] ? (
-                      <ChevronUp className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
-                    )}
-                  </div>
+                  {expandedTasks[task.id] ? (
+                    <ChevronUp className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  )}
                 </button>
 
                 {expandedTasks[task.id] && (
@@ -201,20 +201,54 @@ const WeeklyTaskTemplate = ({ task }: { task: any }) => {
                       </p>
                     )}
 
-                    <div>
-                      <h4 className="text-white text-sm mb-3">
-                        File submissions
-                      </h4>
-                      <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
-                        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-gray-400 text-sm">
-                          Drag or browse from device
+                    <h4 className="text-white text-sm mb-3">File submission</h4>
+                    {task.completed && task.sub_task_image ? (
+                      <div className="relative mb-4 w-full items-center overflow-hidden h-40 bg-[#8373EE]/60 p-4 rounded-lg text-white flex flex-col gap-2 justify-center text-center">
+                        <p className="text-lg font-bold">
+                          {' '}
+                          Task {index + 1} Completed
+                        </p>
+                        <p className="text-sm opacity-80">
+                          Your submission was received successfully.
                         </p>
                       </div>
-                      <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700">
-                        Submit
-                      </Button>
-                    </div>
+                    ) : (
+                      <>
+                        {/* Drag and drop area */}
+                        <div
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files?.[0];
+                            if (file) handleFileChange(task.id, file);
+                          }}
+                          onDragOver={(e) => e.preventDefault()}
+                          className="w-full border border-dashed border-gray-500 rounded-md p-4 mb-2 text-center text-white"
+                        >
+                          Drag & Drop file here or use the file picker below
+                        </div>
+
+                        {/* File picker */}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="w-full text-sm text-white mb-2"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null;
+                            handleFileChange(task.id, file);
+                          }}
+                        />
+
+                        <button
+                          onClick={() => handleSubmit(task.id)}
+                          className="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+                          disabled={uploadingTaskId === task.id}
+                        >
+                          {uploadingTaskId === task.id
+                            ? 'Uploading...'
+                            : 'Submit'}
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>

@@ -10,6 +10,7 @@ import { Navbar } from '@/components/shared/Navbar';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '@/store/authSlice';
+import DailyLoginModal from '@/components/shared/DailyLoginModal';
 
 export default function DashboardLayout({
   children,
@@ -18,6 +19,13 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [loginData, setLoginData] = useState<null | {
+    streakCount: number;
+    totalLogins: number;
+    todayPoints: number;
+  }>(null);
+console.log('loginData',loginData);
 
   const user = useSelector((state: RootState) => state.auth.user);
   const isAuthenticated = user ? true : false;
@@ -49,7 +57,12 @@ export default function DashboardLayout({
           }
         )
         .then((res) => {
-          const { streakCount, airdropsEarned, airdropsRemaining } = res.data;
+          const {  streakCount,
+            todayPoints,
+            airdropsEarned,
+            airdropsRemaining,
+            totalLogins, } = res.data;
+console.log(res.data);
 
           // ✅ Update Redux state
           dispatch(
@@ -60,8 +73,12 @@ export default function DashboardLayout({
             })
           );
 
+                    localStorage.setItem(localKey, today);
+          setLoginData({ streakCount, totalLogins, todayPoints });
+          setShowStreakModal(true);
+
           console.log('[🔥 Daily Streak]', res.data.message);
-          localStorage.setItem(localKey, today);
+
         })
         .catch((err) => {
           console.error('[❌ Streak Error]', err.response?.data || err.message);
@@ -69,6 +86,7 @@ export default function DashboardLayout({
     }
   }, [isAuthenticated, user?.id, dispatch]);
   return (
+    <>
     <div className="flex min-h-screen bg-black w-full text-white">
       <Sidebar
         isCollapsed={isCollapsed}
@@ -83,9 +101,16 @@ export default function DashboardLayout({
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           role={role}
         />
-
         <main className="w-full p-6">{children}</main>
       </div>
     </div>
+    {loginData && (
+        <DailyLoginModal
+          isOpen={showStreakModal}
+          onClose={() => setShowStreakModal(false)}
+          loginData={loginData}
+        />
+      )}
+</>
   );
 }

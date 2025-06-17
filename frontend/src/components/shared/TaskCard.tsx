@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Clock, Pencil } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import EditWeeklyTaskFormModal from './dashboard/admin/weeklyTask/EditWeeklyTaskFormModal';
@@ -19,7 +19,7 @@ interface TaskCardProps {
     progress: number;
     status: string;
   };
-  onClick: () => void;
+  // onClick: () => void;
 }
 
 const getTimeLeftString = (endTime: string): string => {
@@ -38,7 +38,9 @@ const getTimeLeftString = (endTime: string): string => {
     : `${remHours} hour${remHours !== 1 ? 's' : ''} left`;
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+// export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task}) => {
+
   const [openModal, setOpenModal] = useState(false);
   const timeLeft = getTimeLeftString(task.end_time);
 

@@ -122,14 +122,20 @@ export default function AirdropPreview({ airdropData, contentBlocks }: Props) {
                   >
                     <p className="text-white md:text-lg text-sm font-medium">
                       {block.value}{' '}
-                      <a
-                        href={block.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-purple-400 underline"
-                      >
-                        Link
-                      </a>
+                      {block.link && (
+                        <a
+                          href={
+                            block.link.startsWith('http')
+                              ? block.link
+                              : `https://${block.link}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 underline"
+                        >
+                          Link
+                        </a>
+                      )}
                     </p>
                   </div>
                 );

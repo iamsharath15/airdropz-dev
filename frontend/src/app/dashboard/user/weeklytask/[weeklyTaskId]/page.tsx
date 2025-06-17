@@ -6,8 +6,11 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import WeeklyTaskTemplate from '@/components/shared/dashboard/user/weeklyTaskTemplate';
 import Link from 'next/link';
+import { uploadImageToS3 } from '@/lib/uploadToS3';
+import { toast } from 'sonner';
 
 interface TaskData {
+  id: string;
   title: string;
   description: string;
   progress: number;
@@ -16,38 +19,71 @@ interface TaskData {
   category: string;
   image: string;
   timeLeft?: string;
-  // Add more fields if needed
+  // Include other fields if needed
 }
 
 export default function TaskDetail() {
-  const { weeklyTaskId } = useParams(); // 👈 dynamic route param
+  const { weeklyTaskId } = useParams();
   const [taskData, setTaskData] = useState<TaskData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
+
+  const fetchTask = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/weeklytask/v1/${weeklyTaskId}/with-user-progress`,
+        {
+          withCredentials: true,
+        }
+      );
+      setTaskData(response.data.data);
+    } catch (err: any) {
+      console.error(err);
+      setError('Failed to load task data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!weeklyTaskId) return;
-
-    const fetchTask = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/api/weeklytask/v1/${weeklyTaskId}`
-        );
-        setTaskData(response.data.data);
-      } catch (err: any) {
-        console.error(err);
-        setError('Failed to load task data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTask();
+    if (weeklyTaskId) {
+      fetchTask();
+    }
   }, [weeklyTaskId]);
 
-  const handleBack = () => {
-    // implement navigation logic
-    console.log('Back clicked');
+  const handleFileUpload = async (file: File, subTaskId: string) => {
+    try {
+      setUploadingTaskId(subTaskId);
+
+      // Upload to S3
+      const image_url = await uploadImageToS3(file, `sub_tasks/${subTaskId}`);
+console.log(image_url);
+
+      // Send to backend
+      const response = await axios.post(
+        `http://localhost:8080/api/weeklytask/v1/upload-subtask-image/${taskData?.id}`,
+        {
+          sub_task_id: subTaskId,
+          image_url,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('✅ Task marked as completed!');
+        await fetchTask(); // Re-fetch to update UI
+      } else {
+        toast.error('❌ Failed to complete task.');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('❌ Upload failed');
+    } finally {
+      setUploadingTaskId(null);
+    }
   };
 
   if (loading) {
@@ -72,11 +108,14 @@ export default function TaskDetail() {
           <ArrowLeft size={20} className="mr-2" />
           Back to airdrops
         </Link>
-
-        <h1 className="text-2xl font-bold text-white">Weekly Task</h1>
+        <h1 className="text-2xl font-bold text-white ml-4">Weekly Task</h1>
       </div>
 
-      <WeeklyTaskTemplate task={taskData} />
+      <WeeklyTaskTemplate
+        task={taskData}
+        onFileUpload={handleFileUpload}
+        uploadingTaskId={uploadingTaskId}
+      />
     </div>
   );
 }
