@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Toaster, toast } from 'sonner';
 import axios, { AxiosError } from 'axios';
 import OtpInput from '@/components/shared/OtpInput';
-import AuthSlider from '@/components/shared/AuthSlider';
+import AuthSlider from '@/components/shared/auth/AuthSlider';
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();

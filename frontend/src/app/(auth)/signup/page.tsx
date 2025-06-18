@@ -6,9 +6,11 @@ import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { Toaster, toast } from 'sonner';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import AuthSlider from '@/components/shared/AuthSlider';
+import AuthSlider from '@/components/shared/auth/AuthSlider';
+
 import type { SignUpFormData, ApiResponse } from '@/types';
 
 const initialFormData: SignUpFormData = {
@@ -85,21 +87,18 @@ export default function SignUp() {
       <Toaster position="top-right" richColors />
       <div className="flex h-screen w-full">
         <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-[#8373EE] text-white px-6">
-          <div className="max-w-sm w-full space-y-6">
-            <h1 className="text-3xl font-semibold text-center">
+          <div className="md:w-8/12 w-full">
+            <h1 className="text-3xl font-semibold text-center pb-3">
               Create Account
             </h1>
-            <p className="text-center text-sm font-semibold">
-              Join Airdropz and start earning rewards
+            <p className="text-center text-sm font-semibold pb-6">
+              Join LootCrate and start earning rewards
             </p>
 
             <form onSubmit={handleSignUpSubmit} className="space-y-4">
               {fieldConfigs.map(({ id, label, type, required }) => (
                 <div key={id}>
-                  <label
-                    htmlFor={id}
-                    className="block text-sm font-bold mb-1 pb-1"
-                  >
+                  <label htmlFor={id} className="block text-sm font-bold pb-2">
                     {label}
                   </label>
                   <Input
@@ -116,7 +115,7 @@ export default function SignUp() {
 
               <Button
                 type="submit"
-                className="w-full py-6 font-semibold text-sm cursor-pointer"
+                className="w-full py-6 font-semibold text-sm cursor-pointer my-2"
                 disabled={isRegistering}
               >
                 {isRegistering ? 'Signing Up...' : 'Sign Up'}

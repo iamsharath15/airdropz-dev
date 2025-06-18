@@ -13,7 +13,7 @@ const Page = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/'); // Redirect to home or sign-in
+      router.push('/'); 
     }
   }, [isAuthenticated, router]);
 

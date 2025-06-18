@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import AuthSlider from '@/components/shared/AuthSlider';
+import AuthSlider from '@/components/shared/auth/AuthSlider';
 import { Toaster, toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';

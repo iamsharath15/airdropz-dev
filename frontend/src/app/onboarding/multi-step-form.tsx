@@ -75,7 +75,7 @@ export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md p-[5%]">
         <Button
           variant="outline"
           onClick={handleCancel}
