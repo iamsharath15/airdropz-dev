@@ -9,11 +9,7 @@ import { Copy, Facebook, Instagram, Share2, Users } from 'lucide-react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-interface ProfileStatsProps {
-  totalReferrals: number;
-  totalEarned: number;
-  referralCode: string;
-}
+import type { ProfileStatsProps } from '@/types';
 
 const ProfileStats: React.FC<ProfileStatsProps> = ({
   totalReferrals,

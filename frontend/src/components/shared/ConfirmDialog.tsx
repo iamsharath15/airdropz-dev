@@ -11,15 +11,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import type { ConfirmDialogProps } from '@/types';
 
-interface ConfirmDialogProps {
-  trigger: React.ReactNode;
-  title?: string;
-  description?: string;
-  onConfirm: () => void;
-  cancelText?: string;
-  confirmText?: string;
-}
 
 export default function ConfirmDialog({
   trigger,

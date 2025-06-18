@@ -22,11 +22,9 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { updateUser } from '@/store/authSlice';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
+import { SettingSectionProps } from '@/types';
 
-interface SettingSectionProps {
-  title: string;
-  children: React.ReactNode;
-}
+
 
 const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => (
   <section className="py-6 px-2 mb-6 w-full">

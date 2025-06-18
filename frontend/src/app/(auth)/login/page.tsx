@@ -12,20 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '@/store/authSlice';
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    user_name: string;
-    role: string;
-    is_new_user?: boolean;
-    wallet_address: string;
-    daily_login_streak_count: number;
-    airdrops_remaining: number;
-    airdrops_earned: number;
-  };
-}
+import type { LoginResponse } from '@/types';
 
 export default function Login() {
   const router = useRouter();

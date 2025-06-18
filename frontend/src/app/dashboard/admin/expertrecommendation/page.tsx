@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CirclePlay, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import StoryCarousel from './StoryCarousel';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -13,19 +13,7 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import Image from 'next/image';
 import ExpertSectionHeader from '@/components/shared/dashboard/ExpertSectionHeader';
-
-interface Task {
-  id: number;
-  image: string;
-  link: string;
-}
-
-interface Story {
-  cover_id: number;
-  cover_name: string;
-  cover_image: string;
-  stories: Task[];
-}
+import type { Story } from '@/types';
 
 const API_BASE = 'http://localhost:8080/api/expertStories/v1';
 

@@ -13,13 +13,7 @@ import {
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-interface User {
-  user_name: string;
-  email: string;
-  airdrops_earned: number;
-  daily_login_streak_count: number;
-}
+import { User } from '@/types';
 
 const itemsPerPage = 5;
 

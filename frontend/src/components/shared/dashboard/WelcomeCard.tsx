@@ -1,18 +1,9 @@
 // v1 done
 import { Card, CardContent } from '@/components/ui/card';
 import React from 'react';
+import type { WelcomeCardProps } from '@/types';
 
-interface StatItem {
-  label: string;
-  value: string | number;
-  subLabel?: string;
-}
 
-interface WelcomeCardProps {
-  name: string;
-  stats: StatItem[];
-  color?: string;
-}
 
 const WelcomeCard: React.FC<WelcomeCardProps> = ({
   name,

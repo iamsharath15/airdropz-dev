@@ -17,6 +17,25 @@ class UserAirdropController {
       if (result.rowCount === 0) {
         return res.status(200).json({ message: 'Already liked' });
       }
+      const airdropResult = await pool.query(
+        `SELECT title FROM airdrops WHERE id = $1`,
+        [airdropId]
+      );
+
+      const airdropTitle = airdropResult.rows[0]?.title || 'an airdrop';
+
+      // ✅ Create notification for the user
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, title, message, target_url)
+       VALUES ($1, $2, $3, $4, $5)`,
+        [
+          userId,
+          'airdrop',
+          'Airdrop liked!',
+          `You liked "${airdropTitle}"`,
+          `/dashboard/user/airdrops/${airdropId}`, 
+        ]
+      );
 
       res.status(201).json({ message: 'Airdrop liked successfully' });
     } catch (error) {
@@ -68,28 +87,28 @@ class UserAirdropController {
     }
   }
 
- static async getIsAirdropLikedByUser(req, res) {
-  const userId = req.user.userId;
-  const { airdropId } = req.params;
+  static async getIsAirdropLikedByUser(req, res) {
+    const userId = req.user.userId;
+    const { airdropId } = req.params;
 
-  try {
-    const result = await pool.query(
-      `SELECT 1 FROM user_airdrops WHERE user_id = $1 AND airdrop_id = $2 LIMIT 1`,
-      [userId, airdropId]
-    );
+    try {
+      const result = await pool.query(
+        `SELECT 1 FROM user_airdrops WHERE user_id = $1 AND airdrop_id = $2 LIMIT 1`,
+        [userId, airdropId]
+      );
 
-    const isLiked = result.rows.length > 0;
+      const isLiked = result.rows.length > 0;
 
-    return res.status(200).json({ liked: isLiked });
-  } catch (error) {
-    console.error('Error checking airdrop like status:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+      return res.status(200).json({ liked: isLiked });
+    } catch (error) {
+      console.error('Error checking airdrop like status:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
   }
- }
-  
- static async getTopLikedAirdrops(req, res) {
-  try {
-    const result = await pool.query(`
+
+  static async getTopLikedAirdrops(req, res) {
+    try {
+      const result = await pool.query(`
       SELECT 
         a.id,
         a.title,
@@ -104,18 +123,15 @@ class UserAirdropController {
       LIMIT 10;
     `);
 
-    return res.status(200).json({
-      message: 'Top liked airdrops fetched successfully',
-      data: result.rows,
-    });
-  } catch (err) {
-    console.error('[❌ getTopLikedAirdrops]', err.message);
-    return res.status(500).json({ message: 'Server Error' });
+      return res.status(200).json({
+        message: 'Top liked airdrops fetched successfully',
+        data: result.rows,
+      });
+    } catch (err) {
+      console.error('[❌ getTopLikedAirdrops]', err.message);
+      return res.status(500).json({ message: 'Server Error' });
+    }
   }
-}
-
-
-
 }
 
 export default UserAirdropController;

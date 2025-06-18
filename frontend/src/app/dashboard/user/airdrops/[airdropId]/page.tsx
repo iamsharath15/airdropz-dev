@@ -10,32 +10,9 @@ import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { AirdropData, BlockType, ContentBlock } from '@/types';
 
-type BlockType =
-  | 'link'
-  | 'image'
-  | 'description'
-  | 'checklist'
-  | 'highlight'
-  | 'header1';
 
-// Content block structure
-interface ContentBlock {
-  type: BlockType;
-  value: string;
-  link?: string;
-}
-interface AirdropData {
-  title: string;
-  airdrops_banner_title: string;
-  airdrops_banner_description: string;
-  airdrops_banner_subtitle: string;
-  airdrops_date: string;
-  airdrops_banner_image: string;
-  preview_image_url: string;
-  category: string;
-  type: string;
-}
 
 export default function AirdropDetailPage() {
   const { airdropId } = useParams<{ airdropId: string }>();

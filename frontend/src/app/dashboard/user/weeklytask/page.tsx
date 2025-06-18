@@ -9,33 +9,7 @@ import { toast } from 'sonner';
 import { TaskHeader } from '@/components/shared/dashboard/admin/weeklyTask/TaskHeader';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-interface TaskBlock {
-  id: string;
-  link: string | null;
-  type: string;
-  value: string;
-}
-
-interface SubTask {
-  id: string;
-  title: string;
-  completed: boolean;
-  description: string | null;
-  sub_task_image: string | null;
-}
-
-interface WeeklyTask {
-  id: string;
-  task_title: string;
-  task_category: string;
-  week: number;
-  task_banner_image?: string;
-  end_time?: string;
-  progress?: number;
-  tasks?: TaskBlock[];
-  sub_tasks?: SubTask[];
-}
+import type { WeeklyTask, SubTask } from '@/types';
 
 const WeeklyTaskCard = ({
   task,

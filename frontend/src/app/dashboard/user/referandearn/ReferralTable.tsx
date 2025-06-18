@@ -5,16 +5,7 @@
 import Image from 'next/image';
 import React from 'react';
 
-interface Referral {
-  id: number;
-  date: string;
-  user: string;
-  points: number;
-}
-
-interface ReferralTableProps {
-  referrals: Referral[];
-}
+import type { ReferralTableProps } from '@/types';
 
 const ReferralTable: React.FC<ReferralTableProps> = ({ referrals }) => {
   return (

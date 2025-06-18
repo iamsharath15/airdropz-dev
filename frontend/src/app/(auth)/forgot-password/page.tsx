@@ -8,10 +8,7 @@ import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
-
-interface ForgotPasswordResponse {
-  message: string;
-}
+import type { ForgotPasswordResponse } from '@/types';
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('');

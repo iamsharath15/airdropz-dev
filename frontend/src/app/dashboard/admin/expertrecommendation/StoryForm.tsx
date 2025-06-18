@@ -9,11 +9,9 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { DialogTitle } from '@radix-ui/react-dialog';
+import { StoryFormProps } from '@/types';
 
-interface StoryFormProps {
-  coverId: number;
-  onStoryAdded: (newStory: any) => void;
-}
+
 
 const StoryForm: React.FC<StoryFormProps> = ({ coverId, onStoryAdded }) => {
   const [open, setOpen] = useState(false);

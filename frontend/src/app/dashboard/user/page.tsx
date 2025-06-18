@@ -13,34 +13,8 @@ import type { RootState } from '@/store';
 import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Airdrop, WeeklyTask, SubTask } from '@/types';
 
-type Airdrop = {
-  id: string;
-  title: string;
-  category: string;
-  preview_image_url: string;
-  type: 'Free' | 'Paid';
-  likes: string;
-};
-interface SubTask {
-  id: string;
-  title: string;
-  completed: boolean;
-  description: string | null;
-  sub_task_image: string | null;
-}
-
-interface WeeklyTask {
-  id: string;
-  task_title: string;
-  task_category: string;
-  week: number;
-  task_banner_image?: string;
-  end_time?: string;
-  progress?: number;
-  tasks?: TaskBlock[];
-  sub_tasks?: SubTask[];
-}
 const WeeklyTaskCard = ({
   task,
   timeLeft,

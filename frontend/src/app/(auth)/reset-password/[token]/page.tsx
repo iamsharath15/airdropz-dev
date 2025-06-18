@@ -9,10 +9,7 @@ import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
-
-interface ResetPasswordResponse {
-  message: string;
-}
+import type { ResetPasswordResponse } from '@/types';
 
 export default function ResetPasswordForm() {
   const router = useRouter();

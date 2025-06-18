@@ -3,20 +3,9 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Users, Clock, ChevronDown, ChevronUp, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TaskDetailProps } from '@/types';
 
-interface TaskDetailProps {
-  task: {
-    title: string;
-    description: string;
-    progress: number;
-    status: string;
-    week: string;
-    category: string;
-    image: string;
-    timeLeft?: string;
-  };
-  onBack: () => void;
-}
+
 
 export const TaskDetail: React.FC<TaskDetailProps> = ({ task, onBack }) => {
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({

@@ -16,14 +16,9 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import TelegramJoinCard from './dashboard/TelegramJoinCard';
 import { Button } from '@/components/ui/button';
+import { SidebarProps } from '@/types';
 
-interface SidebarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (value: boolean) => void;
-  sidebarOpen: boolean;
-  setSidebarOpen: (value: boolean) => void;
-  role: 'admin' | 'user';
-}
+
 
 const userNavItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/user' },

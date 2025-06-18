@@ -8,21 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-
-type Step = {
-  title: string;
-  description: string;
-  component: (props: {
-    selectedValues: string[];
-    onToggle: (val: string) => void;
-  }) => React.ReactNode;
-  isMultiSelect?: boolean;
-};
-
-interface MultiStepFormProps {
-  steps: Step[];
-  onComplete: (data: Record<string, string[]>) => void;
-}
+import { MultiStepFormProps } from '@/types';
 
 export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
   const [currentStep, setCurrentStep] = useState(0);

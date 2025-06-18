@@ -6,23 +6,8 @@ import { Button } from '@/components/ui/button';
 import { X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 
-interface StoryCarouselProps {
-  stories: Story[];
-  setStories: React.Dispatch<React.SetStateAction<Story[]>>;
-}
+import type { StoryCarouselProps, Story } from '@/types';
 
-interface StoryItem {
-  id: number;
-  image: string;
-  link: string;
-}
-
-interface Story {
-  cover_id: number;
-  cover_name: string;
-  cover_image: string;
-  stories: StoryItem[];
-}
 
 const STORY_DURATION = 5000;
 

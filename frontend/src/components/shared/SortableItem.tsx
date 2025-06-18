@@ -4,11 +4,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-
-interface SortableItemProps {
-  id: string;
-  children: React.ReactNode;
-}
+import type { SortableItemProps } from '@/types';
 
 const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });

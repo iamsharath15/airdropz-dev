@@ -16,24 +16,9 @@ import StoryForm from './StoryForm';
 import axios from 'axios';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { toast } from 'sonner';
+import type { StoryCarouselProps, Story } from '@/types';
 
-interface StoryCarouselProps {
-  stories: Story[];
-  setStories: React.Dispatch<React.SetStateAction<Story[]>>;
-}
 
-interface StoryItem {
-  id: number;
-  image: string;
-  link: string;
-}
-
-interface Story {
-  cover_id: number;
-  cover_name: string;
-  cover_image: string;
-  stories: StoryItem[];
-}
 
 const STORY_DURATION = 5000;
 

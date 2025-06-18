@@ -2,15 +2,7 @@
 
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, Flame, Trophy, Star, Zap, Gift } from 'lucide-react';
-interface DailyLoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  loginData: {
-    streakCount: number;
-    totalLogins: number;
-    todayPoints: number;
-  };
-}
+import type { DailyLoginModalProps } from '@/types';
 
 const DailyLoginModal = ({
   isOpen,

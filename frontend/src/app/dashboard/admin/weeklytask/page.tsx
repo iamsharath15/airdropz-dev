@@ -4,13 +4,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { TaskHeader } from '@/components/shared/dashboard/admin/weeklyTask/TaskHeader';
 import { TaskSection } from '@/components/shared/TaskSection';
+import { WeeklyTask } from '@/types';
 
-interface WeeklyTask {
-  id: string;
-  task_title: string;
-  task_category: string;
-  week: number;
-}
+
 export default function WeeklyTaskPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');

@@ -5,22 +5,9 @@ import { Clock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import EditWeeklyTaskFormModal from './dashboard/admin/weeklyTask/EditWeeklyTaskFormModal';
+import { TaskCardProps } from '@/types';
 
-interface TaskCardProps {
-  task: {
-    id: string;
-    week: number;
-    task_category: string;
-    task_title: string;
-    task_description: string;
-    task_banner_image: string;
-    start_time: string;
-    end_time: string;
-    progress: number;
-    status: string;
-  };
-  // onClick: () => void;
-}
+
 
 const getTimeLeftString = (endTime: string): string => {
   const now = new Date();

@@ -5,13 +5,8 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { LeaderboardUser } from '@/types';
 
-interface LeaderboardUser {
-  id: string;
-  user_id: string;
-  user_name: string;
-  points: number;
-}
 
 const useUsersPerPage = () => {
   const [usersPerPage, setUsersPerPage] = useState(3); // default desktop

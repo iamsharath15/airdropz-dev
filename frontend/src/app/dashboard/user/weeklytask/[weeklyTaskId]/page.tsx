@@ -22,18 +22,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-interface TaskData {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  status: string;
-  week: string;
-  category: string;
-  image: string;
-  timeLeft?: string;
-  // Include other fields if needed
-}
+import type { TaskData } from '@/types';
 
 export default function TaskDetail() {
   const { weeklyTaskId } = useParams();

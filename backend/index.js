@@ -17,6 +17,7 @@ import uploadRoutes from './routes/upload.route.js';
 import expertStoriesRoutes from './routes/expertStories.routes.js';
 import userAirdropRoutes from './routes/userAirdropRoutes.js';
 import adminRoutes from './routes/admin.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use('/api/expertStories/v1', expertStoriesRoutes);
 
 
 app.use('/api/admin/v1', adminRoutes);
+app.use('/api/notification/v1', notificationRoutes);
 
 
 // Test DB connection

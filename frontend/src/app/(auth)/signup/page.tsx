@@ -9,17 +9,7 @@ import { Toaster, toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthSlider from '@/components/shared/AuthSlider';
-
-interface SignUpFormData {
-  userName: string;
-  email: string;
-  password: string;
-  referralCode?: string;
-}
-
-interface ApiResponse {
-  message: string;
-}
+import type { SignUpFormData, ApiResponse } from '@/types';
 
 const initialFormData: SignUpFormData = {
   userName: '',

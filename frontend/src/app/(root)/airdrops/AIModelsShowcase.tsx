@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
@@ -6,48 +5,60 @@ const AIModelsShowcase = () => {
   const [selectedCategory, setSelectedCategory] = useState('Image generation');
 
   const aiModels = [
-    'Google', 'MAGNIFIC', 'KLING', 'Flux', 'ChatGPT', 'ElevenLabs', 'runway', 'Google'
+    'Google',
+    'MAGNIFIC',
+    'KLING',
+    'Flux',
+    'ChatGPT',
+    'ElevenLabs',
+    'runway',
+    'Google',
   ];
 
   const categories = [
     'Image generation',
-    'Image editing', 
+    'Image editing',
     'Video generation',
     'Video editing',
-    'Audio generation'
+    'Audio generation',
   ];
 
   const categoryContent = {
     'Image generation': {
       title: 'Generate Images',
-      description: '35mm film photography, she wears a bold red trench coat over a black turtleneck.',
+      description:
+        '35mm film photography, she wears a bold red trench coat over a black turtleneck.',
       mode: 'Flux 1.0',
-      gradient: 'from-creative-purple via-creative-pink to-creative-orange'
+      gradient: 'from-creative-purple via-creative-pink to-creative-orange',
     },
     'Image editing': {
       title: 'Edit Images',
-      description: 'Remove background, enhance colors, and apply professional filters to your images.',
+      description:
+        'Remove background, enhance colors, and apply professional filters to your images.',
       mode: 'MAGNIFIC AI',
-      gradient: 'from-creative-blue via-creative-purple to-creative-pink'
+      gradient: 'from-creative-blue via-creative-purple to-creative-pink',
     },
     'Video generation': {
       title: 'Generate Videos',
-      description: 'Create stunning video content from text prompts with cinematic quality.',
+      description:
+        'Create stunning video content from text prompts with cinematic quality.',
       mode: 'KLING AI',
-      gradient: 'from-creative-green via-creative-blue to-creative-purple'
+      gradient: 'from-creative-green via-creative-blue to-creative-purple',
     },
     'Video editing': {
       title: 'Edit Videos',
-      description: 'Professional video editing with AI-powered scene detection and transitions.',
+      description:
+        'Professional video editing with AI-powered scene detection and transitions.',
       mode: 'Runway ML',
-      gradient: 'from-creative-orange via-creative-pink to-creative-purple'
+      gradient: 'from-creative-orange via-creative-pink to-creative-purple',
     },
     'Audio generation': {
       title: 'Generate Audio',
-      description: 'Create high-quality voice overs and music from text descriptions.',
+      description:
+        'Create high-quality voice overs and music from text descriptions.',
       mode: 'ElevenLabs',
-      gradient: 'from-creative-pink via-creative-orange to-creative-blue'
-    }
+      gradient: 'from-creative-pink via-creative-orange to-creative-blue',
+    },
   };
 
   const containerVariants = {
@@ -56,9 +67,9 @@ const AIModelsShowcase = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        duration: 0.8
-      }
-    }
+        duration: 0.8,
+      },
+    },
   };
 
   const itemVariants = {
@@ -68,9 +79,9 @@ const AIModelsShowcase = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
-      }
-    }
+        ease: 'easeOut',
+      },
+    },
   };
 
   const currentContent = categoryContent[selectedCategory];
@@ -81,16 +92,16 @@ const AIModelsShowcase = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
           viewport={{ once: true }}
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-8 max-w-4xl mx-auto text-white">
             Powered by GenAI models from industry leaders
           </h2>
-          
+
           {/* AI Model logos with improved animation */}
-          <motion.div 
+          <motion.div
             className="flex flex-wrap justify-center items-center gap-8 md:gap-12 mb-16 opacity-60"
             initial="hidden"
             whileInView="visible"
@@ -101,10 +112,10 @@ const AIModelsShowcase = () => {
               <motion.div
                 key={`${model}-${index}`}
                 variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.1, 
+                whileHover={{
+                  scale: 1.1,
                   opacity: 1,
-                  transition: { duration: 0.2 }
+                  transition: { duration: 0.2 },
                 }}
                 className="text-xl md:text-2xl font-bold text-muted-foreground hover:text-foreground transition-colors duration-300 cursor-pointer"
               >
@@ -118,14 +129,12 @@ const AIModelsShowcase = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           viewport={{ once: true }}
           className="relative"
         >
-          {/* Background gradient */}
-<div className="absolute inset-0 bg-gradient-to-br from-creative-purple/30 via-creative-pink/20 to-creative-orange/30 rounded-3xl blur-3xl" />
-          
-          {/* Main interface mockup */}
+          <div className="absolute inset-0 bg-gradient-to-br from-creative-purple/30 via-creative-pink/20 to-creative-orange/30 rounded-3xl blur-3xl" />
+
           <div className="relative glassmorphic rounded-3xl p-6 md:p-8 overflow-hidden shadow-2xl">
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Left sidebar - controls */}
@@ -133,22 +142,40 @@ const AIModelsShowcase = () => {
                 key={selectedCategory}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
                 className="lg:w-1/3 space-y-6"
               >
                 <div className="glassmorphic rounded-2xl p-6 shadow-lg">
-                  <h3 className="text-lg font-semibold mb-4">{currentContent.title}</h3>
+                  <h3 className="text-lg font-semibold mb-4">
+                    {currentContent.title}
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                     {currentContent.description}
                   </p>
-                  
+
                   {/* Control buttons with improved styling */}
                   <div className="space-y-3">
                     {[
-                      { color: 'bg-creative-purple', label: 'Mode', value: currentContent.mode },
-                      { color: 'bg-creative-blue', label: 'Style', value: null },
-                      { color: 'bg-creative-pink', label: 'Composition', value: null },
-                      { color: 'bg-creative-orange', label: 'Effects', value: null }
+                      {
+                        color: 'bg-creative-purple',
+                        label: 'Mode',
+                        value: currentContent.mode,
+                      },
+                      {
+                        color: 'bg-creative-blue',
+                        label: 'Style',
+                        value: null,
+                      },
+                      {
+                        color: 'bg-creative-pink',
+                        label: 'Composition',
+                        value: null,
+                      },
+                      {
+                        color: 'bg-creative-orange',
+                        label: 'Effects',
+                        value: null,
+                      },
                     ].map((item) => (
                       <motion.div
                         key={item.label}
@@ -156,15 +183,21 @@ const AIModelsShowcase = () => {
                         whileHover={{ x: 4 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <div className={`w-4 h-4 ${item.color} rounded shadow-sm`} />
-                        <span className="text-sm font-medium">{item.label}</span>
+                        <div
+                          className={`w-4 h-4 ${item.color} rounded shadow-sm`}
+                        />
+                        <span className="text-sm font-medium">
+                          {item.label}
+                        </span>
                         {item.value && (
-                          <span className="text-sm text-muted-foreground ml-auto">{item.value}</span>
+                          <span className="text-sm text-muted-foreground ml-auto">
+                            {item.value}
+                          </span>
                         )}
                       </motion.div>
                     ))}
                   </div>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -174,26 +207,32 @@ const AIModelsShowcase = () => {
                   </motion.button>
                 </div>
               </motion.div>
-              
+
               {/* Right side - generated content preview */}
               <motion.div
                 key={`preview-${selectedCategory}`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
                 className="lg:w-2/3"
               >
                 <div className="glassmorphic rounded-2xl overflow-hidden h-64 md:h-80 relative shadow-lg">
                   {/* Dynamic gradient based on selected category */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${currentContent.gradient} opacity-60`} />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${currentContent.gradient} opacity-60`}
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                  
+
                   {/* Overlay elements representing the AI-generated content */}
                   <div className="absolute inset-4 flex items-center justify-center">
-                    <motion.div 
+                    <motion.div
                       className="w-32 h-32 bg-white/10 rounded-full backdrop-blur-sm flex items-center justify-center shadow-xl"
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
                     >
                       <div className="w-16 h-16 bg-white/20 rounded-full" />
                     </motion.div>
@@ -221,7 +260,7 @@ const AIModelsShowcase = () => {
               whileTap={{ scale: 0.95 }}
               className={`px-6 py-3 rounded-full text-sm transition-all duration-300 cursor-pointer ${
                 selectedCategory === category
-                  ? 'bg-white text-black shadow-lg' 
+                  ? 'bg-white text-black shadow-lg'
                   : 'glassmorphic text-muted-foreground hover:text-foreground hover:bg-white/10'
               }`}
             >
