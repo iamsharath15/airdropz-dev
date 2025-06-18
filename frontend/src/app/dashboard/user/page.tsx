@@ -190,7 +190,11 @@ const Dashboard: React.FC = () => {
 
             <div className="flex flex-wrap">
               {myTasks.length === 0 ? (
-                <p className="text-gray-400">No tasks started yet.</p>
+                <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+                  <p className="text-white/80 text-lg font-medium">
+                    No tasks started yet.
+                  </p>
+                </div>
               ) : (
                 myTasks.map((task, index) => {
                   const timeLeft = getTimeLeftString(task.end_time);

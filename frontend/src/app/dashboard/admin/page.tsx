@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import WelcomeCard from '@/components/shared/dashboard/WelcomeCard';
 import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
-// import TasksSection from '@/components/shared/dashboard/TaskSection';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
@@ -11,15 +10,8 @@ import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import axios from 'axios';
 import { BarChart2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { TaskSection } from '@/components/shared/TaskSection';
+import type { Airdrop } from '@/types';
 
-type Airdrop = {
-  id: string;
-  title: string;
-  category: string;
-  preview_image_url: string;
-  type: 'Free' | 'Paid';
-  likes: string;
-};
 const Dashboard: React.FC = () => {
   useRoleRedirect('admin');
   const user = useSelector((state: RootState) => state.auth.user);

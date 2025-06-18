@@ -22,7 +22,7 @@ A crypto airdrop is a way for blockchain projects to distribute free tokens or c
 1. Log In – Sign in to your account.
 2. Go to Dashboard...
 3. Click on “My Airdrops”...
-A crypto airdrop is a way to distribute free tokens.\n\n### How to Claim\n\n1. Log in\n2. Visit **Dashboard**\n\n![Airdrop](https://example.com/airdrop.png)
+A crypto airdrop is a way to distribute free tokens.\n\n### How to Claim\n\n1. Log in\n2. Visit **Dashboard**\n\n![Airdrop]
         `,
       },
       {
@@ -72,7 +72,7 @@ A crypto airdrop is a way for blockchain projects to distribute free tokens or c
 1. Log In – Sign in to your account.
 2. Go to Dashboard...
 3. Click on “My Airdrops”...
-A crypto airdrop is a way to distribute free tokens.\n\n### How to Claim\n\n1. Log in\n2. Visit **Dashboard**\n\n![Airdrop](https://example.com/airdrop.png)
+A crypto airdrop is a way to distribute free tokens.\n\n### How to Claim\n\n1. Log in\n2. Visit **Dashboard**\n\n!
         `,
       },
       {

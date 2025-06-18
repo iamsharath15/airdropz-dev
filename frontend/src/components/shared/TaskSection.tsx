@@ -75,7 +75,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
                     <Image
                       width={1920}
                       height={1080}
-                      src={imageUrl}
+                      src={imageUrl || ""}
                       alt={task.task_title}
                       className="w-full h-40 object-cover rounded-xl bg-gray-700"
                     />
