@@ -261,6 +261,8 @@ export default function WeeklyTaskPage() {
               ) : (
                 filteredMyTasks.map((task, index) => {
                   const timeLeft = getTimeLeftString(task.end_time);
+                  console.log('hi',task);
+                  
                   return (
                     <div
                       key={index}

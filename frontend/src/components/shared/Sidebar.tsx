@@ -1,17 +1,21 @@
 'use client';
-import { Button } from '@/components/ui/button';
-import { Menu, Bitcoin } from 'lucide-react';
+
+import {
+  ClipboardCheck,
+  Gift,
+  LayoutDashboard,
+  Menu,
+  Settings,
+  Star,
+  UserRoundCog,
+  Users,
+} from 'lucide-react';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Gift,
-  ClipboardCheck,
-  Star,
-  Users,
-  Settings,
-} from 'lucide-react';
+
+import TelegramJoinCard from './dashboard/TelegramJoinCard';
+import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -21,7 +25,6 @@ interface SidebarProps {
   role: 'admin' | 'user';
 }
 
-// Navigation items for User
 const userNavItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/user' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/user/airdrops' },
@@ -39,10 +42,9 @@ const userNavItems = [
   { label: 'Settings', icon: Settings, href: '/dashboard/user/settings' },
 ];
 
-// Navigation items for Admin
 const adminNavItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard/admin' },
-  { label: 'Users', icon: Users, href: '/dashboard/admin/users' },
+  { label: 'Users', icon: UserRoundCog, href: '/dashboard/admin/users' },
   { label: 'Airdrops', icon: Gift, href: '/dashboard/admin/airdrops' },
   {
     label: 'Expert Recommendation',
@@ -69,7 +71,6 @@ export function Sidebar({
 
   const navItems = role === 'admin' ? adminNavItems : userNavItems;
 
-  // Close sidebar on mobile when nav item clicked
   const handleNavClick = (href: string) => {
     router.push(href);
     setSidebarOpen(false);
@@ -77,7 +78,6 @@ export function Sidebar({
 
   return (
     <>
-      {/* Overlay backdrop for mobile when sidebar is open */}
       <div
         className={clsx(
           'fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity',
@@ -95,14 +95,12 @@ export function Sidebar({
         )}
       >
         <div>
-          {/* Toggle Button */}
           <div className="flex items-center justify-start mb-6">
             <Button
               variant="ghost"
               size="icon"
               className="text-white cursor-pointer hover:bg-[#8373EE] hover:text-white"
               onClick={() => {
-                // Collapse on desktop, close on mobile
                 if (window.innerWidth >= 768) {
                   setIsCollapsed(!isCollapsed);
                 } else {
@@ -120,16 +118,18 @@ export function Sidebar({
                   alt="Logo"
                   width={80}
                   height={25}
+                  priority
                 />
               </div>
             )}
           </div>
 
-          {/* Nav Items */}
           <nav className="space-y-2">
             {navItems.map(({ label, icon: Icon, href }) => {
-              const isActive = pathname === href;
-              return (
+  const isDashboard = href === '/dashboard/admin' || href === '/dashboard/user';
+  const isActive = isDashboard
+    ? pathname === href
+    : pathname.startsWith(href);              return (
                 <Button
                   key={label}
                   onClick={() => handleNavClick(href)}
@@ -147,32 +147,7 @@ export function Sidebar({
           </nav>
         </div>
 
-        {/* Telegram CTA */}
-        {(!isCollapsed || sidebarOpen) && (
-          <div className="relative bg-[#141522] rounded-2xl px-4 py-6 text-center  shadow-lg">
-            {/* Decorative Circles */}
-            <div className="overflow-hidden absolute h-full w-full top-0 left-0 rounded-2xl">
-              <div className="absolute -top-12 -left-15 w-30 h-30 bg-[#ffffff61] rounded-full opacity-30  pointer-events-none" />
-              <div className="absolute -bottom-16 -right-15 w-35 h-35 bg-[#ffffff61] z-10 rounded-full opacity-30 pointer-events-none" />
-            </div>
-            {/* Floating Bitcoin Icon */}
-            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#FF9900] w-12 h-12 rounded-full flex items-center justify-center shadow-md z-10">
-              <Bitcoin className="text-white w-8 h-8" />
-            </div>
-
-            <div className="flex flex-col items-center justify-center z-50 relative">
-              <h3 className="mt-8 text-white text-base font-semibold">
-                Join channel
-              </h3>
-              <p className="text-sm text-gray-400 mt-1 mb-4">
-                Join our Telegram community for airdrop updates
-              </p>
-              <Button className="bg-white text-black w-full text-sm font-semibold rounded-md">
-                Join Telegram
-              </Button>
-            </div>
-          </div>
-        )}
+        {(!isCollapsed || sidebarOpen) && <TelegramJoinCard />}
       </aside>
     </>
   );

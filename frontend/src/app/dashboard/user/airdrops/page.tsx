@@ -59,7 +59,6 @@ const AirdropsListing = () => {
 
   return (
     <div className="mb-8">
-      {/* Header: Search + Filters */}
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         {/* Search */}
         <div className="relative w-full max-w-md">
@@ -75,10 +74,8 @@ const AirdropsListing = () => {
           />
         </div>
 
-        {/* Right Filters */}
         <div className="flex gap-4 relative">
 
-          {/* Category Filter */}
           <Dropdown
             label={selectedCategory}
             icon={<LayoutGrid size={18} />}
@@ -92,7 +89,6 @@ const AirdropsListing = () => {
             }}
           />
 
-          {/* Type Filter */}
           <Dropdown
             label={`Sort By: ${selectedType}`}
             icon={<SlidersHorizontal size={18} />}
@@ -108,7 +104,6 @@ const AirdropsListing = () => {
         </div>
       </div>
 
-      {/* Listing */}
       <h2 className="text-2xl font-bold mb-6 px-[2%]">Top Airdropz</h2>
       <div className="flex flex-wrap">
         {filteredAirdrops.map((airdrop) => (

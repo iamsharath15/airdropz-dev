@@ -19,7 +19,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { Save, Trash2 } from 'lucide-react';
+import { Save, Trash } from 'lucide-react';
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
@@ -151,7 +151,7 @@ const CreateWeeklyTaskPage = () => {
                 variant="destructive"
                 className="text-sm sm:text-base px-3 cursor-pointer bg-red-500 hover:bg-red-500/80"
               >
-                <Trash2 className="w-4 h-4 sm:hidden" />
+                <Trash className="w-4 h-4 sm:hidden" />
                 <span className="hidden sm:inline">Delete</span>
               </Button>
             </AlertDialogTrigger>

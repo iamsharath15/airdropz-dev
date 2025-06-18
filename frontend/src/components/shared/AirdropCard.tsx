@@ -24,7 +24,8 @@ const AirdropCard = ({ airdrop }: AirdropCardProps) => {
   return (
 
     <div className="p-[1%] lg:w-3/12 md:w-4/12 sm:w-6/12 w-full">
-      <div className="relative group bg-[#151313] w-full rounded-lg overflow-hidden justify-between cursor-pointer flex flex-col">
+
+      <div className="relative group bg-[#151313] w-full rounded-lg overflow-hidden justify-between cursor-pointer flex flex-col transition-all hover:shadow-xl hover:-translate-y-1 duration-200">
         {/* Edit Icon on Hover */}
         {isAdmin && <EditAirdropFormModal airdrop={airdrop} />}
 
@@ -37,8 +38,9 @@ const AirdropCard = ({ airdrop }: AirdropCardProps) => {
           className="w-full"
         >
           <div className="w-full flex items-center justify-center h-7/12 p-[4%]">
+
             <Image
-              className="object-cover w-full h-full rounded-3xl"
+              className="object-cover w-full h-full rounded-3xl transition-transform group-hover:scale-105 duration-300"
               src={
                 airdrop.preview_image_url ||
                 'https://cdn.lootcrate.me/demo/airdropzimage.png'

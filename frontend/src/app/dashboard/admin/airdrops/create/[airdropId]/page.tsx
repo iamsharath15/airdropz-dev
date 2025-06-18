@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 import AirdropFormEditor from '@/components/shared/dashboard/AirdropFormEditor';
-import { Save, Trash2 } from 'lucide-react';
+import { Save, Trash } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/airdrop/v1';
 
@@ -326,7 +326,7 @@ const CreateAirdropPage = () => {
               onClick={handleDelete}
               className="text-sm sm:text-base px-3 cursor-pointer"
             >
-              <Trash2 className="w-4 h-4 sm:hidden" />
+              <Trash className="w-4 h-4 sm:hidden" />
               <span className="hidden sm:inline">Delete</span>
             </Button>
           )}

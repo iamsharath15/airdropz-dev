@@ -9,7 +9,8 @@ import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import axios from 'axios';
-import { BarChart2 } from 'lucide-react';
+import { BarChart2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TaskSection } from '@/components/shared/TaskSection';
 
 type Airdrop = {
   id: string;
@@ -26,6 +27,7 @@ const Dashboard: React.FC = () => {
 
   const [airdrops, setAirdrops] = useState<Airdrop[]>([]);
   const [loading, setLoading] = useState(true);
+  const [weeklyTasks, setWeeklyTasks] = useState([]);
 
   const [stats, setStats] = useState({
     users: 0,
@@ -67,9 +69,21 @@ const Dashboard: React.FC = () => {
         console.error('Failed to fetch dashboard stats:', error);
       }
     };
+    const fetchWeeklyTasks = async () => {
+      try {
+        const res = await axios.get(
+          'http://localhost:8080/api/weeklytask/v1/top-weekly-tasks',
+          { withCredentials: true }
+        );
+        setWeeklyTasks(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch weekly tasks:', error);
+      }
+    };
 
     fetchTopLiked();
     fetchStats();
+    fetchWeeklyTasks();
   }, []);
 
   return (
@@ -94,6 +108,27 @@ const Dashboard: React.FC = () => {
               emptyMessage="No airdrops found."
             />
           )}{' '}
+          <div className="mb-12">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Top Weekly Task</h2>
+              <div className="flex gap-2">
+                <button
+                  className="text-white/80 hover:text-[#8373EE] cursor-pointer "
+                  aria-label="Scroll Left"
+                >
+                  <ChevronLeft />
+                </button>
+                <button
+                  className="text-white/80 hover:text-[#8373EE] cursor-pointer"
+                  aria-label="Scroll Right"
+                >
+                  <ChevronRight />
+                </button>
+              </div>
+            </div>
+
+            <TaskSection tasks={weeklyTasks} />
+          </div>
           {/* <TasksSection /> */}
         </div>
       </div>

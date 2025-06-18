@@ -7,7 +7,7 @@ import {
   Check,
   Calendar as CalendarIcon,
   ChevronDown,
-  Trash2,
+  Trash,
   FileText,
   CheckSquare,
   Link2,
@@ -184,7 +184,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
             <label className="block text-sm text-white mb-3 font-semibold">
               Task Banner Image
             </label>
-            <label className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-purple-500 transition">
+            <label className="relative flex items-center justify-center w-full h-48 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 cursor-pointer overflow-hidden hover:border-[#8373EE] transition">
               {previewUrl ? (
                 <Image
                   src={previewUrl}
@@ -395,7 +395,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
                       className="absolute top-2 right-2 text-white bg-black hover:bg-red-400 p-1 rounded-md cursor-pointer"
                       onClick={() => removeBlock(index)}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash className="w-4 h-4" />
                     </button>
                     <div className="mt-6">{renderBlock(block, index)}</div>
                   </div>
@@ -468,7 +468,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
                   className=" text-white bg-black hover:bg-red-400 p-1 rounded-md cursor-pointer"
                   onClick={() => removeChecklist(index)}
                 >
-                  <Trash2 />
+                  <Trash />
                 </Button>
               </div>
 

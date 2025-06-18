@@ -12,15 +12,17 @@ interface DailyLoginModalProps {
   };
 }
 
-
-const DailyLoginModal = ({ isOpen, onClose, loginData }: DailyLoginModalProps) => {
+const DailyLoginModal = ({
+  isOpen,
+  onClose,
+  loginData,
+}: DailyLoginModalProps) => {
   const getStreakBonus = () => {
     if (loginData.streakCount >= 7) return '🔥 Fire Streak!';
     if (loginData.streakCount >= 3) return '⚡ Hot Streak!';
     return '🌟 Keep Going!';
   };
-  console.log(loginData.todayPoints);
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogTitle></DialogTitle>
@@ -44,7 +46,7 @@ const DailyLoginModal = ({ isOpen, onClose, loginData }: DailyLoginModalProps) =
                 </div>
               </div>
 
-              <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text ">
                 Daily Check-in
               </h2>
 
@@ -63,7 +65,9 @@ const DailyLoginModal = ({ isOpen, onClose, loginData }: DailyLoginModalProps) =
                   <Flame className="w-6 h-6 text-white" />
                 </div>
                 <div className="text-2xl font-bold text-white">
-              <div className="text-2xl font-bold">{loginData.streakCount}</div>
+                  <div className="text-2xl font-bold">
+                    {loginData.streakCount}
+                  </div>
                 </div>
                 <div className="text-xs text-white">Day Streak</div>
               </div>
@@ -88,36 +92,38 @@ const DailyLoginModal = ({ isOpen, onClose, loginData }: DailyLoginModalProps) =
               </div>
             </div>
 
-           {loginData?.todayPoints && loginData.todayPoints > 0 ? (
-  // ✅ User successfully claimed today
-  <div className="bg-green-600/20 rounded-2xl p-6 border border-green-500/30 mb-6">
-    <div className="flex justify-center mb-3">
-      <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
-        <Star className="w-8 h-8 text-white" />
-      </div>
-    </div>
-    <div className="text-green-400 text-2xl font-bold mb-1">Success!</div>
-    <div className="text-green-300 text-lg">
-      +{loginData.todayPoints} Airdrops Earned 
-    </div>
-    <div className="text-gray-400 text-sm mt-2">
-      Come back tomorrow for more!
-    </div>
-  </div>
-) : (
-  <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700 mb-6">
-    <div className="flex justify-center mb-3">
-      <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center">
-        <Gift className="w-8 h-8 text-gray-400" />
-      </div>
-    </div>
-    <div className="text-gray-300 text-xl font-bold mb-1">Already Checked In</div>
-    <div className="text-gray-400">
-      Your daily reward is waiting for tomorrow!
-    </div>
-  </div>
-)}
-
+            {loginData?.todayPoints && loginData.todayPoints > 0 ? (
+              <div className="bg-green-600/20 rounded-2xl p-6 border border-green-500/30 mb-6">
+                <div className="flex justify-center mb-3">
+                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
+                    <Star className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <div className="text-green-400 text-2xl font-bold mb-1">
+                  Success!
+                </div>
+                <div className="text-green-300 text-lg">
+                  +{loginData.todayPoints} Airdrops Earned
+                </div>
+                <div className="text-gray-400 text-sm mt-2">
+                  Come back tomorrow for more!
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700 mb-6">
+                <div className="flex justify-center mb-3">
+                  <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center">
+                    <Gift className="w-8 h-8 text-gray-400" />
+                  </div>
+                </div>
+                <div className="text-gray-300 text-xl font-bold mb-1">
+                  Already Checked In
+                </div>
+                <div className="text-gray-400">
+                  Your daily reward is waiting for tomorrow!
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
@@ -126,7 +132,3 @@ const DailyLoginModal = ({ isOpen, onClose, loginData }: DailyLoginModalProps) =
 };
 
 export default DailyLoginModal;
-
-
-
-

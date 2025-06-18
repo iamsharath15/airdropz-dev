@@ -27,6 +27,7 @@ const pageTitles: Record<string, Record<string, string>> = {
   user: {
     '/dashboard/user': 'Dashboard',
     '/dashboard/user/airdrops': 'Airdrops',
+    '/dashboard/user/airdrops/*': 'Airdrops',
     '/dashboard/user/weeklytask': 'Weekly Task',
     '/dashboard/user/expertrecommendation': 'Expert Recommendation',
     '/dashboard/user/referandearn': 'Refer & Earn',
@@ -51,11 +52,29 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
   // Get user info from redux store
   const user = useSelector((state: RootState) => state.auth.user);
-console.log(user);
+  function resolvePageTitle(role: 'admin' | 'user', pathname: string): string {
+  const routes = pageTitles[role];
 
-  const pageTitle =
-    pageTitles[role]?.[pathname] ||
-    (role === 'admin' ? 'Admin Dashboard' : 'Dashboard');
+  // Exact match
+  if (routes[pathname]) return routes[pathname];
+
+  // Dynamic path matching
+  if (role === 'user') {
+    if (pathname.startsWith('/dashboard/user/airdrops/')) return 'View Airdrop';
+    if (pathname.startsWith('/dashboard/user/weeklytask/')) return 'Weekly Task Details';
+  }
+
+  if (role === 'admin') {
+    if (pathname.startsWith('/dashboard/admin/airdrops/create/')) return 'Create Airdrop';
+    if (pathname.startsWith('/dashboard/admin/airdrops/')) return 'Edit Airdrop';
+    if (pathname.startsWith('/dashboard/admin/users/')) return 'User Details';
+    if (pathname.startsWith('/dashboard/admin/weeklytask/create/')) return 'Edit Weekly Task';
+  }
+
+  return role === 'admin' ? 'Admin Dashboard' : 'Dashboard';
+}
+
+const pageTitle = resolvePageTitle(role, pathname);
 
   const handleLogout = async () => {
     if (user?.id) {

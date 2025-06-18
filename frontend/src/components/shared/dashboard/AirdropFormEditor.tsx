@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import {
-  Trash2,
+  Trash,
   FileText,
   ImageIcon,
   CheckSquare,
@@ -221,7 +221,7 @@ export default function AirdropFormEditor({
                       onClick={() => removeBlock(index)}
                       type="button"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash className="w-4 h-4" />
                     </button>
                     <div className="mt-6">{renderBlock(block, index)}</div>
                   </div>

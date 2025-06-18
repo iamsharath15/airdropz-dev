@@ -83,6 +83,8 @@ static async getAll(req, res) {
     const result = await pool.query(`
       SELECT 
         wt.*,
+
+        -- tasks array
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
@@ -94,6 +96,8 @@ static async getAll(req, res) {
           ) FILTER (WHERE t.id IS NOT NULL),
           '[]'
         ) AS tasks,
+
+        -- sub_tasks array
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
@@ -105,10 +109,32 @@ static async getAll(req, res) {
             )
           ) FILTER (WHERE st.id IS NOT NULL),
           '[]'
-        ) AS sub_tasks
+        ) AS sub_tasks,
+
+        -- user count
+        COUNT(DISTINCT ut.user_id) AS user_count,
+
+        -- top 5 user images
+        COALESCE((
+          SELECT json_agg(u_data) FROM (
+            SELECT DISTINCT ON (u.id)
+              jsonb_build_object(
+                'user_id', u.id,
+                'user_name', u.user_name,
+                'profile_image', u.profile_image
+              ) AS u_data
+            FROM user_tasks ut2
+            JOIN users u ON u.id = ut2.user_id
+            WHERE ut2.weekly_task_id = wt.id
+            LIMIT 5
+          ) sub
+        ), '[]') AS user_images
+
       FROM weekly_tasks wt
       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
       LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
+      LEFT JOIN user_tasks ut ON ut.weekly_task_id = wt.id
+
       GROUP BY wt.id
       ORDER BY wt.created_at DESC;
     `);
@@ -461,6 +487,53 @@ static async getWeeklyTaskWithUserProgress(req, res) {
     client.release();
   }
 }
+
+static async getTopWeeklyTask(req, res) {
+  const client = await pool.connect();
+
+  try {
+    const result = await client.query(
+      `
+      SELECT 
+        wt.id,
+        wt.start_time,
+        wt.end_time,
+        wt.week,
+        wt.task_title,
+        wt.task_banner_image,
+        wt.task_category,
+
+
+        -- Total number of unique users
+        COUNT(DISTINCT ut.user_id) AS user_count,
+
+        -- Array of user { id, profile_image }
+        COALESCE(
+          json_agg(DISTINCT jsonb_build_object(
+            'user_id', u.id,
+            'user_name', u.user_name,
+            'profile_image', u.profile_image
+          )) FILTER (WHERE u.id IS NOT NULL),
+          '[]'
+        ) AS user_images
+
+      FROM user_tasks ut
+      JOIN weekly_tasks wt ON wt.id = ut.weekly_task_id
+      JOIN users u ON u.id = ut.user_id
+      GROUP BY wt.id
+      ORDER BY wt.start_time DESC;
+      `
+    );
+
+    return res.status(200).json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("❌ getTopWeeklyTask error:", error);
+    return res.status(500).json({ success: false, message: "Failed to fetch weekly tasks" });
+  } finally {
+    client.release();
+  }
+}
+
 
 
 
