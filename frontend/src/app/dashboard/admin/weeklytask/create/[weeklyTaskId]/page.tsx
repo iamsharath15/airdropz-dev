@@ -159,7 +159,7 @@ const CreateWeeklyTaskPage = () => {
           >
             <Save className="w-4 h-4 sm:hidden" />
             <span className="hidden sm:inline">
-              {saving ? 'Update' : 'Create'}
+              {saving ? 'Update' : 'Save'}
             </span>
           </Button>
         </div>
@@ -187,6 +187,3 @@ const CreateWeeklyTaskPage = () => {
   );
 };
 export default CreateWeeklyTaskPage;
-//  task={taskData}
-//         onFileUpload={handleFileUpload}
-//         uploadingTaskId={uploadingTaskId}

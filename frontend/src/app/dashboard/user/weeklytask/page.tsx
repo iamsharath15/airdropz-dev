@@ -152,6 +152,9 @@ export default function WeeklyTaskPage() {
 
         const allTasks = allTasksRes.data.data || [];
         const myTaskList = myTasksRes.data.tasks || [];
+        console.log('all',allTasks);
+        console.log('my',myTaskList);
+        
 
         setWeeklyTasks(allTasks);
         setMyTasks(myTaskList);
@@ -239,7 +242,6 @@ export default function WeeklyTaskPage() {
               ) : (
                 filteredMyTasks.map((task, index) => {
                   const timeLeft = getTimeLeftString(task.end_time);
-                  console.log('hi', task);
 
                   return (
                     <div
@@ -272,7 +274,8 @@ export default function WeeklyTaskPage() {
               {filteredAllTasks.length === 0 ? (
                 <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
                   <p className="text-white/80 text-lg font-medium">
-No tasks found. Start by creating a new task.                  </p>
+                    No tasks found. Start by creating a new task.{' '}
+                  </p>
                 </div>
               ) : (
                 filteredAllTasks.map((task, index) => {

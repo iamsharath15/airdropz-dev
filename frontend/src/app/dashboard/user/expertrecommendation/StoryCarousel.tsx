@@ -92,7 +92,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
     <>
       <div className="flex gap-6 w-full">
         {stories.length === 0 ? (
-          <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+          <div className="bg-[#151313] h-50 w-full flex flex-col items-center justify-center rounded-xl">
             <History size={30} />
             <p className="text-white/80 text-lg font-medium">
               {' '}

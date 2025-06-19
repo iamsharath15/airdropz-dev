@@ -8,7 +8,7 @@ class AdminController {
       const [userCountRes, airdropCountRes, taskCountRes] = await Promise.all([
         client.query('SELECT COUNT(*) FROM users'),
         client.query('SELECT COUNT(*) FROM airdrops'),
-        client.query('SELECT COUNT(*) FROM tasks'),
+        client.query('SELECT COUNT(*) FROM weekly_tasks'),
       ]);
 
       client.release();

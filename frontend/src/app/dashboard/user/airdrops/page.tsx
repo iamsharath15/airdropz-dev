@@ -104,20 +104,28 @@ const AirdropsListing = () => {
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold mb-6 px-[2%]">Top Airdropz</h2>
+      <h2 className="md:text-2xl text-xl font-bold mb-6 ">Top Airdrops</h2>
       <div className="flex flex-wrap">
-        {filteredAirdrops.map((airdrop) => (
-          <AirdropCard
-            key={airdrop.id}
-            airdrop={{
-              id: airdrop.id,
-              title: airdrop.title,
-              category: airdrop.category ?? 'Unknown',
-              preview_image_url: airdrop.preview_image_url ?? '',
-              type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
-            }}
-          />
-        ))}
+        {filteredAirdrops.length === 0 ? (
+          <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+            <p className="text-white/80 text-lg font-medium">
+              No airdrops found. Stay tuned for updates!.{' '}
+            </p>
+          </div>
+        ) : (
+            filteredAirdrops.map((airdrop) => (
+              <AirdropCard
+                key={airdrop.id}
+                airdrop={{
+                  id: airdrop.id,
+                  title: airdrop.title,
+                  category: airdrop.category ?? 'Unknown',
+                  preview_image_url: airdrop.preview_image_url ?? '',
+                  type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
+                }}
+              />
+            ))
+        )}
       </div>
     </div>
   );

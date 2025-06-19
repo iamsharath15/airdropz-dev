@@ -128,7 +128,7 @@ const WeeklyTaskFormModal = () => {
               <span>
                 <SquarePen />
               </span>{' '}
-              Create Weekly Task
+              Create New Task
             </DialogTitle>
           </DialogHeader>
 
@@ -227,7 +227,6 @@ const WeeklyTaskFormModal = () => {
                 </Select>
               </div>
 
-
               <div className="space-y-2 p-1">
                 <Label className="text-sm text-white font-semibold">Week</Label>
                 <Select value={week} onValueChange={setWeek}>
@@ -264,56 +263,57 @@ const WeeklyTaskFormModal = () => {
               </div>
 
               {/* Start Date */}
-              <div className="space-y-2">
+              <div className="space-y-2 flex flex-col items-start justify-center">
                 <Label className="text-sm text-white font-semibold">
-                  Start Date
+                  Choose Date
                 </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal bg-white text-black  border-0 cursor-pointer"
-                    >
-                      <Calendar1 />
-                      {startDate ? format(startDate, 'PPP') : 'Pick a date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white text-black rounded-md shadow-lg">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex  items-center justify-center w-full">
+                  <div className="w-6/12 px-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal bg-white text-black  border-0 cursor-pointer"
+                        >
+                          <Calendar1 />
+                          {startDate ? format(startDate, 'PPP') : 'Start date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white text-black rounded-md shadow-lg">
+                        <Calendar
+                          mode="single"
+                          selected={startDate}
+                          onSelect={setStartDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div className="w-6/12 px-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal bg-white text-black  border-0 cursor-pointer"
+                        >
+                          <Calendar1 />
+                          {endDate ? format(endDate, 'PPP') : 'End date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white text-black rounded-md shadow-lg">
+                        <Calendar
+                          mode="single"
+                          selected={endDate}
+                          onSelect={setEndDate}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
               </div>
 
               {/* End Date */}
-              <div className="space-y-2">
-                <Label className="text-sm text-white/80 font-semibold">
-                  End Date
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal bg-white text-black  border-0 cursor-pointer"
-                    >
-                      <Calendar1 />
-                      {endDate ? format(endDate, 'PPP') : 'Pick a date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white text-black rounded-md shadow-lg">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
 
               {/* Submit */}
               <Button
@@ -361,7 +361,7 @@ const WeeklyTaskFormModal = () => {
                       exit={{ opacity: 0, y: 4 }}
                       transition={{ duration: 0.2 }}
                     >
-                      Create Weekly Task
+                      Create Task
                     </motion.span>
                   )}
                 </AnimatePresence>

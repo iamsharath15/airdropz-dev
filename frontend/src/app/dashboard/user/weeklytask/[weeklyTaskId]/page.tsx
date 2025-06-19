@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 
 import type { TaskData } from '@/types';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '@/store/authSlice';
 
 export default function TaskDetail() {
   const { weeklyTaskId } = useParams();
@@ -21,6 +23,7 @@ export default function TaskDetail() {
   const [error, setError] = useState<string | null>(null);
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
   const [animating, setAnimating] = useState(false);
+  const dispatch = useDispatch();
 
   const fetchTask = async () => {
     try {
@@ -67,6 +70,16 @@ export default function TaskDetail() {
 
       if (response.data.success) {
         toast.success('Task marked as completed!');
+          const updated = response.data.data; // assuming { airdrops_earned, points, ... }
+
+      if (updated?.airdrops_earned !== undefined) {
+        dispatch(
+          updateUser({
+            airdrops_earned: updated.airdrops_earned,
+            airdrops_remaining: updated.airdrops_earned, // if same logic
+          })
+        );
+      }
         await fetchTask();
       } else {
         toast.error('Failed to complete task.');

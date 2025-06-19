@@ -243,7 +243,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
             ) : (
               <button
                 aria-label="User menu"
-                className="w-8 h-8 cursor-pointer rounded-full bg-[#8373EE] flex items-center justify-center select-none text-black font-semibold"
+                className="w-8 h-8 cursor-pointer rounded-full bg-[#8373EE] flex items-center justify-center select-none text-white font-semibold"
               >
                 {userName.charAt(0).toUpperCase()}
               </button>
