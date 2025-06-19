@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { HiMenu, HiX } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -23,7 +23,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const handleNavClick = (href: string) => {
-    setMenuOpen(false); // Close menu with animation
+    setMenuOpen(false);
     router.push(href);
   };
 
@@ -97,7 +97,7 @@ export default function Header() {
               transition={{ duration: 0.3 }}
               className="inline-block"
             >
-              {menuOpen ? <HiX /> : <HiMenu />}
+              {menuOpen ? <X /> : <Menu />}
             </motion.span>
           </AnimatePresence>
         </button>
