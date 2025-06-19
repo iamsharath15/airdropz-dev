@@ -25,7 +25,7 @@ export default function ConfirmDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent className="bg-black text-white border border-zinc-800">
+      <AlertDialogContent className="bg-[#2a2a2a] text-white border border-zinc-800">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-white/80">

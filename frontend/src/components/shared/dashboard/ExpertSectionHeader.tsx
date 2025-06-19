@@ -19,7 +19,6 @@ const ExpertSectionHeader = () => {
         />
       </div>
 
-      {/* Text Content */}
       <div className="relative z-10 w-full lg:w-7/12">
         <span className="inline-block px-3 py-1 mb-3 bg-white/20 text-xs sm:text-sm font-medium rounded-full backdrop-blur-md shadow-sm">
           🎯 Premium Feature
@@ -34,7 +33,7 @@ const ExpertSectionHeader = () => {
         </p>
 
         <Button
-          className="flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-full bg-white text-black hover:bg-gray-200 transition duration-300"
+          className="flex items-center gap-2 px-6 py-2 text-sm font-semibold rounded-full bg-white text-black hover:bg-gray-200 transition duration-300 cursor-pointer"
           aria-label="Join Expert Analysis"
         >
           Join Now <CirclePlay className="w-4 h-4" />

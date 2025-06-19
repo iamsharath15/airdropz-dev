@@ -20,6 +20,7 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { Save, Trash } from 'lucide-react';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
@@ -145,8 +146,13 @@ const CreateWeeklyTaskPage = () => {
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4 bg-zinc-900 shadow-sm rounded-2xl">
         <h1 className="text-xl font-semibold">Edit Weekly Task</h1>
         <div className="flex gap-3">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <ConfirmDialog
+            title="Are you absolutely sure?"
+            description="This action cannot be undone. It will permanently delete this Weekly Task."
+            onConfirm={handleDelete}
+            confirmText="Yes, Remove"
+            cancelText="Cancel"
+            trigger={
               <Button
                 variant="destructive"
                 className="text-sm sm:text-base px-3 cursor-pointer bg-red-500 hover:bg-red-500/80"
@@ -154,28 +160,8 @@ const CreateWeeklyTaskPage = () => {
                 <Trash className="w-4 h-4 sm:hidden" />
                 <span className="hidden sm:inline">Delete</span>
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-[#0F0F0F] text-white border border-zinc-800">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. It will permanently delete this
-                  Weekly Task.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
-                >
-                  Yes, Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            }
+          />
 
           <Button
             onClick={handleSaveChanges}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import StoryCarousel from './StoryCarousel';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,6 @@ const Index = () => {
   const [coverImage, setCoverImage] = useState('');
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
-  // 1️⃣ Fetch stories on mount
   useEffect(() => {
     const fetchStories = async () => {
       try {
@@ -50,7 +49,6 @@ const Index = () => {
     fetchStories();
   }, []);
 
-  // 2️⃣ Create new cover
   const handleCreateCover = async () => {
     if (!coverName || !coverFile) {
       toast.error('Please provide both cover name and image.');
@@ -85,49 +83,31 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white flex w-full flex-col">
-      {/* Expert Analysis */}
      
 <ExpertSectionHeader />
-      {/* Top Recommendation Header */}
-      <div className="flex items-center justify-between mb-6 px-4">
+      <div className="flex items-center justify-between md:mb-6 mb-3 px-4">
         <h3 className="md:text-xl text-lg font-bold">Top Recommendation</h3>
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-8 h-8 p-0 text-gray-400 hover:text-white"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-8 h-8 p-0 text-gray-400 hover:text-white"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
       </div>
 
       {/* Stories Carousel */}
-      <div className="p-4 flex gap-4 overflow-scroll">
+      <div className="flex gap-4 w-full overflow-x-scroll p-4 scrollbar-hidden">
         <div className="">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-[#8373EE]/40 border-2 cursor-pointer border-[#8373EE] rounded-full w-20 h-20 flex items-center justify-center">
+              <Button className="bg-[#8373EE]/40 border-4 cursor-pointer border-[#8373EE] rounded-full md:w-20 md:h-20 w-16 h-16 flex items-center justify-center">
                 <Plus size={20} className="text-[#8373EE]" />
               </Button>
             </DialogTrigger>
             <DialogTitle></DialogTitle>
-            <DialogContent className="bg-[#151313] border-[#151313] max-w-md text-white">
-              <h2 className="text-lg font-bold mb-2">Create New Cover</h2>
+            <DialogContent className="bg-[#2a2a2a] border-0 max-w-md text-white">
+              <h2 className="text-lg font-bold ">Create New Cover</h2>
               <div className="space-y-3">
                 <div>
                   <Label className="mb-3 tetx-sm font-semibold">
                     Cover Name
                   </Label>
                   <Input
-                    className="placeholder:text-white/80"
+                    className="placeholder:text-black border-0 bg-white text-black"
                     value={coverName}
                     onChange={(e) => setCoverName(e.target.value)}
                     placeholder="Top Airdrops June"
@@ -140,7 +120,7 @@ const Index = () => {
                   <Input
                     type="file"
                     accept="image/*"
-                    className="text-white"
+                    className="text-black bg-white file:text-black cursor-pointer"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -153,13 +133,13 @@ const Index = () => {
                   <div className="mt-2">
                     <Label className="mb-1 block">Preview</Label>
                     <div className="w-full flex items-center justify-center flex-col p-[2%]">
-                      <div className="w-20 h-20 rounded-full overflow-hidden">
+                      <div className="w-22 h-22 border-[#8373EE] border-3 rounded-full overflow-hidden ">
                         <Image
                           width={1920}
                           height={1080}
                           src={URL.createObjectURL(coverFile)}
                           alt="Preview"
-                          className="w-full rounded-lg"
+                          className="w-full rounded-lg "
                         />
                       </div>
                       <p className="pt-2 text-sm capitalize">{coverName}</p>
@@ -177,7 +157,7 @@ const Index = () => {
             </DialogContent>
           </Dialog>
 
-          <p className="pt-3 text-white">Add cover</p>
+          <p className="pt-3 text-white text-xs">Add cover</p>
         </div>
         {loading ? (
           <p>Loading...</p>

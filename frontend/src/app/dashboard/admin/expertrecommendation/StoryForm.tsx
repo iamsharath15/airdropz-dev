@@ -34,7 +34,6 @@ const StoryForm: React.FC<StoryFormProps> = ({ coverId, onStoryAdded }) => {
         `expert-stories/story-${Date.now()}`
       );
 
-      // 2️⃣ Submit story with uploaded image URL
       const res = await axios.post(
         'http://localhost:8080/api/expertStories/v1/top-recommendations-stories/story',
         {
@@ -62,18 +61,18 @@ const StoryForm: React.FC<StoryFormProps> = ({ coverId, onStoryAdded }) => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="text-xs py-1 px-2 text-black cursor-pointer"
+          className="text-xs py-1 px-2 border-0 cursor-pointer bg-[#2a2a2a] text-white"
         >
           Add Story
         </Button>
       </DialogTrigger>
       <DialogTitle></DialogTitle>
-      <DialogContent className="bg-[#151313] border-[#151313] max-w-md text-white">
-        <h3 className="text-lg font-bold mb-4">Add Story</h3>
+      <DialogContent className="bg-[#2a2a2a] border-0 max-w-md text-white">
+        <h3 className="text-lg font-bold  ">Add Story</h3>
         <div className="space-y-3">
           <div>
             <Label className="mb-3 text-sm font-semibold">Image</Label>
-            <Input
+            <Input className='bg-white file:text-black border-0 text-black'
               type="file"
               accept="image/*"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
@@ -81,7 +80,7 @@ const StoryForm: React.FC<StoryFormProps> = ({ coverId, onStoryAdded }) => {
           </div>
           <div>
             <Label className="text-sm font-semibold mb-3">Link</Label>
-            <Input className='text-white placeholder:text-white/80' placeholder="add aidrops link" value={link} onChange={(e) => setLink(e.target.value)} />
+            <Input className='bg-white placeholder:text-black border-0 text-black' placeholder="Add aidrops link" value={link} onChange={(e) => setLink(e.target.value)} />
           </div>
           <Button
             onClick={handleSubmit} 

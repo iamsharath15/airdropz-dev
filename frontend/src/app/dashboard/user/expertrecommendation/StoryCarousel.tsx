@@ -3,17 +3,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  ChevronLeft,
+  ChevronRight,
+  History,
+} from 'lucide-react';
 import Image from 'next/image';
 
 import type { StoryCarouselProps, Story } from '@/types';
-
 
 const STORY_DURATION = 5000;
 
 const StoryCarousel: React.FC<StoryCarouselProps> = ({
   stories,
-  setStories,
 }) => {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -29,14 +33,18 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
     intervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          if (currentIndex < (selectedStory.stories.length || 0) - 1) {
-            setCurrentIndex((i) => i + 1);
-            return 0;
-          } else {
+          const isLast = currentIndex >= selectedStory.stories.length - 1;
+
+          if (isLast) {
             closeStory();
-            return 0;
+          } else {
+            setCurrentIndex(currentIndex + 1);
+            setProgress(0);
           }
+
+          return 0;
         }
+
         return prev + 100 / (STORY_DURATION / 100);
       });
     }, 100);
@@ -82,11 +90,15 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
 
   return (
     <>
-      <div className="flex gap-4 flex-wrap">
+      <div className="flex gap-6 w-full">
         {stories.length === 0 ? (
-          <p className="text-gray-400 text-sm bg-red-600">
-            Stories will be added soon.
-          </p>
+          <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+            <History size={30} />
+            <p className="text-white/80 text-lg font-medium">
+              {' '}
+              Recommendation will be added soon.
+            </p>
+          </div>
         ) : (
           stories.map((story, index) => (
             <div
@@ -95,9 +107,9 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
             >
               <div
                 onClick={() => openStory(story)}
-                className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 mb-2 group-hover:scale-105 transition-transform relative"
+                className="md:w-20 md:h-20 w-16 h-16 rounded-full bg-[#8373EE] p-1 mb-2 group-hover:scale-105 transition-transform relative"
               >
-                <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
+                <div className="md:w-18 md:h-18 w-14 h-14 bg-gray-800 rounded-full overflow-hidden">
                   <Image
                     src={story.cover_image}
                     alt={story.cover_name}
@@ -105,13 +117,8 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                     height={80}
                   />
                 </div>
-                {/* {story.stories.length > 1 && (
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-                  {story.stories.length}
-                </span>
-              )} */}
               </div>
-              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+              <span className="text-sm text-gray-300 group-hover:text-white transition-colors capitalize">
                 {story.cover_name}
               </span>
             </div>
@@ -124,19 +131,14 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
         onOpenChange={(open) => !open && closeStory()}
       >
         <DialogTitle></DialogTitle>
-        <DialogContent
-          className="bg-gray-900 border-gray-700 max-w-md p-0"
-          onPointerDownOutside={(e) => e.preventDefault()}
-        >
+        <DialogContent className="bg-[#2a2a2a] max-w-md p-0 border-0 ">
           {selectedStory &&
             (selectedStory.stories.length === 0 ? (
-              <div className="p-6 text-center text-white flex flex-col items-center">
-                <p className="text-gray-400 mb-4">
-                  Stories will be added soon. Come back later.
+              <div className="p-6 text-center text-white flex justify-center gap-5 flex-col h-[400px] items-center py-[10%]">
+                <History size={50} />
+                <p className="text-white mb-4 w-8/12 font-semibold">
+                  Recommendation will be added soon. Come back later.
                 </p>
-                <Button onClick={closeStory} variant="outline">
-                  Close
-                </Button>
               </div>
             ) : (
               currentStory && (
@@ -185,7 +187,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 absolute z-30 right-4">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -193,15 +195,15 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                           e.stopPropagation();
                           togglePlayPause();
                         }}
-                        className="text-gray-400 hover:text-white"
+                        className="text-gray-400 hover:text-white hover:bg-[#8373EE] cursor-pointer"
                       >
                         {isPlaying ? (
-                          <Pause className="w-4 h-4" />
+                          <Pause className="w-4 h-4 " />
                         ) : (
                           <Play className="w-4 h-4" />
                         )}
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="ghost"
                         size="sm"
                         onClick={(e) => {
@@ -211,12 +213,12 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                         className="text-gray-400 hover:text-white"
                       >
                         <X className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
 
                   <div
-                    className="absolute left-0 w-1/12 h-full z-10 cursor-pointer flex items-center justify-start px-2"
+                    className="absolute z-10 left-0 w-1/12 h-full  cursor-pointer flex items-center justify-start px-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       goToPrev();
@@ -235,18 +237,20 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                   </div>
 
                   <div className="w-full flex flex-col items-center relative">
-                    <Image
-                      src={currentStory.image}
-                      alt="story"
-                      width={400}
-                      height={600}
-                      className="rounded-lg object-contain"
-                    />
+                    <div className="w-[400px] h-[400px]">
+                      <Image
+                        src={currentStory.image}
+                        alt="story"
+                        width={400}
+                        height={400}
+                        className="rounded-lg object-cover h-full"
+                      />
+                    </div>
                     <a
                       href={currentStory.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-6/12 bg-purple-600 hover:bg-purple-700 text-white text-center mt-4 py-2 rounded-md"
+                      className="mb-4 w-6/12 bg-[#8373EE] hover:bg-[#8373EE]/80 text-white text-center mt-4 py-2 rounded-md"
                     >
                       Visit Link
                     </a>

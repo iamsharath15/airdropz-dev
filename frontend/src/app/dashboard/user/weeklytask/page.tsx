@@ -231,12 +231,16 @@ export default function WeeklyTaskPage() {
 
             <div className="flex flex-wrap">
               {filteredMyTasks.length === 0 ? (
-                <p className="text-gray-400">No tasks started yet.</p>
+                <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+                  <p className="text-white/80 text-lg font-medium">
+                    No tasks started yet.
+                  </p>
+                </div>
               ) : (
                 filteredMyTasks.map((task, index) => {
                   const timeLeft = getTimeLeftString(task.end_time);
-                  console.log('hi',task);
-                  
+                  console.log('hi', task);
+
                   return (
                     <div
                       key={index}
@@ -265,17 +269,24 @@ export default function WeeklyTaskPage() {
             </div>
 
             <div className="flex flex-wrap">
-              {filteredAllTasks.map((task, index) => {
-                const timeLeft = getTimeLeftString(task.end_time);
-                return (
-                  <div
-                    key={index}
-                    className="lg:w-3/12 md:w-4/12 sm:w-6/12 w-full p-[1%]"
-                  >
-                    <WeeklyTaskCard task={task} timeLeft={timeLeft} />
-                  </div>
-                );
-              })}
+              {filteredAllTasks.length === 0 ? (
+                <div className="bg-[#151313] h-50 w-full flex items-center justify-center rounded-xl">
+                  <p className="text-white/80 text-lg font-medium">
+No tasks found. Start by creating a new task.                  </p>
+                </div>
+              ) : (
+                filteredAllTasks.map((task, index) => {
+                  const timeLeft = getTimeLeftString(task.end_time);
+                  return (
+                    <div
+                      key={index}
+                      className="lg:w-3/12 md:w-4/12 sm:w-6/12 w-full p-[1%]"
+                    >
+                      <WeeklyTaskCard task={task} timeLeft={timeLeft} />
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

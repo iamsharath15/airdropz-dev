@@ -44,7 +44,7 @@ const SkeletonLoader = () => (
 );
 
 const AdminSettings: React.FC = () => {
-  useRoleRedirect('user');
+  useRoleRedirect('admin');
   const [activeTab, setActiveTab] = useState<Tab>('Account');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'user1';

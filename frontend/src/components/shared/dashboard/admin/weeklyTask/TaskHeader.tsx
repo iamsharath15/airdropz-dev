@@ -38,7 +38,7 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
   selectedWeek,
 }) => {
   const inputId = useId();
- const userRole = useSelector((state: RootState) => state.auth.user?.role);
+  const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isAdmin = userRole === 'admin';
 
   return (
@@ -58,9 +58,7 @@ export const TaskHeader: React.FC<TaskHeaderProps> = ({
       </div>
 
       <div className="flex gap-2 w-6/12 items-center justify-end">
-                {isAdmin &&  <WeeklyTaskFormModal />}
-
-       
+        {isAdmin && <WeeklyTaskFormModal />}
 
         <Select
           value={selectedCategory}

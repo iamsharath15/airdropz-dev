@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus } from 'lucide-react';
+import { ChevronDownIcon, Plus } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import {
@@ -147,7 +147,7 @@ const AirdropFormModal = () => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="md:w-[950px] bg-[#151313] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center border-0">
+      <DialogContent className="md:w-[950px] bg-[#2a2a2a] w-11/12 max-h-[90vh] rounded-xl flex items-center justify-center border-0">
         <div className="overflow-y-auto max-h-[80vh] pr-1 scrollable-modal w-full touch-pan-y">
           <DialogHeader>
             <DialogTitle className="text-white">Create New Airdrop</DialogTitle>
@@ -166,7 +166,7 @@ const AirdropFormModal = () => {
                     className="rounded-lg mb-2 object-cover"
                   />
                 ) : (
-                  <div className="w-full h-[180px] rounded-lg mb-2 bg-gradient-to-br from-purple-700 via-indigo-700 to-blue-700 flex items-center justify-center text-white text-sm">
+                  <div className="w-full h-[180px] font-semibold rounded-lg mb-2 bg-[#8373EE] flex items-center justify-center text-white text-sm">
                     No Image Selected
                   </div>
                 )}
@@ -195,7 +195,7 @@ const AirdropFormModal = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="cursor-pointer text-white file:text-white"
+                  className="cursor-pointer text-black file:text-black bg-white"
                 />
               </div>
 
@@ -203,7 +203,7 @@ const AirdropFormModal = () => {
               <div className="space-y-2">
                 <Label className="text-white">Airdrop Name</Label>
                 <Input
-                  className="text-white placeholder:text-white"
+                  className="text-black placeholder:text-black bg-white focus-visible:border-[#8373EE] "
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter name"
@@ -221,8 +221,10 @@ const AirdropFormModal = () => {
                         : setCategory(val)
                     }
                   >
-                    <SelectTrigger className="cursor-pointer">
-                      <SelectValue placeholder="Select category" />
+                    <SelectTrigger hideIcon className="cursor-pointer w-full text-black placeholder:text-black bg-white">
+                      <SelectValue placeholder="Select category" className='text-black placeholder:text-black' />
+                                    <ChevronDownIcon className="inline h-4 w-4 text-black" />
+
                     </SelectTrigger>
                     <SelectContent>
                       {defaultCategories.map((cat) => (
@@ -252,8 +254,10 @@ const AirdropFormModal = () => {
                   value={type}
                   onValueChange={(val) => setType(val as 'Free' | 'Paid')}
                 >
-                  <SelectTrigger className="cursor-pointer">
+                  <SelectTrigger hideIcon className="cursor-pointer w-full text-black placeholder:text-black bg-white">
                     <SelectValue placeholder="Select type" />
+                                                        <ChevronDownIcon className="inline h-4 w-4 text-black" />
+
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Free">Free</SelectItem>
@@ -263,7 +267,7 @@ const AirdropFormModal = () => {
               </div>
 
               <Button
-                className="bg-[#8373EE] cursor-pointer hover:bg-[#8373EE]/80"
+                className="bg-[#8373EE] md:w-7/12  w-full  cursor-pointer hover:bg-[#8373EE]/80"
                 onClick={handleCreate}
                 disabled={isSubmitting}
               >

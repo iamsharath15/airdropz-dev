@@ -143,32 +143,15 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
       console.error('Error marking as read:', err);
     }
   };
-  const formatTimeAgo = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+ const formatTimeAgo = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
 
-    const intervals: [number, string][] = [
-      [60, 'second'],
-      [60 * 60, 'minute'],
-      [60 * 60 * 24, 'hour'],
-      [60 * 60 * 24 * 7, 'day'],
-      [60 * 60 * 24 * 30, 'week'],
-      [60 * 60 * 24 * 365, 'month'],
-      [Infinity, 'year'],
-    ];
+  return `${diffInHours} hr${diffInHours !== 1 ? 's' : ''} ago`;
+};
 
-    let unit = 'second';
-    let value = seconds;
-
-    for (let i = 0; i < intervals.length; i++) {
-      if (seconds < intervals[i][0]) break;
-      value = Math.floor(seconds / intervals[i][0]);
-      unit = intervals[i][1];
-    }
-
-    return `${value} ${unit}${value !== 1 ? 's' : ''} ago`;
-  };
 
   return (
     <header className="h-16 border-b border-[#272727] px-6 flex items-center justify-between bg-black">
@@ -198,9 +181,9 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-80 max-h-72 overflow-y-auto bg-[#121212] border border-[#272727] rounded-md shadow-lg text-white"
+              className="w-80 max-h-72 overflow-y-auto rounded-md shadow-lg text-white bg-[#2a2a2a] border-white/10"
             >
-              <DropdownMenuLabel className="px-4 py-3 text-base font-semibold border-b border-[#272727]">
+              <DropdownMenuLabel className="px-4 py-3 text-base font-semibold border-b border-white/10">
                 Notifications
               </DropdownMenuLabel>
 
@@ -243,10 +226,6 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                 )}
               </div>
 
-              <DropdownMenuSeparator className="bg-[#272727]" />
-              <div className="px-4 py-2 text-sm text-center text-purple-400 hover:underline cursor-pointer">
-                View All Notifications
-              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -264,7 +243,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
             ) : (
               <button
                 aria-label="User menu"
-                className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold"
+                className="w-8 h-8 cursor-pointer rounded-full bg-[#8373EE] flex items-center justify-center select-none text-black font-semibold"
               >
                 {userName.charAt(0).toUpperCase()}
               </button>
@@ -273,7 +252,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
           <DropdownMenuContent
             align="end"
             sideOffset={5}
-            className="text-black"
+            className="text-white bg-[#2a2a2a] border-white/10"
           >
             <DropdownMenuLabel className="px-4 py-2">
               Profile
@@ -294,15 +273,15 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                   )}
                 </div>
                 <div className="flex flex-col items-start justify-center">
-                  <div className="mt-1 text-sm font-medium">{userName}</div>
-                  <div className="text-xs text-gray-600 truncate">
+                  <div className="mt-1 text-sm font-medium text-white">{userName}</div>
+                  <div className="text-xs text-white truncate">
                     {userEmail}
                   </div>
                 </div>
               </div>
             </DropdownMenuLabel>
 
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className='bg-white/10' />
 
             <DropdownMenuItem
               onSelect={handleAccountSettings}
@@ -311,11 +290,11 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
               Account Settings
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className='bg-white/10' />
 
             <DropdownMenuItem
               onSelect={handleLogout}
-              className="cursor-pointer px-4 py-2 text-red-600 font-semibold hover:bg-gray-100"
+              className="cursor-pointer px-4 py-2  hover:bg-red-400"
             >
               Logout
             </DropdownMenuItem>

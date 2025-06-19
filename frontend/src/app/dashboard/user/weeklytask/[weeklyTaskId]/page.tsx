@@ -10,19 +10,9 @@ import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 import type { TaskData } from '@/types';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
 export default function TaskDetail() {
   const { weeklyTaskId } = useParams();
@@ -138,40 +128,22 @@ export default function TaskDetail() {
           animate={animating ? { scale: [1, 1.3, 1] } : {}}
           transition={{ duration: 0.3 }}
         >
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <ConfirmDialog
+            title="Remove this task ?"
+            description="This will remove the task from My Tasks."
+            onConfirm={handleRemoveTask}
+            confirmText="Yes, Remove"
+            cancelText="Cancel"
+            trigger={
               <Button
                 className={`cursor-pointer md:p-2 p-1 rounded-full transition-all hover:bg-[#8373EE]/40
               bg-white/30
             `}
               >
-                <CalendarOff
-                  className="w-5 h-5"
-                  // fill={liked ? '#8373EE' : 'none'}
-                  // color={liked ? '#8373EE' : 'white'}
-                />
+                <CalendarOff className="w-5 h-5" />
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-black text-white border border-zinc-800">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Remove this task?</AlertDialogTitle>
-                <AlertDialogDescription className="text-white/80">
-                  This will remove the task from My Tasks.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white cursor-pointer border-0 hover:text-white">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleRemoveTask}
-                  className="bg-red-500 hover:bg-red-500/80 text-white cursor-pointer"
-                >
-                  Yes, Remove
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            }
+          />
         </motion.div>
       </div>
       <WeeklyTaskTemplate

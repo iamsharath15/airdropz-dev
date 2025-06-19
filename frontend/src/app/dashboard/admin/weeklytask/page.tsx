@@ -5,7 +5,7 @@ import axios from 'axios';
 import { TaskHeader } from '@/components/shared/dashboard/admin/weeklyTask/TaskHeader';
 import { TaskSection } from '@/components/shared/TaskSection';
 import { WeeklyTask } from '@/types';
-
+import { History } from 'lucide-react';
 
 export default function WeeklyTaskPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -77,7 +77,19 @@ export default function WeeklyTaskPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">Weekly Task</h2>
             </div>
-            <TaskSection title="Weekly Tasks" tasks={filteredAndSortedTasks} />
+            {filteredAndSortedTasks.length === 0 ? (
+              <div className="bg-[#151313] h-50 w-full flex items-center flex-col justify-center rounded-xl px-4">
+                <History  size={30}/>
+                <p className="text-white/80 text-lg font-medium text-center pt-4">
+                  No tasks found. Start by creating a new task.{' '}
+                </p>
+              </div>
+            ) : (
+              <TaskSection
+                title="Weekly Tasks"
+                tasks={filteredAndSortedTasks}
+              />
+            )}
           </div>
         </div>
       </main>

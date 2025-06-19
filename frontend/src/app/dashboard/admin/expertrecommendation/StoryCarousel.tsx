@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
-  X,
   Play,
   Pause,
   ChevronLeft,
   ChevronRight,
   Trash,
+  History,
 } from 'lucide-react';
 import Image from 'next/image';
 import StoryForm from './StoryForm';
@@ -17,8 +17,6 @@ import axios from 'axios';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { toast } from 'sonner';
 import type { StoryCarouselProps, Story } from '@/types';
-
-
 
 const STORY_DURATION = 5000;
 
@@ -40,14 +38,18 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
     intervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          if (currentIndex < (selectedStory.stories.length || 0) - 1) {
-            setCurrentIndex((i) => i + 1);
-            return 0;
-          } else {
+          const isLast = currentIndex >= selectedStory.stories.length - 1;
+
+          if (isLast) {
             closeStory();
-            return 0;
+          } else {
+            setCurrentIndex(currentIndex + 1);
+            setProgress(0);
           }
+
+          return 0;
         }
+
         return prev + 100 / (STORY_DURATION / 100);
       });
     }, 100);
@@ -92,11 +94,6 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
   };
 
   const handleDelete = async (coverId: number) => {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this story cover?'
-    );
-    if (!confirmed) return;
-
     try {
       await axios.delete(
         `http://localhost:8080/api/expertStories/v1/top-recommendations-stories/${coverId}`
@@ -111,11 +108,6 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
   };
 
   const handleDeleteStory = async (storyId: number) => {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this story?'
-    );
-    if (!confirmed) return;
-
     try {
       await axios.delete(
         `http://localhost:8080/api/expertStories/v1/top-recommendations-stories/story/${storyId}`
@@ -149,11 +141,14 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
 
   return (
     <>
-      <div className="flex gap-4 flex-wrap">
+      <div className="flex gap-6 w-full">
         {stories.length === 0 ? (
-          <p className="text-gray-400 text-sm bg-red-600">
-            Stories will be added soon.
-          </p>
+          <div className="bg-[#151313] h-auto w-full flex flex-col items-center justify-center rounded-xl px-4">
+            <History size={23} />
+            <p className="text-center text-sm font-medium pt-2">
+              No recommendations available. Use ‘Add Cover’ to create one.{' '}
+            </p>
+          </div>
         ) : (
           stories.map((story, index) => (
             <div
@@ -175,15 +170,19 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
 
               <div
                 onClick={() => openStory(story)}
-                className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-1 mb-2 group-hover:scale-105 transition-transform relative"
+                className="md:w-20 md:h-20 w-16 h-16 rounded-full bg-[#8373EE] p-1 mb-2 group-hover:scale-105 transition-transform relative"
               >
-                <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
-                  <Image
-                    src={story.cover_image || ''}
-                    alt={story.cover_name}
-                    width={80}
-                    height={80}
-                  />
+                <div className="md:w-18 md:h-18 w-14 h-14 bg-gray-800 rounded-full overflow-hidden">
+                  {story.cover_image ? (
+                    <Image
+                      src={story.cover_image}
+                      alt={story.cover_name}
+                      width={80}
+                      height={80}
+                    />
+                  ) : (
+                    <div className="w-[80px] h-[80px] bg-gray-200 rounded" />
+                  )}
                 </div>
               </div>
               <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
@@ -212,19 +211,14 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
         onOpenChange={(open) => !open && closeStory()}
       >
         <DialogTitle></DialogTitle>
-        <DialogContent
-          className="bg-gray-900 border-gray-700 max-w-md p-0"
-          onPointerDownOutside={(e) => e.preventDefault()}
-        >
+        <DialogContent className="bg-[#2a2a2a] max-w-md p-0 border-0 ">
           {selectedStory &&
             (selectedStory.stories.length === 0 ? (
-              <div className="p-6 text-center text-white flex flex-col items-center">
-                <p className="text-gray-400 mb-4">
-                  Stories will be added soon. Come back later.
+              <div className="p-6 text-center text-white flex justify-center gap-5 flex-col h-[400px] items-center py-[10%]">
+                <History size={50} />
+                <p className="text-white mb-4 w-8/12 font-semibold">
+                  Recommendation will be added soon. Come back later.
                 </p>
-                <Button onClick={closeStory} variant="outline">
-                  Close
-                </Button>
               </div>
             ) : (
               currentStory && (
@@ -254,12 +248,16 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
                         <div className="w-full h-full bg-gray-800 rounded-full overflow-hidden">
-                          <Image
-                            src={selectedStory.cover_image}
-                            alt="cover"
-                            width={100}
-                            height={100}
-                          />
+                          {selectedStory.cover_image ? (
+                            <Image
+                              src={selectedStory.cover_image}
+                              alt="cover"
+                              width={100}
+                              height={100}
+                            />
+                          ) : (
+                            <div className="w-[100px] h-[100px] bg-gray-700 rounded-full" />
+                          )}
                         </div>
                       </div>
                       <div>
@@ -273,7 +271,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 absolute z-30 right-4">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -281,30 +279,19 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                           e.stopPropagation();
                           togglePlayPause();
                         }}
-                        className="text-gray-400 hover:text-white"
+                        className="text-gray-400 hover:text-white hover:bg-[#8373EE] cursor-pointer"
                       >
                         {isPlaying ? (
-                          <Pause className="w-4 h-4" />
+                          <Pause className="w-4 h-4 " />
                         ) : (
                           <Play className="w-4 h-4" />
                         )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          closeStory();
-                        }}
-                        className="text-gray-400 hover:text-white"
-                      >
-                        <X className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
 
                   <div
-                    className="absolute left-0 w-1/12 h-full z-10 cursor-pointer flex items-center justify-start px-2"
+                    className="absolute z-10 left-0 w-1/12 h-full  cursor-pointer flex items-center justify-start px-2"
                     onClick={(e) => {
                       e.stopPropagation();
                       goToPrev();
@@ -323,30 +310,44 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
                   </div>
 
                   <div className="w-full flex flex-col items-center relative">
-                    <Image
-                      src={currentStory.image}
-                      alt="story"
-                      width={400}
-                      height={600}
-                      className="rounded-lg object-contain"
-                    />
+                    <div className="w-[400px] h-[400px]">
+                      {currentStory.image ? (
+                        <Image
+                          src={currentStory.image}
+                          alt="story"
+                          width={400}
+                          height={400}
+                          className="rounded-lg object-cover h-full"
+                        />
+                      ) : (
+                        <div className="w-[400px] h-[400px] bg-gray-700 rounded-lg" />
+                      )}
+                    </div>
                     <a
                       href={currentStory.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-6/12 bg-purple-600 hover:bg-purple-700 text-white text-center mt-4 py-2 rounded-md"
+                      className="mb-4 w-6/12 bg-[#8373EE] hover:bg-[#8373EE]/80 text-white text-center mt-4 py-2 rounded-md"
                     >
                       Visit Link
                     </a>
 
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteStory(currentStory.id)}
-                      className="mt-3"
-                    >
-                      Delete This Story
-                    </Button>
+                    <ConfirmDialog
+                      title="Remove this Story ?"
+                      description="This will remove the Story from Top Recommendation"
+                      onConfirm={() => handleDeleteStory(currentStory.id)}
+                      confirmText="Yes, Remove"
+                      cancelText="Cancel"
+                      trigger={
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="mb-4 cursor-pointer bg-red-500 hover:bg-red-400"
+                        >
+                          Delete This Story
+                        </Button>
+                      }
+                    />
                   </div>
                 </div>
               )
