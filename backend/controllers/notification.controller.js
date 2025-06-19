@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import { sendSuccess, sendError } from '../utils/response.js';
+import { createUserNotification } from '../services/notificationService.js';
 
 export class NotificationController {
   async getUserNotifications(req, res) {
@@ -54,26 +55,15 @@ export class NotificationController {
       });
     }
     try {
-      const result = await pool.query(
-        `INSERT INTO notifications (user_id, type, title, message, target_url, points_earned)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING *`,
-        [user_id, type, title, message, target_url, points_earned]
-      );
+        const createNotification = await createUserNotification({
+      user_id,
+      type,
+      title,
+      message,
+      target_url,
+      points_earned,
+    });
 
-      const createNotification = result.rows[0];
-
-      // Delete older notifications if more than 30
-      await pool.query(
-        `DELETE FROM notifications
-         WHERE id IN (
-         SELECT id FROM notifications
-         WHERE user_id = $1
-         ORDER BY created_at DESC
-         OFFSET 30
-       )`,
-        [user_id]
-      );
       return sendSuccess(
         res,
         createNotification,

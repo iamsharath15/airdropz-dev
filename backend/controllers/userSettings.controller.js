@@ -1,7 +1,7 @@
 import pool from '../config/db.js';
+import { sendSuccess, sendError } from '../utils/response.js';
 
 class UserSettingsController {
-  // GET /api/settings
   static async getSettings(req, res) {
     const userId = req.user.userId;
 
@@ -10,34 +10,44 @@ class UserSettingsController {
         `SELECT user_name, profile_image, wallet_address FROM users WHERE id = $1`,
         [userId]
       );
- if (userResult.rows.length === 0) {
-        return res.status(404).json({ message: 'User not found' });
+
+      if (userResult.rows.length === 0) {
+        return sendError(res, 'User not found with the given ID.', 404);
       }
 
       const user = userResult.rows[0];
+
       const settingsResult = await pool.query(
         `SELECT new_airdrop_alerts, weekly_reports, task_reminders, mode, language
          FROM user_settings WHERE user_id = $1`,
         [userId]
       );
 
-     console.log(settingsResult.rows[0]);
-     
       const settings = settingsResult.rows[0] || {};
 
-      return res.status(200).json({
+      const userData = {
         user_name: user.user_name,
         profile_image: user.profile_image,
-        wallet_address: user.wallet_address, // from `users` table
-        ...settings, // includes notification/display settings
-      });
+        wallet_address: user.wallet_address,
+        ...settings,
+      };
+
+      return sendSuccess(
+        res,
+        userData,
+        'User data with settings fetched successfully',
+        200
+      );
     } catch (error) {
-      console.error('Error fetching settings:', error);
-      res.status(500).json({ message: 'Failed to fetch settings' });
+      return sendError(
+        res,
+        'An error occurred while retrieving user settings. Please try again later',
+        500,
+        error
+      );
     }
   }
 
-  // PATCH /api/settings
   static async updateAllSettings(req, res) {
     const userId = req.user.userId;
     const {
@@ -52,7 +62,6 @@ class UserSettingsController {
     } = req.body;
 
     try {
-      // Update users table (if provided)
       if (user_name || profile_image || wallet_address) {
         await pool.query(
           `UPDATE users SET
@@ -64,7 +73,6 @@ class UserSettingsController {
         );
       }
 
-      // Update user_settings table (if provided)
       await pool.query(
         `UPDATE user_settings SET
           new_airdrop_alerts = $1,
@@ -86,31 +94,38 @@ class UserSettingsController {
         `SELECT user_name, profile_image, wallet_address FROM users WHERE id = $1`,
         [userId]
       );
-      console.log(userResult);
-            console.log(userId);
 
-if (userResult.rows.length === 0) {
-  return res.status(404).json({ message: 'User not found after update' });
-}
+      if (userResult.rows.length === 0) {
+        return sendError(res, 'User not found after update.', 404);
+      }
       const settingsResult = await pool.query(
         `SELECT new_airdrop_alerts, weekly_reports, task_reminders, mode, language
-       FROM user_settings WHERE user_id = $1`,
+         FROM user_settings WHERE user_id = $1`,
         [userId]
       );
 
       const user = userResult.rows[0];
       const settings = settingsResult.rows[0] || {};
 
-      res.status(200).json({
-        message: 'All settings updated',
+      const userData = {
         user_name: user.user_name,
         profile_image: user.profile_image,
         wallet_address: user.wallet_address,
         ...settings,
-      });
+      };
+      return sendSuccess(
+        res,
+        userData,
+        'User profile and settings updated successfully.',
+        200
+      );
     } catch (error) {
-      console.error('Error updating settings:', error);
-      res.status(500).json({ message: 'Failed to update settings' });
+      return sendError(
+        res,
+        'An error occurred while updating settings. Please try again later.',
+        500,
+        error
+      );
     }
   }
 }

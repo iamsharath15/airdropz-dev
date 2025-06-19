@@ -12,19 +12,19 @@ import type { RootState } from '@/store';
 import type { ProfileStatsProps } from '@/types';
 
 const ProfileStats: React.FC<ProfileStatsProps> = ({
-  totalReferrals,
-  totalEarned,
-  referralCode,
+  total_referrals,
+  total_earned,
+  referral_code,
 }) => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.user_name || 'User';
-
+  const user_name = user?.user_name || 'User';
+  const user_profile = user?.profile_image || '';
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(referralCode);
+    navigator.clipboard.writeText(referral_code);
     toast.success('Referral code copied to clipboard');
   };
   const shareOnPlatform = (platform: string) => {
-    const encodedLink = encodeURIComponent(referralCode);
+    const encodedLink = encodeURIComponent(referral_code);
     const encodedMessage = encodeURIComponent('Join me and earn rewards! 🎉');
 
     let shareUrl = '';
@@ -51,9 +51,19 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
     <div className="rounded-2xl bg-[#151313] p-6 shadow-sm mb-8">
       <div className="flex w-full flex-col md:flex-row">
         <div className="md:w-3/12 w-full flex items-center justify-center p-[2%]">
-          <div className="rounded-full bg-[#8373EE] w-[150px] h-[150px] flex items-center justify-center font-bold text-3xl">
-            {userName.charAt(0).toUpperCase()}
-          </div>
+          {user_profile ? (
+            <Image
+              src={user_profile}
+              alt="User Profile"
+              width={150}
+              height={150}
+              className="rounded-full object-cover shadow-md"
+            />
+          ) : (
+            <div className="rounded-full bg-[#8373EE] w-[150px] h-[150px] flex items-center justify-center font-bold text-3xl">
+              {user_name.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         <div className="md:w-9/12 w-full flex items-center justify-start flex-col">
           <div className="flex items-center w-full justify-center md:flex-row flex-col py-2">
@@ -65,7 +75,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
                 <div className=" flex items-start justify-center flex-col">
                   <p className="text-sm text-white mb-1">TOTAL REFERRALS</p>
                   <p className="text-3xl font-bold text-white">
-                    {totalReferrals}
+                    {total_referrals}
                   </p>
                 </div>
               </div>
@@ -82,7 +92,7 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
                 </div>
                 <div className=" flex items-start justify-center flex-col">
                   <p className="text-sm text-white mb-1">TOTAL EARNED</p>
-                  <p className="text-3xl font-bold text-white">{totalEarned}</p>
+                  <p className="text-3xl font-bold text-white">{total_earned}</p>
                 </div>
               </div>
             </div>
@@ -93,42 +103,34 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
             <div className="flex flex-col items-start justify-center w-full">
               <div className="w-full flex bg-black justify-between items-center p-[1.5%] rounded-2xl flex-row gap-4 ">
                 <p className="text-white break-all text-sm px-2 md:w-6/12 w-7/12">
-                  {referralCode}
+                  {referral_code}
                 </p>
 
-                {/* Buttons */}
                 <div className="gap-2 flex overflow-hidden md:w-6/12 w-5/12">
-                  {/* Copy Button */}
                   <Button
                     variant="secondary"
                     onClick={copyToClipboard}
                     className="cursor-pointer gap-2 w-1/2"
                   >
-                    {/* Show icon on mobile */}
                     <Copy className="h-2 w-2 block md:hidden" />
-                    {/* Show icon + text on desktop */}
                     <span className="hidden md:inline-flex gap-2 items-center">
                       <Copy className="h-4 w-4" /> Copy
                     </span>
                   </Button>
 
-                  {/* Share Dropdown */}
                   <div className="relative group inline-block w-1/2 ">
                     <div className="flex">
                       <Button
                         variant="default"
                         className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer flex items-center gap-2 w-full"
                       >
-                        {/* Mobile icon only */}
                         <Share2 className="h-2 w-2 block md:hidden" />
-                        {/* Desktop icon + text */}
                         <span className="hidden md:inline-flex items-center gap-2">
                           <Share2 className="h-4 w-4" /> Share
                         </span>
                       </Button>
                     </div>
 
-                    {/* Dropdown menu */}
                     <div className="absolute invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 flex flex-col gap-2 p-2 bg-[#1c1c1c] border border-gray-800 rounded-xl top-full mt-2 right-0 z-10 min-w-[160px]">
                       <Button
                         variant="ghost"
@@ -158,9 +160,8 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
                 </div>
               </div>
 
-              {/* Reward Text */}
               <p className="text-yellow-500 mt-4 font-medium flex items-center gap-1">
-                Get 50
+                Get + 50
                 <span className="inline-block px-1">
                   <Image
                     src="https://cdn.lootcrate.me/svg/airdrop.svg"

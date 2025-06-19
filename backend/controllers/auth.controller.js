@@ -11,6 +11,7 @@ import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js
 // } from '../utils/emailService/email.js';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
 import { generateReferralCode } from '../utils/generateReferralCode.js';
+import { createUserNotification } from '../services/notificationService.js';
 
 class UserController {
   static async registerUser(req, res) {
@@ -61,9 +62,9 @@ class UserController {
       const defaultUserRole = 'user';
 
       const insertUserResult = await pool.query(
-        `INSERT INTO users (user_name, email, password, referral_code, verification_token, verification_token_expires_at, role)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, user_name, email, referral_code, role`,
+        `INSERT INTO users (user_name, email, password, referral_code, verification_token, verification_token_expires_at, role, airdrops_earned)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, user_name, email, referral_code, role, airdrops_earned`,
         [
           userName,
           email,
@@ -72,16 +73,25 @@ class UserController {
           verificationToken,
           verificationTokenExpiry,
           defaultUserRole,
+          0,
         ]
       );
 
       const newUser = insertUserResult.rows[0];
       await pool.query(
         `INSERT INTO user_settings (user_id)
-   VALUES ($1)
+      VALUES ($1)
    ON CONFLICT (user_id) DO NOTHING`,
         [newUser.id]
       );
+      await createUserNotification({
+        user_id: newUser.id,
+        type: 'welcome',
+        title: 'Welcome to LootCrate!',
+        message: `Hi ${userName}, welcome aboard! Start exploring airdrops and earning rewards.`,
+        target_url: '',
+        points_earned: 0,
+      });
 
       await pool.query(
         `INSERT INTO leaderboard (user_id, points)
@@ -95,13 +105,38 @@ class UserController {
           [referrerId]
         );
         await pool.query(
+          `UPDATE users SET airdrops_earned = airdrops_earned + 50 WHERE id = $1`,
+          [referrerId]
+        );
+        await pool.query(
           `UPDATE leaderboard SET points = points + 25 WHERE user_id = $1`,
+          [newUser.id]
+        );
+        await pool.query(
+          `UPDATE users SET airdrops_earned = airdrops_earned + 25 WHERE id = $1`,
           [newUser.id]
         );
         await pool.query(
           `INSERT INTO referrals (referrer_id, referred_id, referral_code_used) VALUES ($1, $2, $3)`,
           [referrerId, newUser.id, referralCode]
         );
+        await createUserNotification({
+          user_id: referrerId,
+          type: 'referral',
+          title: 'Referral Joined',
+          message: `${userName} joined using your referral code. You earned 50 points!`,
+          target_url: '/referrals',
+          points_earned: 50,
+        });
+
+        await createUserNotification({
+          user_id: newUser.id,
+          type: 'referral',
+          title: 'Referral Bonus',
+          message: `You signed up using a referral code. You earned 25 points!`,
+          target_url: '/rewards',
+          points_earned: 25,
+        });
       }
 
       // await sendVerificationEmail(email, verificationToken);
@@ -215,7 +250,7 @@ class UserController {
         wallet_address: user.wallet_address,
         daily_login_streak_count: user.daily_login_streak_count,
         airdrops_earned: user.airdrops_earned,
-        airdrops_remaining: user.airdrops_remaining,
+        airdrops_remaining: user.airdrops_earned,
         profile_image: user.profile_image,
         is_new_user: user.is_new_user,
         is_verified: user.is_verified,
@@ -391,10 +426,9 @@ class UserController {
         ORDER BY created_at DESC;
       `;
       const result = await pool.query(query);
-      
-      
+
       return res.status(200).json({
-          message: 'User fetched successfully',
+        message: 'User fetched successfully',
         count: result.rows.length,
         data: result.rows,
       });

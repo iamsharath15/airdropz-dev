@@ -1,4 +1,5 @@
 import pool from '../config/db.js';
+import { createUserNotification } from '../services/notificationService.js';
 
 class DailyLoginController {
   static async handleDailyLogin(req, res) {
@@ -93,7 +94,14 @@ class DailyLoginController {
          WHERE id = $2`,
         [streakCount, userId]
       );
-
+      await createUserNotification({
+        user_id: userId,
+        type: 'daily login',
+        title: 'Daily Login Reward',
+        message: `You've earned 2 points for logging in today. Keep it up!`,
+        target_url: '',
+        points_earned: 2,
+      });
       const { rows: updatedUserRows } = await pool.query(
         `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
         [userId]

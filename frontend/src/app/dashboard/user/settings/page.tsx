@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-import Image from 'next/image';
-import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -17,12 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { updateUser } from '@/store/authSlice';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import type { SettingSectionProps } from '@/types';
+import ProfilePictureUpload from '@/components/shared/dashboard/settings/ProfilePictureUpload';
+import NotificationToggle from '@/components/shared/dashboard/settings/NotificationToggle';
 
 const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => (
   <section className="py-6 px-2 mb-6 w-full">
@@ -83,10 +82,11 @@ const Settings: React.FC = () => {
     const fetchSettings = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/settings/v1/',
+          `${process.env.NEXT_PUBLIC_API_URL}/settings/v1/`,
           { withCredentials: true }
         );
-        const settings = response.data;
+        const settings = response.data.data;
+
         setUsername(settings.user_name || '');
         setWallet(settings.wallet_address || '');
         setProfileImageUrl(settings.profile_image || null);
@@ -334,87 +334,6 @@ const Settings: React.FC = () => {
             )}
           </Button>
         </div>
-      </div>
-    </div>
-  );
-};
-
-const NotificationToggle = ({
-  title,
-  description,
-  checked,
-  onChange,
-}: {
-  title: string;
-  description: string;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) => (
-  <div className="flex justify-between items-center max-w-md">
-    <div className="pr-4">
-      <h3 className="text-white font-semibold pb-2">{title}</h3>
-      <p className="text-white/80 text-sm">{description}</p>
-    </div>
-    <Switch
-      checked={checked}
-      onCheckedChange={onChange}
-      className="peer bg-gray-700 peer-checked:bg-[#8373EE] cursor-pointer"
-    />
-  </div>
-);
-
-const ProfilePictureUpload = ({
-  userId,
-  userName,
-  setProfileImageUrl,
-  profileImageUrl,
-}: {
-  userId: string;
-  userName: string;
-  setProfileImageUrl: (url: string) => void;
-  profileImageUrl: string;
-}) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const initial = userName.charAt(0).toUpperCase();
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPreviewUrl(URL.createObjectURL(file));
-    try {
-      const url = await uploadImageToS3(file, `profile-pictures/${userId}`);
-      setProfileImageUrl(url);
-    } catch (error) {
-      console.error('Upload error:', error);
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-4">
-      <div className="w-4/12 rounded-full overflow-hidden flex items-center justify-center text-white text-3xl font-bold">
-        {previewUrl || profileImageUrl ? (
-          <Image
-            width={96}
-            height={96}
-            src={previewUrl || profileImageUrl}
-            alt="Profile"
-            className="object-cover w-24 h-24 rounded-full border border-gray-500 bg-gray-700"
-          />
-        ) : (
-          <div className="w-24 h-24 border border-gray-500 bg-gray-700 rounded-full flex items-center justify-center">
-            <span>{initial}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="w-8/12">
-        <Label className="text-white block mb-1">Profile Picture</Label>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="cursor-pointer bg-white text-black"
-        />
       </div>
     </div>
   );

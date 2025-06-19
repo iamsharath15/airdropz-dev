@@ -139,7 +139,6 @@ const Dashboard: React.FC = () => {
     fetchTopLiked();
     fetchTopWeeklyTask();
   }, []);
-  console.log(myTasks);
 
   const getTimeLeftString = (endTime?: string): string => {
     if (!endTime) return '';

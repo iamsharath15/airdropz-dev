@@ -108,12 +108,13 @@ export function Sidebar({
 
             {!isCollapsed && !sidebarOpen && (
               <div className="ml-2">
+                
                 <Image
                   src="https://cdn.lootcrate.me/static-image-v1/plans/airdropz-plan-light.png"
                   alt="Logo"
                   width={80}
                   height={25}
-                  priority
+                  className='w-auto h-10'
                 />
               </div>
             )}

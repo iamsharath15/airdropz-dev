@@ -143,18 +143,19 @@ export interface SettingSectionProps {
 
 export interface Referral {
   id: number;
-  date: string;
-  user: string;
-  points: number;
+  join_date: string;
+  user_name: string;
+  points_earned: number;
+  profile_image: string;
 }
 
 export interface ReferralTableProps {
   referrals: Referral[];
 }
 export interface ProfileStatsProps {
-  totalReferrals: number;
-  totalEarned: number;
-  referralCode: string;
+  total_referrals: number;
+  total_earned: number;
+  referral_code: string;
 }
 export interface StoryCarouselProps {
   stories: Story[];

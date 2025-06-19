@@ -13,6 +13,9 @@ const HowItWorks = () => {
           alt="refer & earn image"
           fill
           className="object-cover object-right"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
+
         />
       </div>
 

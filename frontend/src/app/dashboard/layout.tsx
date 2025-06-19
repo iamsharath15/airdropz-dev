@@ -25,7 +25,6 @@ export default function DashboardLayout({
     totalLogins: number;
     todayPoints: number;
   }>(null);
-console.log('loginData',loginData);
 
   const user = useSelector((state: RootState) => state.auth.user);
   const isAuthenticated = user ? true : false;
@@ -60,16 +59,15 @@ console.log('loginData',loginData);
           const {  streakCount,
             todayPoints,
             airdropsEarned,
-            airdropsRemaining,
+            // airdropsRemaining,
             totalLogins, } = res.data;
-console.log(res.data);
 
           // ✅ Update Redux state
           dispatch(
             updateUser({
               daily_login_streak_count: streakCount,
               airdrops_earned: airdropsEarned,
-              airdrops_remaining: airdropsRemaining,
+              airdrops_remaining: airdropsEarned,
             })
           );
 
