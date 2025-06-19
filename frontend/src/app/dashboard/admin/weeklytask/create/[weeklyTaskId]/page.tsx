@@ -8,17 +8,6 @@ import WeeklyTaskEditor from '@/components/shared/dashboard/admin/weeklyTask/Wee
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
 import { Save, Trash } from 'lucide-react';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
