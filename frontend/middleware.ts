@@ -11,7 +11,6 @@ export function middleware(req: NextRequest) {
 
   if (requiresAuth) {
     const token = req.cookies.get("token");
-console.log("hi",token);
 
     if (!token) {
       const loginUrl = req.nextUrl.clone();

@@ -5,8 +5,7 @@ import React from 'react';
 
 const HowItWorks = () => {
   return (
-    <div className="relative bg-[#8373EE] text-white p-4 sm:p-6 lg:p-8 mb-8 rounded-2xl overflow-hidden">
-      {/* Right-side background image (only on large screens) */}
+    <div className="relative bg-[hsl(248,78%,69%)] text-white p-4 sm:p-6 lg:p-8 mb-8 rounded-2xl overflow-hidden">
       <div className="hidden lg:block absolute top-0 right-0 w-4/12 h-full z-0">
         <Image
           src="https://cdn.lootcrate.me/static-image-v1/referandearn/refer-and-earn-img1.png"
@@ -14,8 +13,7 @@ const HowItWorks = () => {
           fill
           className="object-cover object-right"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority
-
+          priority
         />
       </div>
 

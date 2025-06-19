@@ -136,10 +136,6 @@ export interface TaskData {
   // Include other fields if needed
 }
 
-export interface SettingSectionProps {
-  title: string;
-  children: React.ReactNode;
-}
 
 export interface Referral {
   id: number;
@@ -170,7 +166,14 @@ export interface StoryItem {
 
 export interface StoryFormProps {
   coverId: number;
-  onStoryAdded: (newStory: any) => void;
+  onStoryAdded: (newStory: Story1) => void;
+}
+export interface Story1 {
+  id: number;
+  top_recommendations_stories_id: number;
+  image: string;
+  link: string;
+  created_at: string;
 }
 
 export interface User {
@@ -255,4 +258,33 @@ export interface TaskDetailProps {
     timeLeft?: string;
   };
   onBack: () => void;
+}
+
+// settings
+export interface AccountSectionProps {
+  title: string;
+  userName: string;
+  setUsername: (val: string) => void;
+  userEmail: string;
+  setProfileImageUrl: (url: string) => void;
+  profileImageUrl: string;
+  userId: string | number;
+}
+export interface NotificationSectionProps {
+  title: string;
+  newAirdropAlerts: boolean;
+  setNewAirdropAlerts: (val: boolean) => void;
+  weeklyReports: boolean;
+  setWeeklyReports: (val: boolean) => void;
+  taskReminders: boolean;
+  setTaskReminders: (val: boolean) => void;
+}
+export interface DisplaySectionProps {
+  title: string;
+}
+
+export interface WalletSectionProps {
+  title: string;
+    wallet: string;
+  setWallet: (val: string) => void;
 }

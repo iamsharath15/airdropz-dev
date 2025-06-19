@@ -6,9 +6,9 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-import HowItWorks from './HowItWorks';
-import ProfileStats from './ProfileStats';
-import ReferralTable from './ReferralTable';
+import HowItWorks from '@/components/shared/dashboard/user/referAndEarn/HowItWorks';
+import ReferralTable from '@/components/shared/dashboard/user/referAndEarn/ReferralTable';
+import ProfileStats from '@/components/shared/dashboard/user/referAndEarn/ProfileStats';
 
 const fetchReferralStats = async () => {
   const { data } = await axios.get(
@@ -38,7 +38,8 @@ const Page = () => {
   const referralData = {
     total_referrals: data.total_referrals,
     total_earned: data.user_details.reduce(
-      (sum: number, item: { points_earned: number }) => sum + item.points_earned,
+      (sum: number, item: { points_earned: number }) =>
+        sum + item.points_earned,
       0
     ),
     referral_code: data.referral_code,
@@ -46,7 +47,12 @@ const Page = () => {
 
   const referrals = data.user_details.map(
     (
-      entry: { join_date: string; user_name: string; points_earned: number, profile_image:string },
+      entry: {
+        join_date: string;
+        user_name: string;
+        points_earned: number;
+        profile_image: string;
+      },
       index: number
     ) => ({
       id: index + 1,

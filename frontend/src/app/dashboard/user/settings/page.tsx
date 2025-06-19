@@ -4,31 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
 import { motion } from 'framer-motion';
-
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { updateUser } from '@/store/authSlice';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
-import type { SettingSectionProps } from '@/types';
-import ProfilePictureUpload from '@/components/shared/dashboard/settings/ProfilePictureUpload';
-import NotificationToggle from '@/components/shared/dashboard/settings/NotificationToggle';
+import AccountSection from '@/components/shared/dashboard/settings/AccountSection';
+import NotificationSection from '@/components/shared/dashboard/settings/NotificationSection';
+import DisplaySection from '@/components/shared/dashboard/settings/DisplaySection';
+import WalletSection from '@/components/shared/dashboard/settings/WalletSection'
 
-const SettingSection: React.FC<SettingSectionProps> = ({ title, children }) => (
-  <section className="py-6 px-2 mb-6 w-full">
-    <h2 className="text-xl font-semibold text-gray-200 mb-5">{title}</h2>
-    {children}
-  </section>
-);
 
 const TABS = ['Account', 'Notification', 'Display', 'Wallet'] as const;
 type Tab = (typeof TABS)[number];
@@ -58,14 +43,14 @@ const SkeletonLoader = () => (
   </div>
 );
 
-const Settings: React.FC = () => {
+const UserSettings: React.FC = () => {
   useRoleRedirect('user');
   const [activeTab, setActiveTab] = useState<Tab>('Account');
   const user = useSelector((state: RootState) => state.auth.user);
   const userName = user?.user_name || 'user1';
   const userEmail = user?.email || 'user@example.com';
   const walletAddress = user?.wallet_address || 'add your wallet';
-
+  const user_id = user?.id;
   const [username, setUsername] = useState(userName);
   const [wallet, setWallet] = useState(walletAddress);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -106,7 +91,7 @@ const Settings: React.FC = () => {
     setIsSaving(true);
     try {
       await axios.patch(
-        'http://localhost:8080/api/settings/v1/',
+        `${process.env.NEXT_PUBLIC_API_URL}/settings/v1/`,
         {
           user_name: username,
           profile_image: profileImageUrl,
@@ -181,122 +166,36 @@ const Settings: React.FC = () => {
 
       <div className="md:w-5/12 w-10/12 flex flex-col justify-center mt-6">
         {activeTab === 'Account' && (
-          <SettingSection title="Account Settings">
-            <div className="space-y-6 w-full">
-              <ProfilePictureUpload
-                userId={(user?.id ?? '').toString()}
-                userName={username}
-                setProfileImageUrl={setProfileImageUrl}
-                profileImageUrl={profileImageUrl ?? ''}
-              />
-              <div>
-                <Label htmlFor="username" className="text-white mb-4 block">
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="border-0 text-black placeholder:text-black bg-white"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email" className="text-white mb-4 block">
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  disabled
-                  placeholder={userEmail}
-                  className="border-0 text-black placeholder:text-black bg-white opacity-70 cursor-not-allowed"
-                />
-              </div>
-            </div>
-          </SettingSection>
+          <AccountSection
+            title="Account Settings"
+            userName={username}
+            setUsername={setUsername}
+            userEmail={userEmail}
+            setProfileImageUrl={setProfileImageUrl}
+            profileImageUrl={profileImageUrl || ''}
+            userId={user_id || ''}
+          />
         )}
 
         {activeTab === 'Notification' && (
-          <SettingSection title="Notification Preferences">
-            <div className="space-y-6 max-w-md">
-              <NotificationToggle
-                title="New Airdrop Alerts"
-                description="Get notified when new airdrops are available"
-                checked={newAirdropAlerts}
-                onChange={setNewAirdropAlerts}
-              />
-              <NotificationToggle
-                title="Weekly Reports"
-                description="Receive weekly summary of your airdrop activities"
-                checked={weeklyReports}
-                onChange={setWeeklyReports}
-              />
-              <NotificationToggle
-                title="Task Reminders"
-                description="Get reminders for incomplete weekly tasks"
-                checked={taskReminders}
-                onChange={setTaskReminders}
-              />
-            </div>
-          </SettingSection>
+          <NotificationSection
+            title="Notification Preferences"
+            newAirdropAlerts={newAirdropAlerts}
+            setNewAirdropAlerts={setNewAirdropAlerts}
+            weeklyReports={weeklyReports}
+            setWeeklyReports={setWeeklyReports}
+            taskReminders={taskReminders}
+            setTaskReminders={setTaskReminders}
+          />
         )}
-
-        {activeTab === 'Display' && (
-          <SettingSection title="Display Settings">
-            <div className="space-y-6 max-w-md">
-              <div>
-                <Label htmlFor="theme" className="text-white/80 pb-4 block">
-                  Theme
-                </Label>
-                <Select defaultValue="dark" disabled>
-                  <SelectTrigger className="bg-white border-gray-800 text-black w-full">
-                    <SelectValue placeholder="Dark Mode" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dark">Dark Mode</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="language" className="text-white/80 pb-4 block">
-                  Language
-                </Label>
-                <Select defaultValue="en" disabled>
-                  <SelectTrigger className="bg-white border-gray-800 text-black w-full">
-                    <SelectValue placeholder="English" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </SettingSection>
-        )}
+        {activeTab === 'Display' && <DisplaySection title="Display Settings" />}
 
         {activeTab === 'Wallet' && (
-          <SettingSection title="Wallet Settings">
-            <div className="space-y-6 max-w-md">
-              <div>
-                <Label className="text-white/80 pb-4 block">
-                  Connected Wallet
-                </Label>
-                <Input
-                  type="text"
-                  value={wallet}
-                  onChange={(e) => setWallet(e.target.value)}
-                  className="border-0 text-black placeholder:text-black bg-white py-4"
-                />
-              </div>
-              <div>
-                <Button className="bg-red-500 hover:bg-red-400 cursor-pointer">
-                  Disconnect
-                </Button>
-              </div>
-            </div>
-          </SettingSection>
+          <WalletSection
+            title="Wallet Settings"
+            wallet={wallet}
+            setWallet={setWallet}
+          />
         )}
 
         <div className="flex justify-start">
@@ -339,4 +238,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings;
+export default UserSettings;

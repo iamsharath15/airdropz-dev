@@ -57,10 +57,10 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
               alt="User Profile"
               width={150}
               height={150}
-              className="rounded-full object-cover shadow-md"
+              className="rounded-full object-cover shadow-md lg:w-[150px] lg:h-[150px] md:w-[120px] md:h-[120px] w-[150px] h-[150px]"
             />
           ) : (
-            <div className="rounded-full bg-[#8373EE] w-[150px] h-[150px] flex items-center justify-center font-bold text-3xl">
+            <div className="rounded-full bg-[#8373EE] lg:w-[150px] lg:h-[150px] md:w-[120px] md:h-[120px] w-[150px] h-[150px] flex items-center justify-center font-bold text-3xl">
               {user_name.charAt(0).toUpperCase()}
             </div>
           )}

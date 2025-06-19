@@ -19,11 +19,27 @@ class UserSettingsController {
 
       const settingsResult = await pool.query(
         `SELECT new_airdrop_alerts, weekly_reports, task_reminders, mode, language
-         FROM user_settings WHERE user_id = $1`,
+       FROM user_settings WHERE user_id = $1`,
         [userId]
       );
 
-      const settings = settingsResult.rows[0] || {};
+      let settings;
+
+      if (settingsResult.rows.length === 0) {
+        await pool.query(`INSERT INTO user_settings (user_id) VALUES ($1)`, [
+          userId,
+        ]);
+
+        const defaultSettings = await pool.query(
+          `SELECT new_airdrop_alerts, weekly_reports, task_reminders, mode, language
+           FROM user_settings WHERE user_id = $1`,
+          [userId]
+        );
+
+        settings = defaultSettings.rows[0];
+      } else {
+        settings = settingsResult.rows[0];
+      }
 
       const userData = {
         user_name: user.user_name,
