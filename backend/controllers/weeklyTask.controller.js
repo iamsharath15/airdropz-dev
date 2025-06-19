@@ -266,9 +266,9 @@ class WeeklyTaskController {
 
       // Delete old tasks
       await client.query(`DELETE FROM tasks WHERE weekly_task_id = $1`, [id]);
-      await client.query(`DELETE FROM sub_tasks WHERE weekly_task_id = $1`, [
-        id,
-      ]);
+      // await client.query(`DELETE FROM sub_tasks WHERE weekly_task_id = $1`, [
+      //   id,
+      // ]);
 
       // Insert new tasks
       for (const task of tasks) {
@@ -279,14 +279,30 @@ class WeeklyTaskController {
           [id, type, value || '', link || null]
         );
       }
-      for (const sub of sub_tasks) {
-        const { title, description, sub_task_image, completed } = sub;
-        await client.query(
-          `INSERT INTO sub_tasks (weekly_task_id, title, description, sub_task_image, completed)
-         VALUES ($1, $2, $3, $4, $5);`,
-          [id, title, description || null, sub_task_image || null, completed]
-        );
-      }
+   for (const sub of sub_tasks) {
+  const { id: subTaskId, title, description, sub_task_image, completed } = sub;
+
+  if (subTaskId) {
+    // Update existing sub-task
+    await client.query(
+      `UPDATE sub_tasks
+       SET title = $1,
+           description = $2,
+           sub_task_image = $3,
+           completed = $4
+       WHERE id = $5 AND weekly_task_id = $6`,
+      [title, description || null, sub_task_image || null, completed, subTaskId, id]
+    );
+  } else {
+    // Insert new sub-task
+    await client.query(
+      `INSERT INTO sub_tasks (weekly_task_id, title, description, sub_task_image, completed)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [id, title, description || null, sub_task_image || null, completed]
+    );
+  }
+}
+
       // Fetch full updated weekly task including tasks
       const fullData = await client.query(
         `
