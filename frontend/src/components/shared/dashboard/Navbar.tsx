@@ -125,7 +125,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
 
   const handleMarkAsRead = async (
     notificationId: string,
-    targetUrl: string
+    // targetUrl: string
   ) => {
     try {
       await axios.put(
@@ -136,7 +136,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
-      if (targetUrl) router.push(targetUrl);
+      // if (targetUrl) router.push(targetUrl);
     } catch (err) {
       console.error('Error marking as read:', err);
     }
@@ -196,7 +196,8 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                   notifications.map((note) => (
                     <DropdownMenuItem
                       key={note.id}
-                      onClick={() => handleMarkAsRead(note.id, note.target_url)}
+                      onClick={() => handleMarkAsRead(note.id)}
+                      // note.target_url
                       className={`px-4 py-3 gap-3 items-start rounded-md ${
                         note.is_read ? 'bg-neutral-800' : 'bg-[#8373EE]/30'
                       } hover:bg-[#1f1f1f] transition-colors cursor-pointer`}
@@ -213,8 +214,8 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium">{note.title}</p>
-                        <p className="text-xs text-gray-400">{note.message}</p>
+                        <p className="text-sm font-medium text-white">{note.title}</p>
+                        <p className="text-xs text-white">{note.message}</p>
                       </div>
                       <span className="text-[10px] text-gray-500">
                         {formatTimeAgo(note.created_at)}

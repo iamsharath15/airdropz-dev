@@ -9,6 +9,43 @@ import axios from 'axios';
 import HowItWorks from '@/components/shared/dashboard/user/referAndEarn/HowItWorks';
 import ReferralTable from '@/components/shared/dashboard/user/referAndEarn/ReferralTable';
 import ProfileStats from '@/components/shared/dashboard/user/referAndEarn/ProfileStats';
+import { motion } from 'framer-motion';
+
+const SkeletonBox = ({ className = '' }: { className?: string }) => (
+  <motion.div
+    className={`bg-zinc-800 rounded-md ${className}`}
+    animate={{ opacity: [0.4, 1, 0.4] }}
+    transition={{ duration: 1.5, repeat: Infinity }}
+  />
+);
+
+const ReferralSkeleton = () => (
+  <div className="w-full space-y-8 py-12">
+    <div className="space-y-4">
+      <SkeletonBox className="w-40 h-6" />
+      <SkeletonBox className="w-2/3 h-4" />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <SkeletonBox className="h-24" />
+      <SkeletonBox className="h-24" />
+      <SkeletonBox className="h-24" />
+    </div>
+
+    <div className="mt-8 space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4">
+          <SkeletonBox className="w-12 h-12 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <SkeletonBox className="w-1/2 h-4" />
+            <SkeletonBox className="w-1/3 h-4" />
+          </div>
+          <SkeletonBox className="w-16 h-4" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 const fetchReferralStats = async () => {
   const { data } = await axios.get(
@@ -21,11 +58,17 @@ const fetchReferralStats = async () => {
 const Page = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['referralStats'],
-    queryFn: fetchReferralStats,
+    queryFn: fetchReferralStats
   });
-  if (isLoading) {
-    return <div className="text-white text-center mt-10">Loading...</div>;
-  }
+ if (isLoading) {
+  return (
+    <div className="min-h-screen max-w-[1440px] w-full flex justify-center bg-black">
+      <div className="w-11/12">
+        <ReferralSkeleton />
+      </div>
+    </div>
+  );
+}
 
   if (isError) {
     return (

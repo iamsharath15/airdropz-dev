@@ -32,7 +32,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use('/api/auth/v1', authRoutes);
-app.use("/api/referral/v1", referralRoutes); 
 app.use('/api/leaderboard/v1', leaderboardRoutes)
 app.use('/api/airdrop/v1', airdropRoutes)
 app.use('/api/userAirdrop/v1', userAirdropRoutes)
@@ -49,6 +48,7 @@ app.use('/api/notification/v1', notificationRoutes);
 
 //v1
 app.use('/api/account-setting/v1', profileRoutes);
+app.use("/api/referral/v1", referralRoutes); 
 
 
 

@@ -16,9 +16,9 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
   total_earned,
   referral_code,
 }) => {
-  const user = useSelector((state: RootState) => state.auth.user);
-  const user_name = user?.user_name || 'User';
-  const user_profile = user?.profile_image || '';
+  const profile = useSelector((state: RootState) => state.profile.data);
+  const user_name = profile?.user_name || 'User';
+  const user_profile = profile?.profile_image || '';
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referral_code);
     toast.success('Referral code copied to clipboard');

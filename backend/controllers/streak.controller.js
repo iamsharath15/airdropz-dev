@@ -3,7 +3,7 @@ import { createUserNotification } from '../services/notificationService.js';
 
 class DailyLoginController {
   static async handleDailyLogin(req, res) {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const getTodayDate = (mockDate) => {
@@ -125,7 +125,7 @@ class DailyLoginController {
   }
 
   static async getLoginDates(req, res) {
-    const userId = req.user?.id;
+    const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     try {

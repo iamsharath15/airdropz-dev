@@ -27,7 +27,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['auth'], // only persist the auth slice
+  whitelist: ['auth', 'profile'], // only persist the auth slice
     //whitelist: ['auth', 'airdrops'], // ✅ Add airdrops if you want it persisted
 
 };
