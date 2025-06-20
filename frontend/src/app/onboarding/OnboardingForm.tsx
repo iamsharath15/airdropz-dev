@@ -93,20 +93,19 @@ function WalletAddressStep({
 export default function OnboardingForm() {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
-  const userId = user?.id;
-  const userName = user?.user_name || 'User';
+  const user_id = user?.id;
+  const user_name = user?.user_name || 'User';
 
   const onboardingMutation = useMutation({
     mutationFn: async (data: {
-      userId: string;
-      userName: string;
-      heardFrom: string;
+      user_name: string;
+      heard_from: string;
       interests: string;
-      experienceLevel: string;
-      walletAddress: string;
+      experience_level: string;
+      wallet_address: string;
     }) => {
       const res = await axios.post(
-        'http://localhost:8080/api/onboarding/v1',
+        'http://localhost:8080/api/account-setting/v1/onboarding',
         data,
         {
           withCredentials: true,
@@ -127,18 +126,17 @@ export default function OnboardingForm() {
   });
 
   const handleComplete = (data: Record<string, string[]>) => {
-    if (!userId) {
+    if (!user_id) {
       toast.error('User not logged in');
       return;
     }
 
     const payload = {
-      userId: String(userId),
-      userName: data.step_0?.[0] || userName,
-      heardFrom: data.step_1?.join(', ') || '',
+      user_name: data.step_0?.[0] || user_name,
+      heard_from: data.step_1?.join(', ') || '',
       interests: data.step_2?.join(', ') || '',
-      experienceLevel: data.step_3?.[0] || '',
-      walletAddress: data.step_4?.[0] || '',
+      experience_level: data.step_3?.[0] || '',
+      wallet_address: data.step_4?.[0] || '',
     };
 
     onboardingMutation.mutate(payload);

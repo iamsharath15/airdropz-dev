@@ -13,10 +13,11 @@ router.use(verifyToken);
  */
 router.get('/profile', ProfileController.getProfile);
 
- /* @route   PATCH /api/account-settings/v1/profile
- * @desc    Update the current user's profile and settings
+/**
+ * @route   POST /api/account-settings/v1/onboarding
+ * @desc    Complete onboarding for the current user (update profile + user)
  * @access  Private
  */
-router.patch('/profile', ProfileController.updateProfile);
+router.post('/onboarding', ProfileController.onboarding);
 
 export default router;

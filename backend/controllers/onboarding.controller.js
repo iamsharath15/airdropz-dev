@@ -2,12 +2,12 @@ import pool from "../config/db.js";
 
 class OnboardingController {
   static async submitOnboarding(req, res) {
-    const userId = req.user?.userId; 
-    const { userName, heardFrom, interests, experienceLevel, walletAddress } = req.body;
+    const user_id = req.user?.userId; 
+    const { user_name, heard_from, interests, experience_level, wallet_address } = req.body;
 
     try {
       const result = await pool.query(
-        `UPDATE users SET
+        `UPDATE profiles SET
           user_name = $1,
           heard_from = $2,
           interests = $3,
@@ -17,7 +17,7 @@ class OnboardingController {
           updated_at = NOW()
         WHERE id = $6
         RETURNING id, user_name, email`,
-        [userName, heardFrom, interests, experienceLevel, walletAddress, userId]
+        [user_name, heard_from, interests, experience_level, wallet_address, user_id]
       );
 
       if (result.rowCount === 0) {

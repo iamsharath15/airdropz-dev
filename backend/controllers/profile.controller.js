@@ -3,7 +3,7 @@ import { sendSuccess, sendError } from '../utils/response.js';
 
 class ProfileController {
   static async getProfile(req, res) {
-    const userId = req.user.userId;
+    const user_id = req.user.userId;
 
     try {
       const result = await pool.query(
@@ -27,14 +27,14 @@ class ProfileController {
       FROM users u
       LEFT JOIN profiles p ON u.id = p.user_id
       WHERE u.id = $1`,
-        [userId]
+        [user_id]
       );
 
       if (result.rows.length === 0) {
         // Create default profile if not exists
         await pool.query(
           `INSERT INTO profiles (user_id) VALUES ($1) ON CONFLICT DO NOTHING`,
-          [userId]
+          [user_id]
         );
 
         const defaultProfile = await pool.query(
@@ -58,7 +58,7 @@ class ProfileController {
         FROM users u
         LEFT JOIN profiles p ON u.id = p.user_id
         WHERE u.id = $1`,
-          [userId]
+          [user_id]
         );
 
         return sendSuccess(
@@ -86,7 +86,7 @@ class ProfileController {
   }
 
   static async updateProfile(req, res) {
-    const userId = req.user.userId;
+    const user_id = req.user.userId;
     const {
       user_name,
       profile_image,
@@ -104,7 +104,7 @@ class ProfileController {
           `UPDATE users SET 
           user_name = $1
         WHERE id = $2`,
-          [user_name, userId]
+          [user_name, user_id]
         );
       }
 
@@ -126,7 +126,7 @@ class ProfileController {
           task_reminders,
           mode,
           language,
-          userId,
+          user_id,
         ]
       );
 
@@ -144,7 +144,7 @@ class ProfileController {
       FROM users u
       LEFT JOIN profiles p ON u.id = p.user_id
       WHERE u.id = $1`,
-        [userId]
+        [user_id]
       );
 
       return sendSuccess(
@@ -160,6 +160,55 @@ class ProfileController {
         500,
         error
       );
+    }
+  }
+
+  static async onboarding(req, res) {
+    const user_id = req.user?.userId;
+    const {
+      user_name,
+      heard_from,
+      interests,
+      experience_level,
+      wallet_address,
+    } = req.body;
+
+    try {
+      // Update users table if user_name is provided
+      if (user_name) {
+        await pool.query(
+          `UPDATE users
+           SET user_name = $1, is_new_user = false
+           WHERE id = $2`,
+          [user_name, user_id]
+        );
+      }
+
+      // Update profile fields
+      const result = await pool.query(
+        `UPDATE profiles SET
+          heard_from = $1,
+          interests = $2,
+          experience_level = $3,
+          wallet_address = $4,
+          updated_at = NOW()
+        WHERE user_id = $5
+        RETURNING heard_from, interests, experience_level, wallet_address`,
+        [
+          heard_from,
+          interests,
+          experience_level,
+          wallet_address,
+          user_id,
+        ]
+      );
+
+      if (result.rowCount === 0) {
+        return sendError(res, 'User not found', 404);
+      }
+      return sendSuccess(res, result.rows[0], 'Onboarding completed', 200);
+    } catch (error) {
+      return sendError(res, 'Error in submitOnboarding', 500, error);
     }
   }
 }
