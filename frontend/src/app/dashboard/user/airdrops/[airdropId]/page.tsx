@@ -54,7 +54,7 @@ export default function AirdropDetailPage() {
             value: string;
             link?: string;
           }[];
-        }>(`http://localhost:8080/api/airdrop/v1/${airdropId}`, {
+        }>(`${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1/${airdropId}`, {
           withCredentials: true,
         });
 
@@ -95,7 +95,7 @@ export default function AirdropDetailPage() {
     const checkLikedStatus = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/liked`,
+          `${process.env.NEXT_PUBLIC_API_URL}/userAirdrop/v1/${airdropId}/liked`,
           { withCredentials: true }
         );
         setLiked(res.data.liked);
@@ -114,13 +114,13 @@ export default function AirdropDetailPage() {
 
       if (liked) {
         await axios.delete(
-          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/unlike`,
+          `${process.env.NEXT_PUBLIC_API_URL}/userAirdrop/v1/${airdropId}/unlike`,
           { withCredentials: true }
         );
         toast.error('Airdrop removed from likes');
       } else {
         await axios.post(
-          `http://localhost:8080/api/userAirdrop/v1/${airdropId}/like`,
+          `${process.env.NEXT_PUBLIC_API_URL}/userAirdrop/v1/${airdropId}/like`,
           {},
           { withCredentials: true }
         );

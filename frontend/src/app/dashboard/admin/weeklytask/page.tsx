@@ -20,7 +20,7 @@ export default function WeeklyTaskPage() {
     const fetchWeeklyTasks = async () => {
       try {
         const response = await axios.get<{ data: WeeklyTask[] }>(
-          'http://localhost:8080/api/weeklytask/v1'
+          `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1`
         );
         const tasks = response.data.data || [];
         setWeeklyTasks(tasks);

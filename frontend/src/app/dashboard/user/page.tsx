@@ -100,7 +100,7 @@ const WeeklyTaskCard = ({
 };
 const fetchAirdrops = async () => {
   const res = await axios.get<Airdrop[]>(
-    'http://localhost:8080/api/userAirdrop/v1/liked',
+    `${process.env.NEXT_PUBLIC_API_URL}/userAirdrop/v1/liked`,
     { withCredentials: true }
   );
   return res.data;
@@ -108,7 +108,7 @@ const fetchAirdrops = async () => {
 
 const fetchWeeklyTasks = async () => {
   const res = await axios.get<{ tasks: WeeklyTask[] }>(
-    'http://localhost:8080/api/user-task/v1/all',
+    `${process.env.NEXT_PUBLIC_API_URL}/user-task/v1/all`,
     { withCredentials: true }
   );
   return res.data.tasks;
@@ -140,7 +140,7 @@ useQuery({
   queryKey: ['profile'],
   queryFn: async () => {
     const res = await axios.get(
-      'http://localhost:8080/api/account-setting/v1/profile',
+      `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
       { withCredentials: true }
     );
     dispatch(setProfile(res.data?.data));

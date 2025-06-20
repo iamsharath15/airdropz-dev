@@ -111,7 +111,7 @@ const LeaderboardSection = () => {
   } = useQuery<LeaderboardUser[]>({
     queryKey: ['leaderboard'],
     queryFn: async () => {
-      const res = await axios.get('http://localhost:8080/api/leaderboard/v1/');
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/v1/`);
       return res.data.data;
     },
   });

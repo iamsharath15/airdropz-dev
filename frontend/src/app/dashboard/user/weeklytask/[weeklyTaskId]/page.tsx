@@ -28,7 +28,7 @@ export default function TaskDetail() {
   const fetchTask = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/weeklytask/v1/${weeklyTaskId}/with-user-progress`,
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${weeklyTaskId}/with-user-progress`,
         {
           withCredentials: true,
         }
@@ -58,7 +58,7 @@ export default function TaskDetail() {
 
       // Send to backend
       const response = await axios.post(
-        `http://localhost:8080/api/weeklytask/v1/upload-subtask-image/${taskData?.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/upload-subtask-image/${taskData?.id}`,
         {
           sub_task_id: subTaskId,
           image_url,
@@ -108,7 +108,7 @@ export default function TaskDetail() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:8080/api/user-task/v1/remove/${weeklyTaskId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/user-task/v1/remove/${weeklyTaskId}`,
         {
           withCredentials: true,
         }

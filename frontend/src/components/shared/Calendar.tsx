@@ -35,7 +35,7 @@ const Calendar = () => {
     const fetchLoginDates = async () => {
       try {
         const res = await axios.get(
-          'http://localhost:8080/api/streak/v1/login-dates',
+          `${process.env.NEXT_PUBLIC_API_URL}/streak/v1/login-dates`,
           {
             withCredentials: true,
           }

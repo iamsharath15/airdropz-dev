@@ -89,7 +89,7 @@ const UserSettings: React.FC = () => {
   const mutation = useMutation({
     mutationFn: async () =>
       axios.patch(
-        `http://localhost:8080/api/account-setting/v1/profile`,
+        `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
         {
           user_name: username,
           profile_image: profileImageUrl,

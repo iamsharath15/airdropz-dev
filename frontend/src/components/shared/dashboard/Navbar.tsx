@@ -110,7 +110,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
     const fetchNotifications = async () => {
       try {
         const res = await axios.get(
-          'http://localhost:8080/api/notification/v1/notifications?page=1&per_page=5',
+          `${process.env.NEXT_PUBLIC_API_URL}/notification/v1/notifications?page=1&per_page=5`,
           { withCredentials: true }
         );
         setNotifications(res.data?.data || []);
@@ -129,7 +129,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
   ) => {
     try {
       await axios.put(
-        `http://localhost:8080/api/notification/v1/read/${notificationId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/notification/v1/read/${notificationId}`,
         {},
         { withCredentials: true }
       );

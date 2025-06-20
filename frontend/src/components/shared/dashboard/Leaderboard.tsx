@@ -23,7 +23,7 @@ const fetchLeaderboard = async (
   limit: number
 ): Promise<LeaderboardResponse> => {
   const res = await axios.get(
-    `http://localhost:8080/api/leaderboard/v1?limit=${limit}&page=${page}`
+    `${process.env.NEXT_PUBLIC_API_URL}/leaderboard/v1?limit=${limit}&page=${page}`
   );
   return res.data;
 };

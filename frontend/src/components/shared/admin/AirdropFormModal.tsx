@@ -75,7 +75,7 @@ const AirdropFormModal = () => {
       };
 
       const createRes = await axios.post(
-        'http://localhost:8080/api/airdrop/v1/',
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1/`,
         createPayload,
         { withCredentials: true }
       );
@@ -90,7 +90,7 @@ const AirdropFormModal = () => {
       const s3Path = `airdrops/${airdropId}/banner.${fileExt}`;
 
       const presignRes = await axios.get(
-        'http://localhost:8080/api/upload/v1/generate-upload-url',
+        `${process.env.NEXT_PUBLIC_API_URL}/upload/v1/generate-upload-url`,
         {
           params: {
             filename: s3Path,
@@ -108,7 +108,7 @@ const AirdropFormModal = () => {
 
       // Step 4: Update the airdrop with the image URL
       await axios.put(
-        `http://localhost:8080/api/airdrop/v1/${airdropId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1/${airdropId}`,
         {
           title: name,
           category: finalCategory,

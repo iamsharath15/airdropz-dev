@@ -105,7 +105,7 @@ export default function OnboardingForm() {
       wallet_address: string;
     }) => {
       const res = await axios.post(
-        'http://localhost:8080/api/account-setting/v1/onboarding',
+        `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/onboarding`,
         data,
         {
           withCredentials: true,

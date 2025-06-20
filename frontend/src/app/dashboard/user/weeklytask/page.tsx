@@ -23,7 +23,7 @@ const WeeklyTaskCard = ({
   const handleStartTask = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/user-task/v1/add/${task.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/user-task/v1/add/${task.id}`,
         {},
         { withCredentials: true }
       );
@@ -140,10 +140,10 @@ export default function WeeklyTaskPage() {
       try {
         const [allTasksRes, myTasksRes] = await Promise.all([
           axios.get<{ data: WeeklyTask[] }>(
-            'http://localhost:8080/api/weeklytask/v1'
+            `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1`
           ),
           axios.get<{ tasks: WeeklyTask[] }>(
-            'http://localhost:8080/api/user-task/v1/all',
+            `${process.env.NEXT_PUBLIC_API_URL}/user-task/v1/all`,
             {
               withCredentials: true,
             }

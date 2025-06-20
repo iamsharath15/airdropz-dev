@@ -33,7 +33,7 @@ const Dashboard: React.FC = () => {
     const fetchTopLiked = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/userAirdrop/v1/top-liked',
+          `${process.env.NEXT_PUBLIC_API_URL}/userAirdrop/v1/top-liked`,
           {
             withCredentials: true,
           }
@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
     const fetchStats = async () => {
       try {
         const res = await axios.get(
-          'http://localhost:8080/api/admin/v1/stats',
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/v1/stats`,
           { withCredentials: true }
         );
         setStats({
@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
     const fetchWeeklyTasks = async () => {
       try {
         const res = await axios.get(
-          'http://localhost:8080/api/weeklytask/v1/top-weekly-tasks',
+          `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/top-weekly-tasks`,
           { withCredentials: true }
         );
         setWeeklyTasks(res.data.data || []);

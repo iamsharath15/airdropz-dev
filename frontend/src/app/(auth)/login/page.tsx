@@ -23,7 +23,7 @@ export default function Login() {
   const loginMutation = useMutation<{ data: LoginResponse }, AxiosError>({
     mutationFn: async () => {
       const response = await axios.post<{ data: LoginResponse }>(
-        'http://localhost:8080/api/auth/v1/login',
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/login`,
         { email, password },
         { withCredentials: true }
       );
@@ -51,7 +51,7 @@ export default function Login() {
 
       if (message === 'Email not verified.') {
         try {
-          await axios.post('http://localhost:8080/api/auth/v1/resend-otp', {
+          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/v1/resend-otp`, {
             email,
           });
           router.push(`/verify-email?email=${email}`);

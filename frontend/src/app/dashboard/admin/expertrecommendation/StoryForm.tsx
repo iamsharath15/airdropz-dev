@@ -35,7 +35,7 @@ const StoryForm: React.FC<StoryFormProps> = ({ coverId, onStoryAdded }) => {
       );
 
       const res = await axios.post(
-        'http://localhost:8080/api/expertStories/v1/top-recommendations-stories/story',
+        `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1/top-recommendations-stories/story`,
         {
           top_recommendations_stories_id: coverId,
           image: imageUrl,

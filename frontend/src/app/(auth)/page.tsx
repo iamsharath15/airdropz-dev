@@ -46,7 +46,7 @@ export default function SignUp() {
       mutationFn: async (data) =>
         (
           await axios.post<ApiResponse>(
-            'http://localhost:8080/api/auth/v1/signup',
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/signup`,
             data
           )
         ).data,

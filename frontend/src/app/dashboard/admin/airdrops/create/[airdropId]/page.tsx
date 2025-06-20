@@ -16,7 +16,7 @@ import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 import AirdropFormEditor from '@/components/shared/dashboard/AirdropFormEditor';
 import { Save, Trash } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8080/api/airdrop/v1';
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1`;
 
 const CreateAirdropPage = () => {
   const params = useParams();

@@ -73,7 +73,7 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
         const s3Path = `airdrops/${airdrop.id}/previewr.${fileExt}`;
 
         const presignRes = await axios.get(
-          'http://localhost:8080/api/upload/v1/generate-upload-url',
+          `${process.env.NEXT_PUBLIC_API_URL}/upload/v1/generate-upload-url`,
           {
             params: {
               filename: s3Path,
@@ -92,7 +92,7 @@ const EditAirdropFormModal = ({ airdrop }: EditAirdropFormModalProps) => {
       }
 
       await axios.put(
-        `http://localhost:8080/api/airdrop/v1/${airdrop.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1/${airdrop.id}`,
         {
           title: name,
           category: finalCategory,

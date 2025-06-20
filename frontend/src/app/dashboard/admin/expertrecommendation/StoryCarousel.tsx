@@ -96,7 +96,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
   const handleDelete = async (coverId: number) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/expertStories/v1/top-recommendations-stories/${coverId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1/top-recommendations-stories/${coverId}`
       );
       setStories((prev) => prev.filter((story) => story.cover_id !== coverId));
       if (selectedStory?.cover_id === coverId) closeStory();
@@ -110,7 +110,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
   const handleDeleteStory = async (storyId: number) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/expertStories/v1/top-recommendations-stories/story/${storyId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1/top-recommendations-stories/story/${storyId}`
       );
 
       setStories((prev) =>

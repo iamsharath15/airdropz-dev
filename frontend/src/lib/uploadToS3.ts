@@ -12,7 +12,7 @@ export const uploadImageToS3 = async (
 
   // Step 1: Get presigned URL
   const presignRes = await axios.get(
-    'http://localhost:8080/api/upload/v1/generate-upload-url',
+    `${process.env.NEXT_PUBLIC_API_URL}/upload/v1/generate-upload-url`,
     {
       params: {
         filename: s3Path,

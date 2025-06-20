@@ -15,7 +15,7 @@ import Image from 'next/image';
 import ExpertSectionHeader from '@/components/shared/dashboard/ExpertSectionHeader';
 import type { Story } from '@/types';
 
-const API_BASE = 'http://localhost:8080/api/expertStories/v1';
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1`;
 
 const Index = () => {
   const [stories, setStories] = useState<Story[]>([]);
@@ -29,7 +29,7 @@ const Index = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          'http://localhost:8080/api/expertStories/v1/top-recommendations-stories'
+          `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1/top-recommendations-stories`
         );
 
         // ✅ Ensure `stories` is always an array

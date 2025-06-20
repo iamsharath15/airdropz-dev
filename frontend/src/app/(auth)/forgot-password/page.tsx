@@ -20,7 +20,7 @@ export default function ForgotPasswordForm() {
   >({
     mutationFn: async (email) => {
       const response = await axios.post(
-        'http://localhost:8080/api/auth/v1/request-password-reset',
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/request-password-reset`,
         { email }
       );
       return response.data;

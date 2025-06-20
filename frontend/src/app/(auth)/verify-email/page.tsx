@@ -29,7 +29,7 @@ export default function VerifyEmailPage() {
     try {
       setIsVerifying(true);
       const response = await axios.post(
-        'http://localhost:8080/api/auth/v1/verify-email',
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/verify-email`,
         {
           code: otp,
           email,
@@ -51,7 +51,7 @@ export default function VerifyEmailPage() {
     try {
       setIsResending(true);
       const response = await axios.post(
-        'http://localhost:8080/api/auth/v1/resend-otp',
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/resend-otp`,
         {
           email,
         }

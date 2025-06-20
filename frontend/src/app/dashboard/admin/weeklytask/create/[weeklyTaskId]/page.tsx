@@ -36,7 +36,7 @@ const CreateWeeklyTaskPage = () => {
     async function fetchWeeklyTask() {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/weeklytask/v1/${taskId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${taskId}`
         );
         if (response.data.success) {
           setTaskData(response.data.data);
@@ -94,7 +94,7 @@ const CreateWeeklyTaskPage = () => {
 
       // ✅ Send PUT request
       const response = await axios.put(
-        `http://localhost:8080/api/weeklytask/v1/${taskId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${taskId}`,
         payload
       );
 
@@ -115,7 +115,7 @@ const CreateWeeklyTaskPage = () => {
 
     try {
       const res = await axios.delete(
-        `http://localhost:8080/api/weeklytask/v1/${taskId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${taskId}`
       );
       if (res.data.success) {
         toast.success('Weekly Task deleted successfully!');

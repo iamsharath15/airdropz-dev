@@ -87,7 +87,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
       };
 
       await axios.put(
-        `http://localhost:8080/api/weeklytask/v1/${task.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${task.id}`,
         payload
       );
       toast.success('✅ Weekly task updated!');

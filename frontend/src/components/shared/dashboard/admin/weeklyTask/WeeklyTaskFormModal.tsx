@@ -70,7 +70,7 @@ const WeeklyTaskFormModal = () => {
       };
 
       const response = await axios.post(
-        'http://localhost:8080/api/weeklytask/v1',
+        `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1`,
         payload
       );
 

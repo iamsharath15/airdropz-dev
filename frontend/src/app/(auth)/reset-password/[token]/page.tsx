@@ -26,7 +26,7 @@ export default function ResetPasswordForm() {
   >({
     mutationFn: async ({ token, password }) => {
       const response = await axios.post(
-        `http://localhost:8080/api/auth/v1/reset-password/${token}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/reset-password/${token}`,
         { password }
       );
       return response.data;
