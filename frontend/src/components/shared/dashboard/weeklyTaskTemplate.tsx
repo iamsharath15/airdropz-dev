@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Clock,
   CloudUpload,
-  Upload,
   Users,
 } from 'lucide-react';
 import Image from 'next/image';

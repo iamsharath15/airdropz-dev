@@ -43,7 +43,6 @@ router.post("/resend-otp", UserController.resendOtp)
 
 router.get("/check-auth", verifyToken, UserController.checkAuth);
 
-router.get('/users', UserController.getAllUsers);
 
 
 export default router

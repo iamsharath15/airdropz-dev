@@ -1,11 +1,12 @@
 import express from 'express';
-import AdminController from '../controllers/AdminController.js';
+import AdminController from '../controllers/admin.controller.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 import { verifyToken } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
+const adminAuth = [verifyToken, isAdmin];
 
-// GET /api/admin/stats
-router.get('/stats',verifyToken, isAdmin, AdminController.getDashboardStats);
+router.get('/stats', adminAuth, AdminController.getDashboardStats);
+router.get('/users', adminAuth, AdminController.getAllUsers);
 
 export default router;

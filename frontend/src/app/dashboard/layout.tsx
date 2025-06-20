@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { RootState } from '@/store';
 
 import { Sidebar } from '@/components/shared/Sidebar';
-import { Navbar } from '@/components/shared/Navbar';
+import { Navbar } from '@/components/shared/dashboard/Navbar';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '@/store/authSlice';

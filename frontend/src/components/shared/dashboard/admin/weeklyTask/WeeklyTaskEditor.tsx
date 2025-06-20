@@ -56,7 +56,6 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
   onTaskUpdate,
 }) => {
   const [step, setStep] = useState(1);
-  const [banner, setBanner] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [categoryOpen, setCategoryOpen] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));

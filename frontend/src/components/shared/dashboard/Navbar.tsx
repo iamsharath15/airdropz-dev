@@ -12,7 +12,7 @@ import {
   Star as StarIcon,
   ClipboardList as ClipboardListIcon,
 } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -20,7 +20,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '../ui/dropdown-menu';
+} from '../../ui/dropdown-menu';
 import { logout } from '@/app/(auth)/logout/page';
 import Image from 'next/image';
 import axios from 'axios';
@@ -60,7 +60,6 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
   const userProfile = user?.profile_image;
 
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   const resolvePageTitle = (
     role: 'admin' | 'user',
@@ -105,11 +104,9 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
     router.push('/dashboard/user/settings');
   };
 
-  // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        setLoadingNotifications(true);
         const res = await axios.get(
           'http://localhost:8080/api/notification/v1/notifications?page=1&per_page=5',
           { withCredentials: true }
@@ -118,7 +115,6 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
       } catch (err) {
         console.error('Error fetching notifications:', err);
       } finally {
-        setLoadingNotifications(false);
       }
     };
 

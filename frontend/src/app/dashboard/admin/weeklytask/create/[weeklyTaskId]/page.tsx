@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { Save, Trash } from 'lucide-react';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { WeeklyTask } from '@/types';
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
@@ -60,7 +61,7 @@ const CreateWeeklyTaskPage = () => {
     try {
       setSaving(true);
 
-      const payload: any = {
+      const payload:WeeklyTask = {
         task_title: taskData.task_title,
         task_category: taskData.task_category,
         start_time: taskData.start_time,

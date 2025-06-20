@@ -95,7 +95,7 @@ const DailyLoginModal = ({
                   Success!
                 </div>
                 <div className="text-green-300 text-lg">
-                  +{loginData.todayPoints} Airdrops Earned
+                  +{loginData.todayPoints} Points Earned
                 </div>
                 <div className="text-gray-400 text-sm mt-2">
                   Come back tomorrow for more!

@@ -22,7 +22,6 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [coverName, setCoverName] = useState('');
-  const [coverImage, setCoverImage] = useState('');
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -72,8 +71,6 @@ const Index = () => {
       setOpen(false);
       setCoverName('');
       setCoverFile(null);
-
-      setCoverImage('');
       setStories((prev) => [...prev, res.data]);
     } catch (error) {
       console.error('Create cover error', error);
