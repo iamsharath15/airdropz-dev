@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-import { updateUser } from '@/store/authSlice';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -14,6 +13,7 @@ import DisplaySection from '@/components/shared/dashboard/settings/DisplaySectio
 import WalletSection from '@/components/shared/dashboard/settings/WalletSection';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { setProfile } from '@/store/profileSlice';
 
 const TABS = ['Account', 'Notification', 'Display', 'Wallet'] as const;
 type Tab = (typeof TABS)[number];
@@ -58,8 +58,9 @@ const UserSettings: React.FC = () => {
   const [newAirdropAlerts, setNewAirdropAlerts] = useState(true);
   const [weeklyReports, setWeeklyReports] = useState(false);
   const [taskReminders, setTaskReminders] = useState(true);
+  const profile = useSelector((state: RootState) => state.profile.data);
 
-  const { data: settings, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ['user-settings'],
     queryFn: async () => {
       const res = await axios.get(
@@ -68,26 +69,27 @@ const UserSettings: React.FC = () => {
           withCredentials: true,
         }
       );
+      dispatch(setProfile(res.data.data));
       return res.data.data;
     },
-    staleTime: 1000 * 60 * 5,
+    enabled: !profile, // only fetch if profile doesn't exist in Redux
   });
 
   useEffect(() => {
-    if (settings) {
-      setUsername(settings.user_name || '');
-      setWallet(settings.wallet_address || '');
-      setProfileImageUrl(settings.profile_image || null);
-      setNewAirdropAlerts(settings.new_airdrop_alerts ?? true);
-      setWeeklyReports(settings.weekly_reports ?? false);
-      setTaskReminders(settings.task_reminders ?? true);
+    if (profile) {
+      setUsername(profile.user_name || '');
+      setWallet(profile.wallet_address || '');
+      setProfileImageUrl(profile.profile_image || null);
+      setNewAirdropAlerts(profile.new_airdrop_alerts ?? true);
+      setWeeklyReports(profile.weekly_reports ?? false);
+      setTaskReminders(profile.task_reminders ?? true);
     }
-  }, [settings]);
+  }, [profile]);
 
   const mutation = useMutation({
     mutationFn: async () =>
       axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
+        `http://localhost:8080/api/account-setting/v1/profile`,
         {
           user_name: username,
           profile_image: profileImageUrl,
@@ -100,13 +102,10 @@ const UserSettings: React.FC = () => {
         },
         { withCredentials: true }
       ),
-    onSuccess: () => {
-      dispatch(
-        updateUser({
-          user_name: username,
-          profile_image: profileImageUrl ?? undefined,
-        })
-      );
+    onSuccess: (res) => {
+      const updatedProfile = res.data?.data;
+
+      dispatch(setProfile(updatedProfile));
 
       queryClient.invalidateQueries({
         queryKey: ['user-settings'],

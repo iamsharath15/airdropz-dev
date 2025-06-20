@@ -55,9 +55,11 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
   const dispatch = useDispatch();
 
   const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.user_name || 'User';
-  const userEmail = user?.email || 'user@example.com';
-  const userProfile = user?.profile_image;
+    const profile = useSelector((state: RootState) => state.profile.data);
+  
+  const userName = profile?.user_name || 'User';
+  const userEmail = profile?.email || 'user@example.com';
+  const userProfile = profile?.profile_image;
 
   const [notifications, setNotifications] = useState<any[]>([]);
 
@@ -263,7 +265,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                       className="rounded-full object-cover w-8 h-8 cursor-pointer"
                     />
                   ) : (
-                    <div className="w-8 h-8 cursor-pointer rounded-full bg-gray-300 flex items-center justify-center select-none text-black font-semibold">
+                    <div className="w-8 h-8 cursor-pointer rounded-full bg-[#8373EE] flex items-center justify-center select-none text-white font-semibold">
                       {userName.charAt(0).toUpperCase()}
                     </div>
                   )}

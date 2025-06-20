@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | Airdropz – Discover. Complete. Earn.`,
+    template: `%s | LootCrate – Discover. Complete. Earn.`,
     default: APP_NAME,
   },
   description: APP_DESCRIPTION,

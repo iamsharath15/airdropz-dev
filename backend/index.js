@@ -8,7 +8,6 @@ import referralRoutes from "./routes/referral.routes.js";
 import cookieParser from 'cookie-parser';
 import leaderboardRoutes from './routes/leaderboard.routes.js';
 import airdropRoutes from "./routes/airdrop.routes.js";
-import onboardingRoutes from "./routes/onboarding.routes.js";
 import weeklyTaskRoutes from "./routes/weeklytask.routes.js";
 import userTaskRoutes from "./routes/userTasks.routes.js";
 import streakRoutes from './routes/streak.routes.js';
@@ -34,7 +33,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/auth/v1', authRoutes);
 app.use("/api/referral/v1", referralRoutes); 
-app.use('/api/onboarding/v1', onboardingRoutes)
 app.use('/api/leaderboard/v1', leaderboardRoutes)
 app.use('/api/airdrop/v1', airdropRoutes)
 app.use('/api/userAirdrop/v1', userAirdropRoutes)

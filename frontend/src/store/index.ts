@@ -15,10 +15,12 @@ import storage from 'redux-persist/lib/storage'; // defaults to localStorage for
 
 import authReducer from './authSlice';
 import airdropsReducer from './airdropsSlice'; // ✅ Import
+import profileReducer from './profileSlice'; 
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  airdrops: airdropsReducer, 
+  airdrops: airdropsReducer,
+  profile: profileReducer
 });
 
 const persistConfig = {
