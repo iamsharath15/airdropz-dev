@@ -14,10 +14,10 @@ import AuthSlider from '@/components/shared/auth/AuthSlider';
 import type { SignUpFormData, ApiResponse } from '@/types';
 
 const initialFormData: SignUpFormData = {
-  userName: '',
+  user_name: '',
   email: '',
   password: '',
-  referralCode: '',
+  referral_code: '',
 };
 
 const fieldConfigs: {
@@ -26,10 +26,10 @@ const fieldConfigs: {
   type: string;
   required?: boolean;
 }[] = [
-  { id: 'userName', label: 'Name', type: 'text', required: true },
+  { id: 'user_name', label: 'Name', type: 'text', required: true },
   { id: 'email', label: 'Email', type: 'email', required: true },
   { id: 'password', label: 'Password', type: 'password', required: true },
-  { id: 'referralCode', label: 'Referral Code', type: 'text' },
+  { id: 'referral_code', label: 'Referral Code', type: 'text' },
 ];
 
 export default function SignUp() {

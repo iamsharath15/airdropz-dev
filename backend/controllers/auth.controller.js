@@ -12,99 +12,113 @@ import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
 import { generateReferralCode } from '../utils/generateReferralCode.js';
 import { createUserNotification } from '../services/notificationService.js';
+import { sendSuccess, sendError } from '../utils/response.js';
 
 class UserController {
   static async registerUser(req, res) {
-    const { userName, email, password, referralCode } = req.body;
+    const { user_name, email, password, referral_code } = req.body;
+
     try {
-      if (!userName || !email || !password) {
-        return res.status(400).json({
-          error: 'Validation Error',
-          message: 'UserName, Email, and Password are required.',
-        });
+      // Validation
+      if (!user_name || !email || !password) {
+        return sendError(
+          res,
+          'Username, email, and password are required.',
+          400,
+          new Error('ValidationError: Missing required fields')
+        );
       }
 
-      const existingUserResult = await pool.query(
+      // Check if user already exists
+      const existingUser = await pool.query(
         'SELECT * FROM users WHERE email = $1',
         [email]
       );
-      if (existingUserResult.rows.length > 0) {
-        return res.status(409).json({
-          error: 'Conflict Error',
-          message: 'A user with this email already exists.',
-        });
+      if (existingUser.rows.length > 0) {
+        return sendError(
+          res,
+          'A user with this email already exists.',
+          409,
+          new Error('Conflict Error : Duplicate email')
+        );
       }
 
+      // Handle referral code
       let referrerId = null;
-      if (referralCode) {
+      if (referral_code) {
         const referrerResult = await pool.query(
-          'SELECT id FROM users WHERE referral_code = $1',
-          [referralCode]
+          'SELECT user_id FROM profiles WHERE referral_code = $1',
+          [referral_code]
         );
 
         if (referrerResult.rows.length === 0) {
-          return res.status(400).json({
-            error: 'Invalid Referral Code',
-            message:
-              'Referral code is invalid. Please enter a valid referral code or continue without code.',
-            referralCodeInvalid: true,
-          });
+          return sendError(
+            res,
+            'Referral code is invalid. Please enter a valid referral code or continue without code.',
+            400,
+            new Error('Invalid Referral Code Error')
+          );
         }
-        referrerId = referrerResult.rows[0].id;
+        referrerId = referrerResult.rows[0].user_id;
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const verificationToken = generateVerificationToken();
       const verificationTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 min
-      const generatedReferralCode = generateReferralCode(userName);
-
       const defaultUserRole = 'user';
 
-      const insertUserResult = await pool.query(
-        `INSERT INTO users (user_name, email, password, referral_code, verification_token, verification_token_expires_at, role, airdrops_earned)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, user_name, email, referral_code, role, airdrops_earned`,
+      // Insert user
+      const insertUser = await pool.query(
+        `INSERT INTO users (user_name, email, password, verification_token, verification_token_expires_at, role)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, user_name, email, role`,
         [
-          userName,
+          user_name,
           email,
           hashedPassword,
-          generatedReferralCode,
           verificationToken,
           verificationTokenExpiry,
           defaultUserRole,
-          0,
         ]
       );
 
-      const newUser = insertUserResult.rows[0];
+      const newUser = insertUser.rows[0];
+      const generatedReferralCode = generateReferralCode(user_name);
+
+      // Create profile with referral code
       await pool.query(
-        `INSERT INTO account_settings (user_id)
-      VALUES ($1)
-   ON CONFLICT (user_id) DO NOTHING`,
-        [newUser.id]
+        `INSERT INTO profiles (user_id, referral_code)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id) DO NOTHING`,
+        [newUser.id, generatedReferralCode]
       );
+
+      // Welcome notification
       await createUserNotification({
         user_id: newUser.id,
         type: 'welcome',
         title: 'Welcome to LootCrate!',
-        message: `Hi ${userName}, welcome aboard! Start exploring airdrops and earning rewards.`,
+        message: `Hi ${user_name}, welcome aboard! Start exploring airdrops and earning rewards.`,
         target_url: '',
         points_earned: 0,
       });
 
+      // Leaderboard entry
       await pool.query(
         `INSERT INTO leaderboard (user_id, points)
-       VALUES ($1, 0)
-       ON CONFLICT (user_id) DO NOTHING`,
+         VALUES ($1, 0)
+         ON CONFLICT (user_id) DO NOTHING`,
         [newUser.id]
       );
+
+      // Handle referral rewards
       if (referrerId) {
         await pool.query(
           `UPDATE leaderboard SET points = points + 50 WHERE user_id = $1`,
           [referrerId]
         );
         await pool.query(
-          `UPDATE users SET airdrops_earned = airdrops_earned + 50 WHERE id = $1`,
+          `UPDATE profiles SET airdrops_earned = airdrops_earned + 50 WHERE user_id = $1`,
           [referrerId]
         );
         await pool.query(
@@ -112,18 +126,19 @@ class UserController {
           [newUser.id]
         );
         await pool.query(
-          `UPDATE users SET airdrops_earned = airdrops_earned + 25 WHERE id = $1`,
+          `UPDATE profiles SET airdrops_earned = airdrops_earned + 25 WHERE user_id = $1`,
           [newUser.id]
         );
         await pool.query(
           `INSERT INTO referrals (referrer_id, referred_id, referral_code_used) VALUES ($1, $2, $3)`,
-          [referrerId, newUser.id, referralCode]
+          [referrerId, newUser.id, referral_code]
         );
+
         await createUserNotification({
           user_id: referrerId,
           type: 'referral',
           title: 'Referral Joined',
-          message: `${userName} joined using your referral code. You earned 50 points!`,
+          message: `${user_name} joined using your referral code. You earned 50 points!`,
           target_url: '/referrals',
           points_earned: 50,
         });
@@ -138,20 +153,20 @@ class UserController {
         });
       }
 
+      // send verification email
       // await sendVerificationEmail(email, verificationToken);
 
+      // Set token
       generateTokenAndSetCookie(res, newUser.id);
 
-      res.status(201).json({
-        message: 'User successfully created.',
-        user: newUser,
-      });
+      return sendSuccess(res, newUser, 'User created successfully.', 201);
     } catch (error) {
-      console.error('Signup error:', error);
-      res.status(500).json({
-        error: 'Internal Server Error',
-        message: 'An error occurred during signup. Please try again later.',
-      });
+      return sendError(
+        res,
+        'An error occurred during signup. Please try again later.',
+        500,
+        error
+      );
     }
   }
 
@@ -166,10 +181,7 @@ class UserController {
       );
 
       if (result.rows.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid or expired verification code.',
-        });
+        return sendError(res, 'Invalid or expired verification code.', 400);
       }
 
       const user = result.rows[0];
@@ -188,32 +200,22 @@ class UserController {
       );
       try {
         // await sendWelcomeEmail(user.email, user.username);
-      } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError);
+      } catch (error) {
+        return sendError(res, 'Failed to send welcome email', 500, error);
       }
-
-      res.status(200).json({
-        success: true,
-        message: 'Email verified successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          user_name: user.user_name,
-          is_verified: true,
-        },
-      });
+      const verifyUser = {
+        email: user.email,
+        user_name: user.user_name,
+        is_verified: true,
+      };
+      return sendSuccess(res, verifyUser, 'Email verified successfully', 201);
     } catch (error) {
-      console.error('Error in verifyUserEmail:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'nternal server error. Please try again.',
-      });
+      return sendError(res, 'Error in verify user email', 500, error);
     }
   }
 
   static async loginUser(req, res) {
     const { email, password } = req.body;
-
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', [
         email,
@@ -221,17 +223,11 @@ class UserController {
       const user = result.rows[0];
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid email or password.',
-        });
+        return sendError(res, 'Invalid email or password.', 400);
       }
 
       if (!user.is_verified) {
-        return res.status(401).json({
-          success: false,
-          message: 'Email not verified.',
-        });
+        return sendError(res, 'Email not verified.', 401);
       }
 
       generateTokenAndSetCookie(res, user);
@@ -245,27 +241,17 @@ class UserController {
         email: user.email,
         user_name: user.user_name,
         role: user.role,
-        referral_code: user.referral_code,
-        wallet_address: user.wallet_address,
-        daily_login_streak_count: user.daily_login_streak_count,
-        airdrops_earned: user.airdrops_earned,
-        airdrops_remaining: user.airdrops_earned,
-        profile_image: user.profile_image,
         is_new_user: user.is_new_user,
         is_verified: user.is_verified,
       };
-
-      res.status(200).json({
-        success: true,
-        message: 'Logged in successfully',
-        user: safeUser,
-      });
+      return sendSuccess(res, safeUser, 'successfully', 200);
     } catch (error) {
-      console.error('Error in loginUser:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Server error. Please try again later.',
-      });
+      return sendError(
+        res,
+        'Server error. Please try again later.',
+        401,
+        error
+      );
     }
   }
 
@@ -276,16 +262,9 @@ class UserController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
       });
-      return res.status(200).json({
-        success: true,
-        message: 'User logged out successfully',
-      });
+      return sendSuccess(res, null, 'User logged out successfully.', 200);
     } catch (error) {
-      console.error('Logout error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Logout failed.',
-      });
+      return sendError(res, 'Logout failed.', 500, error);
     }
   }
 
@@ -299,10 +278,7 @@ class UserController {
       const user = result.rows[0];
 
       if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: 'User not found',
-        });
+        return sendError(res, 'User not found', 400);
       }
 
       const resetToken = crypto.randomBytes(20).toString('hex');
@@ -316,16 +292,19 @@ class UserController {
       const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
       // await sendPasswordResetEmail(email, resetURL);
 
-      res.status(200).json({
-        success: true,
-        message: 'Password reset link sent to your email',
-      });
+      return sendSuccess(
+        res,
+        { email },
+        'Password reset link sent to your email',
+        200
+      );
     } catch (error) {
-      console.log('Error in forgotPassword', error);
-      res.status(500).json({
-        success: false,
-        message: 'Server error. Please try again later.',
-      });
+      return sendError(
+        res,
+        'Server error. Please try again later.',
+        500,
+        error
+      );
     }
   }
 
@@ -341,9 +320,7 @@ class UserController {
 
       const user = result.rows[0];
       if (!user) {
-        return res
-          .status(400)
-          .json({ success: false, message: 'Invalid or expired token.' });
+        return sendError(res, 'Invalid or expired token.', 400);
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -353,32 +330,9 @@ class UserController {
       );
 
       // await sendResetSuccessEmail(user.email);
-      res
-        .status(200)
-        .json({ success: true, message: 'Password reset successfully' });
+      return sendSuccess(res, null, 'Password reset successfully', 200);
     } catch (error) {
-      console.error('Reset password error:', error);
-      res.status(500).json({ success: false, message: 'Server error.' });
-    }
-  }
-
-  static async checkAuth(req, res) {
-    try {
-      const result = await pool.query(
-        `SELECT id, user_name, email, role FROM users WHERE id = $1`,
-        [req.user.userId]
-      );
-
-      if (result.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: 'User not found' });
-      }
-
-      return res.status(200).json({ success: true, user: result.rows[0] });
-    } catch (error) {
-      console.error('checkAuth error:', error);
-      return res.status(500).json({ success: false, message: 'Server error' });
+      return sendError(res, 'Server error.', 500, error);
     }
   }
 
@@ -413,7 +367,35 @@ class UserController {
     return res.json({ message: 'OTP resent to your email.' });
   }
 
- 
+  static async checkAuth(req, res) {
+    try {
+      const result = await pool.query(
+        `SELECT id, user_name, email, role FROM users WHERE id = $1`,
+        [req.user.userId]
+      );
+
+      if (result.rows.length === 0) {
+        return sendError(res, 'User not found', 404);
+      }
+      const user = result.rows[0];
+
+      const userDetails = {
+        id: user.id,
+        user_name: user.user_name,
+        email: user.email,
+        role: user.role,
+      };
+
+      return sendSuccess(
+        res,
+        userDetails,
+        'User authenticated successfully.',
+        200
+      );
+    } catch (error) {
+      return sendError(res, 'Server error', 500, error);
+    }
+  }
 }
 
 export default UserController;

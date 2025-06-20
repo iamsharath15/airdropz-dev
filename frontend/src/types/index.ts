@@ -42,25 +42,19 @@ export interface ResetPasswordResponse {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    user_name: string;
-    role: string;
-    is_new_user?: boolean;
-    wallet_address: string;
-    daily_login_streak_count: number;
-    airdrops_remaining: number;
-    airdrops_earned: number;
-  };
+  id: string;
+  email: string;
+  user_name: string;
+  role: string;
+  is_new_user?: boolean;
+  is_verified?: boolean;
 }
 
 export interface SignUpFormData {
-  userName: string;
+  user_name: string;
   email: string;
   password: string;
-  referralCode?: string;
+  referral_code?: string;
 }
 export interface ApiResponse {
   message: string;
@@ -136,7 +130,6 @@ export interface TaskData {
   // Include other fields if needed
 }
 
-
 export interface Referral {
   id: number;
   join_date: string;
@@ -207,11 +200,10 @@ export type BlockType =
   | 'highlight'
   | 'header1';
 
-
-  export interface MultiStepFormProps {
+export interface MultiStepFormProps {
   steps: Step[];
   onComplete: (data: Record<string, string[]>) => void;
-  }
+}
 
 export type Step = {
   title: string;
@@ -285,6 +277,6 @@ export interface DisplaySectionProps {
 
 export interface WalletSectionProps {
   title: string;
-    wallet: string;
+  wallet: string;
   setWallet: (val: string) => void;
 }

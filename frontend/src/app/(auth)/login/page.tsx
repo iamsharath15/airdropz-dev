@@ -20,22 +20,22 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const loginMutation = useMutation<LoginResponse, AxiosError>({
+  const loginMutation = useMutation<{ data: LoginResponse }, AxiosError>({
     mutationFn: async () => {
-      const response = await axios.post<LoginResponse>(
+      const response = await axios.post<{ data: LoginResponse }>(
         'http://localhost:8080/api/auth/v1/login',
         { email, password },
         { withCredentials: true }
       );
       return response.data;
     },
-    onSuccess: (data) => {
-      dispatch(setCredentials({ token: data.token, user: data.user }));
+    onSuccess: ({ data }) => {
+      dispatch(setCredentials({ user: data }));
       toast.success('Logged in successfully!');
 
-      if (data.user.is_new_user === true) {
+      if (data.is_new_user === true) {
         router.push('/onboarding');
-      } else if (data.user.role === 'admin') {
+      } else if (data.role === 'admin') {
         router.push('/dashboard/admin');
       } else {
         router.push('/dashboard/user');
