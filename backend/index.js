@@ -11,13 +11,14 @@ import airdropRoutes from "./routes/airdrop.routes.js";
 import onboardingRoutes from "./routes/onboarding.routes.js";
 import weeklyTaskRoutes from "./routes/weeklytask.routes.js";
 import userTaskRoutes from "./routes/userTasks.routes.js";
-import userSettingsRoutes from './routes/userSettings.routes.js';
 import streakRoutes from './routes/streak.routes.js';
 import uploadRoutes from './routes/upload.route.js';
 import expertStoriesRoutes from './routes/expertStories.routes.js';
 import userAirdropRoutes from './routes/userAirdropRoutes.js';
 import adminRoutes from './routes/admin.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+
+import profileRoutes from "./routes/profile.routes.js";
 
 dotenv.config();
 
@@ -39,7 +40,6 @@ app.use('/api/airdrop/v1', airdropRoutes)
 app.use('/api/userAirdrop/v1', userAirdropRoutes)
 app.use('/api/weeklytask/v1', weeklyTaskRoutes);
 app.use('/api/user-task/v1', userTaskRoutes);
-app.use('/api/settings/v1', userSettingsRoutes);
 app.use('/api/streak/v1', streakRoutes);
 app.use('/api/upload/v1', uploadRoutes);
 app.use('/api/expertStories/v1', expertStoriesRoutes);
@@ -47,6 +47,11 @@ app.use('/api/expertStories/v1', expertStoriesRoutes);
 
 app.use('/api/admin/v1', adminRoutes);
 app.use('/api/notification/v1', notificationRoutes);
+
+
+//v1
+app.use('/api/account-setting/v1', profileRoutes);
+
 
 
 // Test DB connection

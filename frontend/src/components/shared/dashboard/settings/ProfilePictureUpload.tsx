@@ -43,7 +43,7 @@ const ProfilePictureUpload = ({
             className="object-cover w-24 h-24 rounded-full border border-gray-500 bg-gray-700"
           />
         ) : (
-          <div className="w-24 h-24 border border-gray-500 bg-gray-700 rounded-full flex items-center justify-center">
+          <div className="w-24 h-24 bg-[#8373EE] rounded-full flex items-center justify-center">
             <span>{initial}</span>
           </div>
         )}

@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
+import { updateUser } from '@/store/authSlice';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import axios from 'axios';
 import { toast } from 'sonner';
-import { updateUser } from '@/store/authSlice';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import AccountSection from '@/components/shared/dashboard/settings/AccountSection';
 import NotificationSection from '@/components/shared/dashboard/settings/NotificationSection';
 import DisplaySection from '@/components/shared/dashboard/settings/DisplaySection';
-import WalletSection from '@/components/shared/dashboard/settings/WalletSection'
-
+import WalletSection from '@/components/shared/dashboard/settings/WalletSection';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 const TABS = ['Account', 'Notification', 'Display', 'Wallet'] as const;
 type Tab = (typeof TABS)[number];
@@ -45,53 +45,49 @@ const SkeletonLoader = () => (
 
 const AdminSettings: React.FC = () => {
   useRoleRedirect('admin');
-  const [activeTab, setActiveTab] = useState<Tab>('Account');
-  const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.user_name || 'user1';
-  const userEmail = user?.email || 'user@example.com';
-  const walletAddress = user?.wallet_address || 'add your wallet';
-  const user_id = user?.id;
-  const [username, setUsername] = useState(userName);
-  const [wallet, setWallet] = useState(walletAddress);
-  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const [activeTab, setActiveTab] = useState<Tab>('Account');
+
+  const [username, setUsername] = useState('');
+  const [wallet, setWallet] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [newAirdropAlerts, setNewAirdropAlerts] = useState(true);
   const [weeklyReports, setWeeklyReports] = useState(false);
   const [taskReminders, setTaskReminders] = useState(true);
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const dispatch = useDispatch();
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ['user-settings'],
+    queryFn: async () => {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
+        {
+          withCredentials: true,
+        }
+      );
+      return res.data.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/settings/v1/`,
-          { withCredentials: true }
-        );
-        const settings = response.data.data;
+    if (settings) {
+      setUsername(settings.user_name || '');
+      setWallet(settings.wallet_address || '');
+      setProfileImageUrl(settings.profile_image || null);
+      setNewAirdropAlerts(settings.new_airdrop_alerts ?? true);
+      setWeeklyReports(settings.weekly_reports ?? false);
+      setTaskReminders(settings.task_reminders ?? true);
+    }
+  }, [settings]);
 
-        setUsername(settings.user_name || '');
-        setWallet(settings.wallet_address || '');
-        setProfileImageUrl(settings.profile_image || null);
-        setNewAirdropAlerts(settings.new_airdrop_alerts ?? true);
-        setWeeklyReports(settings.weekly_reports ?? false);
-        setTaskReminders(settings.task_reminders ?? true);
-      } catch (error) {
-        console.error('Failed to load settings:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchSettings();
-  }, []);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/settings/v1/`,
+  const mutation = useMutation({
+    mutationFn: async () =>
+      axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
         {
           user_name: username,
           profile_image: profileImageUrl,
@@ -103,23 +99,25 @@ const AdminSettings: React.FC = () => {
           language: 'english',
         },
         { withCredentials: true }
-      );
+      ),
+    onSuccess: () => {
       dispatch(
         updateUser({
           user_name: username,
           profile_image: profileImageUrl ?? undefined,
-          wallet_address: wallet,
         })
       );
 
+      queryClient.invalidateQueries({
+        queryKey: ['user-settings'],
+      });
+
       toast.success('Settings updated successfully!');
-    } catch (error) {
-      console.error('Error updating settings:', error);
+    },
+    onError: () => {
       toast.error('Failed to update settings. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    },
+  });
 
   if (isLoading) {
     return (
@@ -170,13 +168,12 @@ const AdminSettings: React.FC = () => {
             title="Account Settings"
             userName={username}
             setUsername={setUsername}
-            userEmail={userEmail}
+            userEmail={user?.email || ''}
             setProfileImageUrl={setProfileImageUrl}
             profileImageUrl={profileImageUrl || ''}
-            userId={user_id || ''}
+            userId={user?.id || ''}
           />
         )}
-
         {activeTab === 'Notification' && (
           <NotificationSection
             title="Notification Preferences"
@@ -189,7 +186,6 @@ const AdminSettings: React.FC = () => {
           />
         )}
         {activeTab === 'Display' && <DisplaySection title="Display Settings" />}
-
         {activeTab === 'Wallet' && (
           <WalletSection
             title="Wallet Settings"
@@ -198,13 +194,13 @@ const AdminSettings: React.FC = () => {
           />
         )}
 
-        <div className="flex justify-start">
+        <div className="flex justify-start mt-4">
           <Button
-            onClick={handleSave}
-            disabled={isSaving}
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
             className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer flex items-center gap-2"
           >
-            {isSaving ? (
+            {mutation.isPending ? (
               <>
                 <svg
                   className="animate-spin h-5 w-5 text-white"

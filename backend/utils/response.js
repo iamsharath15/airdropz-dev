@@ -24,20 +24,30 @@ export const sendSuccess = (
 /**
  * Send an error response
  * @param {Response} res - Express response object
- * @param {string} message - Error message
+ * @param {string} message - Error message to display to client
  * @param {number} statusCode - Optional status code (default: 500)
  * @param {any} error - Optional error object for debugging/logging
+ * @param {boolean} includeErrorDetails - Show error details if not in production
+
  */
 export const sendError = (
   res,
   message = 'Internal Server Error',
   statusCode = 500,
-  error = null
+  error = null,
+  includeErrorDetails = process.env.NODE_ENV !== 'production'
 ) => {
-  if (error) console.error('Error:', error);
+  if (error) console.error('❌ Error:', error);
 
-  return res.status(statusCode).json({
+  const response = {
     success: false,
     message,
-  });
+  };
+
+  if (includeErrorDetails && error) {
+    response.error = error?.message || error?.toString?.() || String(error);
+  }
+
+  return res.status(statusCode).json(response);
 };
+

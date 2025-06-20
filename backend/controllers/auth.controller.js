@@ -78,7 +78,7 @@ class UserController {
 
       const newUser = insertUserResult.rows[0];
       await pool.query(
-        `INSERT INTO user_settings (user_id)
+        `INSERT INTO account_settings (user_id)
       VALUES ($1)
    ON CONFLICT (user_id) DO NOTHING`,
         [newUser.id]
