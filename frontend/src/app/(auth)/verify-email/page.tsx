@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Toaster, toast } from 'sonner';
 import axios, { AxiosError } from 'axios';
-import OtpInput from '@/components/shared/OtpInput';
+import OtpInput from '@/components/shared/auth/OtpInput';
 import AuthSlider from '@/components/shared/auth/AuthSlider';
 
 export default function VerifyEmailPage() {

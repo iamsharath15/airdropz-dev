@@ -9,16 +9,21 @@ import type { RootState } from '@/store';
 const Page = () => {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = !!user;
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/'); 
+    if (!user) {
+      router.push('/');
+    } else if (user.is_verified) {
+      if (user.role === 'admin') {
+        router.push('/dashboard/admin');
+      } else {
+        router.push('/dashboard/user');
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [user, router]);
 
   // Prevent rendering until user is authenticated
-  if (!isAuthenticated) return null;
+  if (!user) return <div className="text-white p-4">Loading...</div>;
 
   return (
     <div className="w-full">

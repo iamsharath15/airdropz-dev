@@ -6,7 +6,6 @@ import { sendSuccess, sendError } from '../utils/response.js';
 class ReferralController {
   static async getReferralStats(req, res) {
     const user_id = req.user.userId;
-console.log(user_id);
 
     try {
       const userRes = await pool.query(
@@ -14,7 +13,7 @@ console.log(user_id);
         [user_id]
       );
 
-      const { referral_code} = userRes.rows[0];
+      const { referral_code } = userRes.rows[0];
 
       const referrals = await pool.query(
         `
@@ -37,20 +36,15 @@ console.log(user_id);
           join_date: r.created_at,
           points_earned: 50,
         })),
-      }
-        return sendSuccess(
+      };
+      return sendSuccess(
         res,
         userDetails,
         'Users who joined using your referral code',
         200
       );
     } catch (error) {
-        return sendError(
-        res,
-        'Failed to fetch referral data',
-        500,
-        error
-      );
+      return sendError(res, 'Failed to fetch referral data', 500, error);
     }
   }
 }

@@ -133,7 +133,7 @@ export default function Login() {
 
             <p className="text-center text-sm mt-4">
               Don’t have an account?{' '}
-              <Link href="/signup" className="underline ">
+              <Link href="/" className="underline ">
                 Sign Up
               </Link>
             </p>
