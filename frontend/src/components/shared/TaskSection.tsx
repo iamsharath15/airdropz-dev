@@ -3,26 +3,7 @@ import EditWeeklyTaskFormModal from './dashboard/admin/weeklyTask/EditWeeklyTask
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock } from 'lucide-react';
-
-interface Task {
-  id: string;
-  task_title: string;
-  task_banner_image: string | null;
-  task_category: string;
-  week: number;
-  progress: number;
-  end_time: string;
-  user_count: number;
-  user_images: {
-    user_id: string;
-    user_name: string;
-    profile_image: string | null;
-  };
-}
-
-interface TaskSectionProps {
-  tasks: Task[];
-}
+import type { WeeklyTask } from '@/types';
 
 const getTimeLeftString = (endTime: string): string => {
   const now = new Date();
@@ -39,15 +20,25 @@ const getTimeLeftString = (endTime: string): string => {
     ? `${days} day${days > 1 ? 's' : ''} ${remHours}h left`
     : `${remHours} hour${remHours !== 1 ? 's' : ''} left`;
 };
+type WeeklyTaskWithUsers = WeeklyTask & {
+  user_count?: number;
+  user_images?: {
+    user_name?: string;
+    profile_image?: string;
+  }[];
+};
 
-export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
+export const TaskSection: React.FC<{ title: string, tasks: WeeklyTaskWithUsers[] }> = ({
+  title,
+  tasks,
+}) => {
   const [openModal, setOpenModal] = useState(false);
 
   return (
     <div className="mb-6 md:mb-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="md:text-xl tetx-lg font-bold text-white">
-          Top Weekly Task
+          {title}
         </h2>
         {/* <div className="flex gap-2">
                 <button
@@ -66,7 +57,9 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
       </div>
       <div className="flex flex-wrap ">
         {tasks.map((task) => {
-          const timeLeft = getTimeLeftString(task.end_time);
+          const timeLeft = task.end_time
+            ? getTimeLeftString(task.end_time)
+            : 'No end time';
           const imageUrl =
             task.task_banner_image && task.task_banner_image.trim() !== ''
               ? task.task_banner_image
@@ -126,7 +119,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <p className="text-sm text-white mb-1 font-semibold">
-                      User count - {task.user_count}
+                      User count - {task.user_count ?? 0}
                     </p>
                     <div className="flex -space-x-2">
                       {task.user_images && task.user_images.length > 0 ? (
@@ -135,7 +128,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
                             <Image
                               key={index}
                               src={user.profile_image}
-                              alt={user.user_name}
+                              alt={user.user_name || ''}
                               width={24}
                               height={24}
                               className="w-6 h-6 rounded-full border-2 border-white object-cover"
@@ -145,7 +138,7 @@ export const TaskSection: React.FC<TaskSectionProps> = ({ tasks }) => {
                               key={index}
                               className="w-6 h-6 rounded-full border-1 border-white bg-[#8373EE] text-white flex items-center justify-center text-xs font-medium"
                             >
-                              {user.user_name?.charAt(0).toUpperCase()}
+                              {user.user_name?.charAt(0).toUpperCase() ?? "?"}
                             </div>
                           )
                         )

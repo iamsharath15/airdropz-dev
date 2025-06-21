@@ -33,8 +33,8 @@ const AirdropsListing = () => {
   );
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  // const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  // const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   useEffect(() => {
     axios
@@ -91,7 +91,7 @@ const AirdropsListing = () => {
             value={selectedCategory}
             onValueChange={(category) => {
               dispatch(setSelectedCategory(category));
-              setShowCategoryDropdown(false);
+              // setShowCategoryDropdown(false);
             }}
           >
             <SelectTrigger
@@ -123,7 +123,6 @@ const AirdropsListing = () => {
             value={selectedType}
             onValueChange={(type) => {
               dispatch(setSelectedType(type as 'All' | 'Free' | 'Paid'));
-              setShowSortDropdown(false);
             }}
           >
             <SelectTrigger
@@ -152,32 +151,31 @@ const AirdropsListing = () => {
         </div>
       </div>
 
-        {filteredAirdrops.length === 0 ? (
-          <SectionCard title="New Airdrops" message="No airdrops found." />
-        ) : (
-            <div className="mb-6 md:mb-8 ">
-      <div className="flex justify-between items-center mb-4 ">
-        <h2 className="md:text-xl tetx-lg font-bold text-white">
-          Top Weekly Task
-        </h2>
- 
-      </div>
-      <div className="flex flex-wrap  w-full">
-                {filteredAirdrops.map((airdrop) => (
-                  <AirdropCard
-                    key={airdrop.id}
-                    airdrop={{
-                      id: airdrop.id,
-                      title: airdrop.title,
-                      category: airdrop.category ?? 'Unknown',
-                      preview_image_url: airdrop.preview_image_url ?? '',
-                      type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
-                    }}
-                  />
-                ))}
-                   </div>
-    </div>
-        )}
+      {filteredAirdrops.length === 0 ? (
+        <SectionCard title="New Airdrops" message="No airdrops found." />
+      ) : (
+        <div className="mb-6 md:mb-8 ">
+          <div className="flex justify-between items-center mb-4 ">
+            <h2 className="md:text-xl tetx-lg font-bold text-white">
+              Top Weekly Task
+            </h2>
+          </div>
+          <div className="flex flex-wrap  w-full">
+            {filteredAirdrops.map((airdrop) => (
+              <AirdropCard
+                key={airdrop.id}
+                airdrop={{
+                  id: airdrop.id,
+                  title: airdrop.title,
+                  category: airdrop.category ?? 'Unknown',
+                  preview_image_url: airdrop.preview_image_url ?? '',
+                  type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

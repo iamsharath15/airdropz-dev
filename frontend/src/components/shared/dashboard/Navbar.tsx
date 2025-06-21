@@ -21,11 +21,20 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '../../ui/dropdown-menu';
-import { logout } from '@/app/(auth)/logout/page';
+import { logout } from '@/lib/logout';
 import Image from 'next/image';
 import axios from 'axios';
 import type { NavbarProps } from '@/types';
 import { clearProfile } from '@/store/profileSlice';
+type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  created_at: string; // or `Date` if you're parsing it
+  is_read: boolean;
+  type: 'airdrop' | 'points' | 'task';
+  target_url?: string;
+};
 
 
 const pageTitles: Record<string, Record<string, string>> = {
@@ -62,7 +71,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
   const userEmail = profile?.email || 'user@example.com';
   const userProfile = profile?.profile_image;
 
-  const [notifications, setNotifications] = useState<any[]>([]);
+const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const resolvePageTitle = (
     role: 'admin' | 'user',

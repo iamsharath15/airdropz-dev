@@ -15,6 +15,17 @@ import { uploadImageToS3 } from '@/lib/uploadToS3';
 import AirdropPreview from '@/components/shared/dashboard/AirdropPreview';
 import AirdropFormEditor from '@/components/shared/dashboard/AirdropFormEditor';
 import { Save, Trash } from 'lucide-react';
+export type AirdropData = {
+  title: string;
+  category: string;
+  preview_image_url: string;
+  type: string;
+  airdrops_banner_title: string;
+  airdrops_banner_description: string;
+  airdrops_banner_subtitle: string;
+  airdrops_date: string;
+  airdrops_banner_image: string | File;
+};
 
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/airdrop/v1`;
 
@@ -28,17 +39,7 @@ const CreateAirdropPage = () => {
     : rawAirdropId;
 
   const [step, setStep] = useState(1);
-  const [airdropData, setAirdropData] = useState<{
-    title: string;
-    category: string;
-    preview_image_url: string;
-    type: string;
-    airdrops_banner_title: string;
-    airdrops_banner_description: string;
-    airdrops_banner_subtitle: string;
-    airdrops_date: string;
-    airdrops_banner_image: string | File;
-  }>({
+  const [airdropData, setAirdropData] = useState<AirdropData>({
     title: '',
     category: "",
     preview_image_url: "",
@@ -307,7 +308,7 @@ const CreateAirdropPage = () => {
           </div>
         );
       default:
-        return null;
+      return <div className="text-red-500">Unsupported block type</div>;
     }
   };
 

@@ -11,16 +11,20 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { SubTask, TaskBlock, WeeklyTask } from '@/types';
+
+type WeeklyTaskTemplateProps = {
+  task: Partial<WeeklyTask> & { task_banner_image?: string | File };
+  isAdmin?: boolean;
+  onFileUpload?: (file: File, subTaskId: string) => void;
+  uploadingTaskId?: string | null;
+};
 
 const WeeklyTaskTemplate = ({
   task,
   onFileUpload,
   uploadingTaskId,
-}: {
-  task: any;
-  onFileUpload: (file: File, subTaskId: string) => void;
-  uploadingTaskId: string | null;
-}) => {
+}: WeeklyTaskTemplateProps) => {
   const taskList = task?.sub_tasks || [];
   const [previewImages, setPreviewImages] = useState<
     Record<string, string | null>
@@ -29,7 +33,7 @@ const WeeklyTaskTemplate = ({
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>(
     () => {
       const initialState: Record<string, boolean> = {};
-      if (task?.sub_tasks?.length > 0) {
+      if (Array.isArray(task.sub_tasks) && task.sub_tasks.length > 0) {
         initialState[task.sub_tasks[0].id] = true;
       }
       return initialState;
@@ -68,7 +72,11 @@ const WeeklyTaskTemplate = ({
       toast.error('Please select a file before submitting.');
       return;
     }
-    onFileUpload(file, subTaskId);
+    if (onFileUpload) {
+      onFileUpload(file, subTaskId);
+    } else {
+      toast.error('Upload function is not available.');
+    }
   };
   const getTimeLeftString = (endTime?: string): string => {
     if (!endTime) return '';
@@ -150,7 +158,7 @@ const WeeklyTaskTemplate = ({
             </div>
 
             {Array.isArray(task.tasks) &&
-              task.tasks.map((block: any, i: number) => {
+              task.tasks.map((block: TaskBlock, i: number) => {
                 switch (block.type) {
                   case 'description':
                     return (
@@ -186,7 +194,7 @@ const WeeklyTaskTemplate = ({
                         <p className="text-white text-sm">
                           {block.value} :{' '}
                           <a
-                            href={block.link}
+                            href={block.link || ''}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-purple-400 underline"
@@ -217,7 +225,7 @@ const WeeklyTaskTemplate = ({
             Task Checklist
           </h3>
           <div className="space-y-3">
-            {taskList.map((task: any, index: number) => (
+            {taskList.map((task: SubTask, index: number) => (
               <div key={index} className="bg-black rounded-lg">
                 <button
                   onClick={() => toggleTask(task.id)}
@@ -242,7 +250,7 @@ const WeeklyTaskTemplate = ({
                     )}
 
                     <h4 className="text-white text-sm mb-3">File submission</h4>
-                    {task.completed  ? (
+                    {task.completed ? (
                       <div className="relative mb-4 w-full items-center overflow-hidden h-40 bg-[#8373EE]/60 p-4 rounded-lg text-white flex flex-col gap-2 justify-center text-center">
                         <p className="text-lg font-bold">
                           {' '}

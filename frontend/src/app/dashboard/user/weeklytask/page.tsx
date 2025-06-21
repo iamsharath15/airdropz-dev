@@ -38,8 +38,12 @@ const WeeklyTaskCard = ({
       setTimeout(() => {
         window.location.href = `/dashboard/user/weeklytask/${task.id}`;
       }, 1000);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Something went wrong');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || 'Something went wrong');
+      } else {
+        toast.error('Something went wrong');
+      }
     }
   };
 

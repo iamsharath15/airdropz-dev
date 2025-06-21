@@ -122,7 +122,7 @@ const Dashboard: React.FC = () => {
           {weeklyTasks.length === 0 ? (
             <SectionCard title="Top Task" message="No task found" />
           ) : (
-            <TaskSection tasks={weeklyTasks} />
+            <TaskSection tasks={weeklyTasks} title='Top weekly task' />
           )}
         </div>
       </div>

@@ -82,7 +82,7 @@ export default function DashboardLayout({
           console.error('[❌ Streak Error]', err.response?.data || err.message);
         });
     }
-  }, [isAuthenticated, user?.id, dispatch]);
+}, [isAuthenticated, user?.id, dispatch, profile?.last_login, role]);
   return (
     <>
       <div className="flex min-h-screen bg-black w-full text-white">

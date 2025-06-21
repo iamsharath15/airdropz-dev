@@ -28,7 +28,7 @@ type EditAirdropFormModalProps = {
   airdrop: {
     id: string;
     title: string;
-    category: string;
+    category: string | null;
     preview_image_url: string;
     type: 'Free' | 'Paid';
   };

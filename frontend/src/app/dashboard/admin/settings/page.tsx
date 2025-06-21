@@ -104,7 +104,6 @@ const AdminSettings: React.FC = () => {
       dispatch(
         updateUser({
           user_name: username,
-          profile_image: profileImageUrl ?? undefined,
         })
       );
 

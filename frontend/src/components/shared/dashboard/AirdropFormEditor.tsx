@@ -10,7 +10,7 @@ import {
   Highlighter,
   Heading1,
 } from 'lucide-react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
+import { DndContext, closestCenter, useSensors } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/tooltip';
 import SortableItem from '../SortableItem';
 import StepProgress from '../StepProgress';
+import { JSX } from 'react';
 
 type ContentBlock = {
   type:
@@ -39,10 +40,21 @@ type ContentBlock = {
   value: string;
   link?: string;
 };
+type AirdropData = {
+  title: string;
+  category: string;
+  preview_image_url: string;
+  type: string;
+  airdrops_banner_title: string;
+  airdrops_banner_description: string;
+  airdrops_date: string;
+  airdrops_banner_subtitle: string;
+  airdrops_banner_image: string | File;
+};
 
 type Props = {
-  airdropData: any;
-  setAirdropData: (val: (prev: any) => any) => void;
+  airdropData: AirdropData;
+  setAirdropData: React.Dispatch<React.SetStateAction<AirdropData>>;
   step: number;
   setStep: (step: number) => void;
   contentBlocks: ContentBlock[];
@@ -51,7 +63,7 @@ type Props = {
   removeBlock: (index: number) => void;
   addBlock: (type: ContentBlock['type']) => void;
   handleSubmit: () => void;
-  sensors: any;
+  sensors: ReturnType<typeof useSensors>;
   airdropId?: string;
 };
 
@@ -72,6 +84,14 @@ export default function AirdropFormEditor({
   const totalSteps = 2;
 
   const progressPercent = (step / totalSteps) * 100;
+  const tools: { icon: JSX.Element; type: ContentBlock['type'] }[] = [
+    { icon: <FileText />, type: 'description' },
+    { icon: <ImageIcon />, type: 'image' },
+    { icon: <CheckSquare />, type: 'checklist' },
+    { icon: <Link2 />, type: 'link' },
+    { icon: <Highlighter />, type: 'highlight' },
+    { icon: <Heading1 />, type: 'header1' },
+  ];
 
   return (
     <div className="w-full md:w-1/2 md:p-6 px-1 py-6 overflow-auto md:border-t-0  md:border-r border-t border-zinc-800 bg-black">
@@ -81,7 +101,9 @@ export default function AirdropFormEditor({
 
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="md:text-lg tetx-sm font-bold mb-4">Step 1: Airdrop Details</h2>
+          <h2 className="md:text-lg tetx-sm font-bold mb-4">
+            Step 1: Airdrop Details
+          </h2>
 
           <div>
             <label className="block text-sm text-white font-semibold mb-3">
@@ -118,7 +140,9 @@ export default function AirdropFormEditor({
           </div>
 
           <div>
-            <label className="block text-sm text-white mb-3 font-semibold">Date</label>
+            <label className="block text-sm text-white mb-3 font-semibold">
+              Date
+            </label>
             <Input
               value={airdropData.airdrops_date}
               disabled
@@ -195,14 +219,20 @@ export default function AirdropFormEditor({
 
       {step === 2 && (
         <>
-          <h2 className="md:text-lg text-sm font-bold mb-4">Step 2: Content & Reorder</h2>
+          <h2 className="md:text-lg text-sm font-bold mb-4">
+            Step 2: Content & Reorder
+          </h2>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={({ active, over }) => {
-              if (active.id !== over?.id) {
-                const oldIndex = parseInt(active.id);
-                const newIndex = parseInt(over!.id);
+              if (over && active.id !== over?.id) {
+                const oldIndex = parseInt(
+                  (active.id as string).replace('block-', '')
+                );
+                const newIndex = parseInt(
+                  (over.id as string).replace('block-', '')
+                );
                 setContentBlocks((blocks) =>
                   arrayMove(blocks, oldIndex, newIndex)
                 );
@@ -210,7 +240,7 @@ export default function AirdropFormEditor({
             }}
           >
             <SortableContext
-              items={contentBlocks.map((_, i) => i.toString())}
+              items={contentBlocks.map((_, i) => `block-${i}`)}
               strategy={verticalListSortingStrategy}
             >
               {contentBlocks.map((block, index) => (
@@ -231,19 +261,12 @@ export default function AirdropFormEditor({
           </DndContext>
 
           <div className="flex gap-2 flex-wrap">
-            {[
-              { icon: <FileText />, type: 'description' },
-              { icon: <ImageIcon />, type: 'image' },
-              { icon: <CheckSquare />, type: 'checklist' },
-              { icon: <Link2 />, type: 'link' },
-              { icon: <Highlighter />, type: 'highlight' },
-              { icon: <Heading1 />, type: 'header1' },
-            ].map((tool) => (
+            {tools.map((tool) => (
               <Tooltip key={tool.type}>
                 <TooltipTrigger asChild>
                   <Button
                     className="bg-[#8373EE] hover:bg-[#8373EE]/80 cursor-pointer"
-                    onClick={() => addBlock(tool.type as any)}
+                    onClick={() => addBlock(tool.type)}
                   >
                     {tool.icon}
                   </Button>

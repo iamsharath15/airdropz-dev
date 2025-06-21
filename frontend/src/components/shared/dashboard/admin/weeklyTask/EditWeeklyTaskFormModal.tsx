@@ -29,20 +29,12 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-
-type WeeklyTask = {
-  id: string;
-  task_title: string;
-  task_category: string;
-  week: number;
-  start_time: string;
-  end_time: string;
-  task_description: string;
-  task_banner_image: string;
-};
+import { WeeklyTask } from '@/types';
 
 type EditWeeklyTaskFormModalProps = {
   task: WeeklyTask;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
@@ -54,8 +46,13 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
   const [category, setCategory] = useState(task.task_category);
   const [weekOptions, setWeekOptions] = useState(['1', '2', '3', '4', '5']);
   const [week, setWeek] = useState(task.week.toString());
-  const [startDate, setStartDate] = useState(new Date(task.start_time));
-  const [endDate, setEndDate] = useState(new Date(task.end_time));
+  const [startDate, setStartDate] = useState(
+    task.start_time ? new Date(task.start_time) : new Date()
+  );
+  const [endDate, setEndDate] = useState(
+    task.end_time ? new Date(task.end_time) : new Date()
+  );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [showCategoryInput, setShowCategoryInput] = useState(false);
@@ -223,12 +220,15 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
               {/* Week */}
               <div className="space-y-2 p-1">
                 <Label className="text-sm text-white font-semibold">Week</Label>
-                <Select value={week} onValueChange={setWeek} >
+                <Select value={week} onValueChange={setWeek}>
                   <SelectTrigger
                     hideIcon
                     className="bg-white text-black border-0 w-full cursor-pointer"
                   >
-                    <SelectValue placeholder="Select week" className='text-black' />
+                    <SelectValue
+                      placeholder="Select week"
+                      className="text-black"
+                    />
                     <ChevronDownIcon className="inline h-4 w-4 text-black" />
                   </SelectTrigger>
                   <SelectContent
@@ -257,7 +257,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
               </div>
 
               {/* Start Date */}
-               <div className="space-y-2">
+              <div className="space-y-2">
                 <Label className="text-sm text-white font-semibold">
                   Start Date
                 </Label>
@@ -277,13 +277,14 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                       selected={startDate}
                       onSelect={setStartDate}
                       initialFocus
+                      required 
                     />
                   </PopoverContent>
                 </Popover>
               </div>
 
               {/* End Date */}
-             <div className="space-y-2">
+              <div className="space-y-2">
                 <Label className="text-sm text-white/80 font-semibold">
                   End Date
                 </Label>
@@ -303,6 +304,7 @@ const EditWeeklyTaskFormModal = ({ task }: EditWeeklyTaskFormModalProps) => {
                       selected={endDate}
                       onSelect={setEndDate}
                       initialFocus
+                      required 
                     />
                   </PopoverContent>
                 </Popover>

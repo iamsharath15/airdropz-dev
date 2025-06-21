@@ -12,8 +12,9 @@ export type Airdrop = {
 export interface SubTask {
   id: string;
   title: string;
+  image:null,
   completed: boolean;
-  description: string | null;
+  description?: string | null;
   sub_task_image: string | null;
 }
 
@@ -23,10 +24,19 @@ export interface WeeklyTask {
   task_category: string;
   week: number;
   task_banner_image?: string;
+  start_time: string;
+  task_description: string;
   end_time?: string;
   progress?: number;
   tasks?: TaskBlock[]; // Make sure TaskBlock is also defined/exported
   sub_tasks?: SubTask[];
+    total_users_started?: number;
+user_count?: number;
+  user_images?: {
+    user_name?: string;
+    profile_image?: string;
+  }[];
+
 }
 export interface TaskBlock {
   id: string;
@@ -124,7 +134,7 @@ export interface TaskData {
   description: string;
   progress: number;
   status: string;
-  week: string;
+  week: number;
   category: string;
   image: string;
   timeLeft?: string;

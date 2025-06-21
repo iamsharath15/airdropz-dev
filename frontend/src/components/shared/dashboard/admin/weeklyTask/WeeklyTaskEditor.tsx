@@ -45,10 +45,11 @@ import {
 import SortableItem from '@/components/shared/SortableItem';
 import StepProgress from '@/components/shared/StepProgress';
 import { arrayMove } from '@dnd-kit/sortable';
+import type { SubTask, TaskBlock, WeeklyTask } from '@/types';
 
 type WeeklyTaskEditorProps = {
-  task: any;
-  onTaskUpdate: (updates: any) => void;
+  task: Partial<WeeklyTask> & { task_banner_image?: string | File };
+  onTaskUpdate: (updates: Partial<WeeklyTask>) => void;
 };
 
 const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
@@ -69,7 +70,14 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
   ];
 
   const addBlock = (type: string) => {
-    const newBlocks = [...(task.tasks || []), { type, value: '', link: '' }];
+    const newBlock: TaskBlock = {
+      id: crypto.randomUUID(), // ✅ Add a unique ID
+      type,
+      value: '',
+      link: '',
+    };
+
+    const newBlocks = [...(task.tasks || []), newBlock];
     onTaskUpdate({ tasks: newBlocks });
   };
 
@@ -78,14 +86,14 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
     onTaskUpdate({ tasks: newBlocks });
   };
 
-  const renderBlock = (block: any, index: number) => {
+  const renderBlock = (block: TaskBlock, index: number) => {
     return (
       <div className="space-y-2">
         {(block.type === 'description' || block.type === 'checklist') && (
           <Textarea
             value={block.value}
             onChange={(e) => {
-              const updated = [...task.tasks];
+              const updated = [...(task.tasks ?? [])];
               updated[index].value = e.target.value;
               onTaskUpdate({ tasks: updated });
             }}
@@ -103,7 +111,8 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
               placeholder="Link title"
               value={block.value}
               onChange={(e) => {
-                const updated = [...task.tasks];
+                const updated = [...(task.tasks ?? [])];
+
                 updated[index].value = e.target.value;
                 onTaskUpdate({ tasks: updated });
               }}
@@ -111,9 +120,9 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
             />
             <Input
               placeholder="URL"
-              value={block.link}
+              value={block.link ?? ''}
               onChange={(e) => {
-                const updated = [...task.tasks];
+    const updated = [...(task.tasks ?? [])];
                 updated[index].link = e.target.value;
                 onTaskUpdate({ tasks: updated });
               }}
@@ -126,7 +135,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
             <Input
               value={block.value}
               onChange={(e) => {
-                const updated = [...task.tasks];
+    const updated = [...(task.tasks ?? [])];
                 updated[index].value = e.target.value;
                 onTaskUpdate({ tasks: updated });
               }}
@@ -138,11 +147,19 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
       </div>
     );
   };
+const createEmptySubTask = (): SubTask => ({
+  id: crypto.randomUUID(),
+  title: '',
+  description: '',
+  image: null,
+  completed: false,
+  sub_task_image: null,
+});
 
   const addChecklist = () => {
     const updatedSubTasks = [
       ...(task.sub_tasks || []),
-      { title: '', description: '', image: null },
+       createEmptySubTask()
     ];
     onTaskUpdate({
       ...task,
@@ -151,7 +168,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
   };
 
   const removeChecklist = (index: number) => {
-    const updatedSubTasks = task.sub_tasks.filter((_, i) => i !== index);
+    const updatedSubTasks = (task.sub_tasks ?? []).filter((_, i) => i !== index);
     onTaskUpdate({
       ...task,
       sub_tasks: updatedSubTasks,
@@ -204,7 +221,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
                   if (file) {
                     const preview = URL.createObjectURL(file);
                     setPreviewUrl(preview);
-                    onTaskUpdate({ task_banner_image: file });
+onTaskUpdate({ task_banner_image: file as unknown as string });
                   }
                 }}
               />
@@ -370,24 +387,27 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
           </p>
 
           <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={({ active, over }) => {
-              if (active.id !== over?.id) {
-                const oldIndex = parseInt(active.id);
-                const newIndex = parseInt(over!.id);
-                const reordered = arrayMove(task.tasks, oldIndex, newIndex);
-                onTaskUpdate({ tasks: reordered });
-              }
-            }}
-          >
+  sensors={sensors}
+  collisionDetection={closestCenter}
+  onDragEnd={({ active, over }) => {
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = Number(active.id);
+    const newIndex = Number(over.id);
+
+    // ✅ Ensure task.tasks is not undefined
+    const currentTasks = task.tasks ?? [];
+
+    const reordered = arrayMove(currentTasks, oldIndex, newIndex);
+    onTaskUpdate({ tasks: reordered });
+  }}
+>
+
             <SortableContext
-              items={(task.tasks || []).map((_: any, i: number) =>
-                i.toString()
-              )}
+              items={(task.tasks || []).map((_, i) => i.toString())}
               strategy={verticalListSortingStrategy}
             >
-              {(task.tasks || []).map((block: any, index: number) => (
+              {(task.tasks || []).map((block: TaskBlock, index: number) => (
                 <SortableItem key={index} id={index.toString()}>
                   <div className="border border-zinc-700 rounded-lg p-4 mb-4 relative">
                     <button
@@ -452,7 +472,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
             item.
           </p>
 
-          {task.sub_tasks.map((item, index) => (
+          {task.sub_tasks ?? [].map((item: SubTask, index) => (
             <div
               key={index}
               className="space-y-4 border border-zinc-700 p-4 rounded-xl mb-4"
@@ -481,7 +501,7 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
                   className="bg-zinc-800 text-white"
                   value={item.title}
                   onChange={(e) => {
-                    const updatedSubTasks = [...task.sub_tasks];
+const updatedSubTasks = [...(task.sub_tasks ?? [])];
                     updatedSubTasks[index].title = e.target.value;
                     onTaskUpdate({
                       ...task,
@@ -499,9 +519,9 @@ const WeeklyTaskEditor: React.FC<WeeklyTaskEditorProps> = ({
                 <Textarea
                   placeholder="Enter checklist description"
                   className="bg-zinc-900 border-zinc-700 text-white"
-                  value={item.description || ' '}
+                  value={item.description ?? ''}
                   onChange={(e) => {
-                    const updatedSubTasks = [...task.sub_tasks];
+        const updatedSubTasks = [...(task.sub_tasks ?? [])];
                     updatedSubTasks[index].description = e.target.value;
                     onTaskUpdate({
                       ...task,

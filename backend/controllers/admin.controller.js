@@ -1,5 +1,5 @@
 import pool from '../config/db.js';
-import { sendSuccess } from '../utils/response.js';
+import { sendSuccess, sendError } from '../utils/response.js';
 
 class AdminController {
   static async getDashboardStats(req, res) {

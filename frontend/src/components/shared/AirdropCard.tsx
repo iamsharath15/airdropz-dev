@@ -13,7 +13,6 @@ type AirdropCardProps = {
     category: string | null;
     preview_image_url: string;
     type: 'Free' | 'Paid';
-    likes: string;
   };
 };
 

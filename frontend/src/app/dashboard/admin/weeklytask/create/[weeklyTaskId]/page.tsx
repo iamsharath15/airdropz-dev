@@ -10,20 +10,26 @@ import { useParams } from 'next/navigation';
 import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { Save, Trash } from 'lucide-react';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
-import { WeeklyTask } from '@/types';
+import type { WeeklyTask } from '@/types';
+type WeeklyTaskPayload = Omit<WeeklyTask, 'id' | ''>;
+function isFile(value: unknown): value is File {
+  return typeof File !== 'undefined' && value instanceof File;
+}
 
 const CreateWeeklyTaskPage = () => {
   const params = useParams();
   const taskId = params?.weeklyTaskId as string;
 
-  const [taskData, setTaskData] = useState({
+  const [taskData, setTaskData] = useState<
+    Partial<WeeklyTask> & { task_banner_image?: File | string }
+  >({
     task_title: '',
     task_category: '',
     start_time: '',
     end_time: '',
     task_description: '',
     task_banner_image: '',
-    week: '',
+    week: 0,
     tasks: [],
     sub_tasks: [],
     // add other fields as needed (checklists, content blocks, etc.)
@@ -53,27 +59,28 @@ const CreateWeeklyTaskPage = () => {
     if (taskId) fetchWeeklyTask();
   }, [taskId]);
 
-  const handleTaskUpdate = (updates: any) => {
-    setTaskData((prev: any) => ({ ...prev, ...updates }));
+  const handleTaskUpdate = (updates: Partial<WeeklyTask>) => {
+    setTaskData((prev) => ({ ...prev, ...updates }));
   };
 
   const handleSaveChanges = async () => {
     try {
       setSaving(true);
 
-      const payload:WeeklyTask = {
-        task_title: taskData.task_title,
-        task_category: taskData.task_category,
-        start_time: taskData.start_time,
-        end_time: taskData.end_time,
-        task_description: taskData.task_description,
-        week: taskData.week,
-        tasks: taskData.tasks,
-        sub_tasks: taskData.sub_tasks,
+      const payload: WeeklyTaskPayload = {
+        task_title: taskData.task_title || '',
+        task_category: taskData.task_category || '',
+        start_time: taskData.start_time || new Date().toISOString(),
+        end_time: taskData.end_time || new Date().toISOString(),
+        task_description: taskData.task_description || '',
+        week: taskData.week || 0,
+        tasks: taskData.tasks || [],
+        sub_tasks: taskData.sub_tasks || [],
+        task_banner_image: '',
       };
 
       let bannerImage = taskData.task_banner_image;
-      if (bannerImage instanceof File) {
+      if (bannerImage && isFile(bannerImage)) {
         bannerImage = await uploadImageToS3(
           bannerImage,
           `task/${taskId}/taskBannerImage`
@@ -82,7 +89,7 @@ const CreateWeeklyTaskPage = () => {
 
       payload.task_banner_image = bannerImage;
 
-      console.log('Sending payload:', payload);
+      // console.log('Sending payload:', payload);
       // Optional: Include other fields if available
       // if (taskData.content_blocks) {
       //   payload.content_blocks = taskData.content_blocks;

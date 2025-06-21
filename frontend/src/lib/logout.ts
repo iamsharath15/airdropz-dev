@@ -1,6 +1,4 @@
-// done v1
-'use client';
-
+// src/utils/auth.ts
 import axios from 'axios';
 import { toast } from 'sonner';
 
