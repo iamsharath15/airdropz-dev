@@ -5,21 +5,37 @@ import WelcomeCard from '@/components/shared/dashboard/WelcomeCard';
 import AirdropsSection from '@/components/shared/dashboard/AirdropSection';
 import Leaderboard from '@/components/shared/dashboard/Leaderboard';
 import type { RootState } from '@/store';
-import { useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import axios from 'axios';
 import { BarChart2 } from 'lucide-react';
 import { TaskSection } from '@/components/shared/TaskSection';
 import type { Airdrop } from '@/types';
 import SectionCard from '@/components/shared/SectionCard';
+import { setProfile } from '@/store/profileSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Dashboard: React.FC = () => {
   useRoleRedirect('admin');
-  const user = useSelector((state: RootState) => state.auth.user);
-  const userName = user?.user_name || 'User';
+  const dispatch = useDispatch();
+  useQuery({
+  queryKey: ['profile'],
+  queryFn: async () => {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/account-setting/v1/profile`,
+      { withCredentials: true }
+    );
+    dispatch(setProfile(res.data?.data));
+    return null; // or just don't use the return
+  },
+});
+    const profile = useSelector((state: RootState) => state.profile.data);
+  
+  const user_name = profile?.user_name || 'User';
+
 
   const [airdrops, setAirdrops] = useState<Airdrop[]>([]);
-  const [loading, setLoading] = useState(true);
   const [weeklyTasks, setWeeklyTasks] = useState([]);
 
   const [stats, setStats] = useState({
@@ -42,8 +58,6 @@ const Dashboard: React.FC = () => {
         setAirdrops(response.data.data || []);
       } catch (error) {
         console.error('Failed to load top liked airdrops:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -84,7 +98,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col overflow-y-auto w-full">
         <div className="p-2">
           <WelcomeCard
-            name={userName}
+            name={user_name}
             stats={[
               { label: 'Total Users', value: stats.users },
               { label: 'Total Airdrops', value: stats.airdrops },

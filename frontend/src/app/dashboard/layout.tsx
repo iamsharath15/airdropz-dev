@@ -1,16 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import type { RootState } from '@/store';
 
 import { Sidebar } from '@/components/shared/Sidebar';
 import { Navbar } from '@/components/shared/dashboard/Navbar';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
-import { updateUser } from '@/store/authSlice';
 import DailyLoginModal from '@/components/shared/DailyLoginModal';
+import { setProfile } from '@/store/profileSlice';
 
 export default function DashboardLayout({
   children,
@@ -25,9 +24,10 @@ export default function DashboardLayout({
     totalLogins: number;
     todayPoints: number;
   }>(null);
-
+    
+  const profile = useSelector((state: RootState) => state.profile.data);
   const user = useSelector((state: RootState) => state.auth.user);
-  const isAuthenticated = user ? true : false;
+  const isAuthenticated = !!user;
   const role: 'admin' | 'user' = user?.role === 'admin' ? 'admin' : 'user';
 
   const router = useRouter();
@@ -38,52 +38,52 @@ export default function DashboardLayout({
       router.push('/');
     }
   }, [isAuthenticated, router]);
-  // useEffect(() => {
-  //   if (!isAuthenticated || !user?.id) return;
 
-  //   const today = new Date().toISOString().split('T')[0];
-  //   const localKey = `streak-${user.id}-date`;
+  useEffect(() => {
+    if (!isAuthenticated || role !== 'user' || !user?.id) return;
 
-  //   const lastLoggedDate = localStorage.getItem(localKey);
+    const today = new Date().toISOString().split('T')[0];
+    const localKey = `streak-${user.id}-date`;
+    const lastLoggedDate = localStorage.getItem(localKey);
 
-  //   if (lastLoggedDate !== today) {
-  //     axios
-  //       .post(
-  //         'http://localhost:8080/api/streak/v1/daily-login',
-  //         {},
-  //         {
-  //           withCredentials: true, // ⬅️ important for httpOnly cookies
-  //         }
-  //       )
-  //       .then((res) => {
-  //         const {
-  //           streakCount,
-  //           todayPoints,
-  //           airdropsEarned,
-  //           // airdropsRemaining,
-  //           totalLogins,
-  //         } = res.data;
+    if (lastLoggedDate !== today) {
+      axios
+        .post(
+          'http://localhost:8080/api/streak/v1/daily-login',
+          {},
+          {
+            withCredentials: true, 
+          }
+        )
+        .then((res) => {
+          const {
+            streakCount,
+            todayPoints,
+            airdropsEarned,
+            // airdropsRemaining,
+            totalLogins,
+          } = res.data;
 
-  //         // ✅ Update Redux state
-  //         dispatch(
-  //           updateUser({
-  //             daily_login_streak_count: streakCount,
-  //             airdrops_earned: airdropsEarned,
-  //             airdrops_remaining: airdropsEarned,
-  //           })
-  //         );
+          // ✅ Update Redux state
+          dispatch(
+            setProfile({
+              daily_login_streak_count: streakCount,
+              airdrops_earned: airdropsEarned,
+              airdrops_remaining: airdropsEarned,
+            })
+          );
 
-  //         localStorage.setItem(localKey, today);
-  //         setLoginData({ streakCount, totalLogins, todayPoints });
-  //         setShowStreakModal(true);
+          localStorage.setItem(localKey, today);
+          setLoginData({ streakCount, totalLogins, todayPoints });
+          setShowStreakModal(true);
 
-  //         console.log('[🔥 Daily Streak]', res.data.message);
-  //       })
-  //       .catch((err) => {
-  //         console.error('[❌ Streak Error]', err.response?.data || err.message);
-  //       });
-  //   }
-  // }, [isAuthenticated, user?.id, dispatch]);
+          console.log('[🔥 Daily Streak]', res.data.message);
+        })
+        .catch((err) => {
+          console.error('[❌ Streak Error]', err.response?.data || err.message);
+        });
+    }
+  }, [isAuthenticated, user?.id, dispatch]);
   return (
     <>
       <div className="flex min-h-screen bg-black w-full text-white">
@@ -103,13 +103,13 @@ export default function DashboardLayout({
           <main className="w-full p-6">{children}</main>
         </div>
       </div>
-      {/* {loginData && (
+      { role === 'user' && loginData && (
         <DailyLoginModal
           isOpen={showStreakModal}
           onClose={() => setShowStreakModal(false)}
           loginData={loginData}
         />
-      )} */}
+      )} 
     </>
   );
 }

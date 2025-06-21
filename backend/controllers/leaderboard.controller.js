@@ -12,10 +12,13 @@ class LeaderboardController {
           l.id,
           l.user_id,
           u.user_name,
+          p.profile_image,
           l.points,
           l.updated_at
         FROM leaderboard l
         JOIN users u ON l.user_id = u.id
+        JOIN profiles p ON u.id = p.user_id
+        WHERE u.role != 'admin'
         ORDER BY l.points DESC
         LIMIT $1 OFFSET $2;
       `;

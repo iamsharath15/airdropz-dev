@@ -10,6 +10,7 @@ type LeaderboardUser = {
   id: number;
   user_name: string;
   points: number;
+  profile_image: string;
 };
 
 type LeaderboardResponse = {
@@ -57,7 +58,7 @@ const Leaderboard = () => {
         <div className="flex text-xs text-gray-400 mb-3 px-2">
           <div className="w-10">Rank</div>
           <div className="flex-1">User name</div>
-          <div className="w-24 text-right">Airdrops earned</div>
+          <div className="w-24 text-right">Points earned</div>
         </div>
 
         {isLoading && <div className="text-gray-400 px-2">Loading...</div>}
@@ -65,7 +66,7 @@ const Leaderboard = () => {
           <div className="text-red-500 px-2">Failed to load leaderboard.</div>
         )}
         {!isLoading && data?.data.length === 0 && (
-          <div className="text-gray-400 px-2">
+          <div className="text-white bg-[#151313] h-25 px-2 rounded-lg py-2 flex items-center justify-center">
             Leaderboard will update soon.
           </div>
         )}
@@ -80,10 +81,22 @@ const Leaderboard = () => {
                 {(page - 1) * fullLimit + index + 1}.
               </div>
               <div className="flex-1 flex items-center gap-2 justify-start overflow-hidden">
-                <div className="w-6 h-6 bg-white rounded-full" />
+                {user.profile_image ? (
+                  <Image
+                    src={user.profile_image}
+                    alt="prodile image"
+                    width={18}
+                    height={18}
+                    className="w-6 h-6 rounded-full"
+                  />
+                ) : (
+<div className="w-6 h-6 bg-[#8373EE] rounded-full text-white flex items-center justify-center text-black text-sm font-semibold">
+  {user.user_name?.[0]?.toUpperCase()}
+</div>
+                )}
                 <span className="text-white">{user.user_name}</span>
               </div>
-              <div className="w-24 text-right flex justify-end items-center pr-4">
+              <div className="w-24 text-right flex justify-end items-center pr-4s">
                 <span className="text-yellow-500 pr-3">+ {user.points}</span>
                 <Image
                   src="https://cdn.lootcrate.me/svg/airdrop.svg"

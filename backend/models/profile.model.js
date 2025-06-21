@@ -16,6 +16,8 @@ export async function createProfileTable() {
       interests TEXT,
       experience_level VARCHAR(50),
       wallet_address VARCHAR(100),
+      last_login TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+
 
       -- Notification preferences
       new_airdrop_alerts BOOLEAN DEFAULT true,

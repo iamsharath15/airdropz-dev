@@ -29,7 +29,7 @@ class DailyLoginController {
         const totalLogins = parseInt(totalLoginCountRows[0].count);
 
         const { rows: updatedUserRows } = await pool.query(
-          `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
+          `SELECT airdrops_earned, airdrops_remaining FROM profiles WHERE user_id = $1`,
           [userId]
         );
         const updatedUser = updatedUserRows[0];
@@ -85,13 +85,13 @@ class DailyLoginController {
       );
 
       await pool.query(
-        `UPDATE users 
+        `UPDATE profiles
          SET 
            daily_login_streak_count = $1,
            last_login = NOW(),
            airdrops_earned = airdrops_earned + 2,
            airdrops_remaining = airdrops_remaining + 2
-         WHERE id = $2`,
+         WHERE user_id = $2`,
         [streakCount, userId]
       );
       await createUserNotification({
@@ -103,7 +103,7 @@ class DailyLoginController {
         points_earned: 2,
       });
       const { rows: updatedUserRows } = await pool.query(
-        `SELECT airdrops_earned, airdrops_remaining FROM users WHERE id = $1`,
+        `SELECT airdrops_earned, airdrops_remaining FROM profiles WHERE user_id = $1`,
         [userId]
       );
       const updatedUser = updatedUserRows[0];

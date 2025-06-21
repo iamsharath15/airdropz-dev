@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { LeaderboardUser } from '@/types';
 
-
 const useUsersPerPage = () => {
   const [usersPerPage, setUsersPerPage] = useState(3); // default desktop
 
@@ -68,9 +67,20 @@ const LeaderboardItem = ({
 }) => (
   <div className="bg-[#151313] rounded-xl p-4 flex flex-col gap-4 w-full md:w-1/2 lg:w-1/3">
     <div className="flex flex-row gap-4">
-      <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#8373EE]">
-        {user.user_name.charAt(0)}
-      </div>
+      {user.profile_image ? (
+        <Image
+          src={user.profile_image}
+          alt="prodile image"
+          width={18}
+          height={18}
+          className="w-12 h-12 rounded-full"
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold bg-[#8373EE]">
+          {user.user_name.charAt(0)}
+        </div>
+      )}
+
       <div className="flex-1">
         <h4 className="text-white font-semibold">{user.user_name}</h4>
         <p className="text-sm text-gray-400">Free tier</p>
@@ -93,7 +103,7 @@ const LeaderboardItem = ({
           width={15}
           height={15}
         />
-        {user.points} Airdropz
+        {user.points} points
       </div>
     </div>
   </div>
@@ -111,7 +121,9 @@ const LeaderboardSection = () => {
   } = useQuery<LeaderboardUser[]>({
     queryKey: ['leaderboard'],
     queryFn: async () => {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/leaderboard/v1/`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/leaderboard/v1/`
+      );
       return res.data.data;
     },
   });

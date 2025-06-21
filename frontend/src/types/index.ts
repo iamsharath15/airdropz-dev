@@ -81,6 +81,7 @@ export interface LeaderboardUser {
   user_id: string;
   user_name: string;
   points: number;
+  profile_image: string;
 }
 
 export interface StatItem {

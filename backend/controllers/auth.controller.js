@@ -233,7 +233,7 @@ class UserController {
       }
 
       generateTokenAndSetCookie(res, user);
-      await pool.query('UPDATE users SET last_login = NOW() WHERE id = $1', [
+      await pool.query('UPDATE profiles SET last_login = NOW() WHERE user_id = $1', [
         user.id,
       ]);
 
@@ -292,7 +292,7 @@ class UserController {
       );
 
       const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-      await sendPasswordResetEmail(email, resetURL);
+      //await sendPasswordResetEmail(email, resetURL);
 
       return sendSuccess(
         res,
