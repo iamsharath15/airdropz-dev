@@ -52,7 +52,7 @@
 // utils/emailService.js
 import { Resend } from 'resend';
 
-const resend = new Resend("re_FuvSwiP6_BFviz4SLBvYgBXYZidc8TrNj");
+const resend = new Resend(process.env.RESEND_EMAIL_SERVICE_API_KEY);
 const senderEmail = 'Support <support@lootcrate.me>'; // Must be verified in Resend
 
 export const sendEmail = async ({ toEmail, subject, html }) => {
