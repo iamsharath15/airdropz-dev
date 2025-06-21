@@ -17,6 +17,7 @@ interface Profile {
   task_reminders: boolean;
   mode: string;
   language: string;
+  last_login: string;
 }
 
 interface ProfileState {

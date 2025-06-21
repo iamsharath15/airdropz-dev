@@ -200,8 +200,8 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                       key={note.id}
                       onClick={() => handleMarkAsRead(note.id)}
                       // note.target_url
-                      className={`px-4 py-3 gap-3 items-start rounded-md ${
-                        note.is_read ? 'bg-neutral-800' : 'bg-[#8373EE]/30'
+                      className={`px-4 py-3 gap-3 items-start rounded-md text-white hover:text-black/70 ${
+                        note.is_read ? 'bg-neutral-800' : 'bg-[#8373EE]/30 '
                       } hover:bg-[#1f1f1f] transition-colors cursor-pointer`}
                     >
                       <div className="flex-shrink-0">
@@ -216,8 +216,8 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-white">{note.title}</p>
-                        <p className="text-xs text-white">{note.message}</p>
+                        <p className="text-sm font-medium  ">{note.title}</p>
+                        <p className="text-xs">{note.message}</p>
                       </div>
                       <span className="text-[10px] text-gray-500">
                         {formatTimeAgo(note.created_at)}

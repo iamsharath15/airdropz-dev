@@ -280,29 +280,42 @@ class WeeklyTaskController {
           [id, type, value || '', link || null]
         );
       }
-   for (const sub of sub_tasks) {
-  const { id: subTaskId, title, description, sub_task_image, completed } = sub;
+      for (const sub of sub_tasks) {
+        const {
+          id: subTaskId,
+          title,
+          description,
+          sub_task_image,
+          completed,
+        } = sub;
 
-  if (subTaskId) {
-    // Update existing sub-task
-    await client.query(
-      `UPDATE sub_tasks
+        if (subTaskId) {
+          // Update existing sub-task
+          await client.query(
+            `UPDATE sub_tasks
        SET title = $1,
            description = $2,
            sub_task_image = $3,
            completed = $4
        WHERE id = $5 AND weekly_task_id = $6`,
-      [title, description || null, sub_task_image || null, completed, subTaskId, id]
-    );
-  } else {
-    // Insert new sub-task
-    await client.query(
-      `INSERT INTO sub_tasks (weekly_task_id, title, description, sub_task_image, completed)
+            [
+              title,
+              description || null,
+              sub_task_image || null,
+              completed,
+              subTaskId,
+              id,
+            ]
+          );
+        } else {
+          // Insert new sub-task
+          await client.query(
+            `INSERT INTO sub_tasks (weekly_task_id, title, description, sub_task_image, completed)
        VALUES ($1, $2, $3, $4, $5)`,
-      [id, title, description || null, sub_task_image || null, completed]
-    );
-  }
-}
+            [id, title, description || null, sub_task_image || null, completed]
+          );
+        }
+      }
 
       // Fetch full updated weekly task including tasks
       const fullData = await client.query(
@@ -390,21 +403,23 @@ class WeeklyTaskController {
     }
   }
 
-static async userTaskCheckList(req, res) {
-  const user_id = req.user.userId;
-  const { weekly_task_id } = req.params;
-  const { sub_task_id, image_url } = req.body;
-  const client = await pool.connect();
+  static async userTaskCheckList(req, res) {
+    const user_id = req.user.userId;
+    const { weekly_task_id } = req.params;
+    const { sub_task_id, image_url } = req.body;
+    const client = await pool.connect();
 
-  if (!sub_task_id || !image_url || !weekly_task_id) {
-    return res.status(400).json({ success: false, message: 'Missing required fields' });
-  }
+    if (!sub_task_id || !weekly_task_id) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing required fields' });
+    }
 
-  try {
-    await client.query('BEGIN');
+    try {
+      await client.query('BEGIN');
 
-    // 1. Mark sub-task as completed
-    const insertQuery = `
+      // 1. Mark sub-task as completed
+      const insertQuery = `
       INSERT INTO user_sub_tasks (
         user_id,
         sub_task_id,
@@ -420,53 +435,77 @@ static async userTaskCheckList(req, res) {
         is_completed = true,
         completed_at = NOW();
     `;
-    await client.query(insertQuery, [user_id, sub_task_id, weekly_task_id, image_url]);
+      await client.query(insertQuery, [
+        user_id,
+        sub_task_id,
+        weekly_task_id,
+        image_url,
+      ]);
 
-    // 2. Add 10 points
-    await client.query(`UPDATE leaderboard SET points = points + 10 WHERE user_id = $1`, [user_id]);
-    await client.query(`UPDATE users SET airdrops_earned = airdrops_earned + 10 WHERE id = $1`, [user_id]);
+      // 2. Add 10 points
+      await client.query(
+        `UPDATE leaderboard SET points = points + 10 WHERE user_id = $1`,
+        [user_id]
+      );
+      await client.query(
+        `UPDATE profiles SET airdrops_earned = airdrops_earned + 10 WHERE id = $1`,
+        [user_id]
+      );
 
-    // 3. Fetch updated stats
-    const leaderboardRes = await client.query(`SELECT points FROM leaderboard WHERE user_id = $1`, [user_id]);
-    const userRes = await client.query(`SELECT airdrops_earned, user_name FROM users WHERE id = $1`, [user_id]);
+      // 3. Fetch updated stats
+      const leaderboardRes = await client.query(
+        `SELECT points FROM leaderboard WHERE user_id = $1`,
+        [user_id]
+      );
+      const userRes = await client.query(
+        `SELECT 
+  u.user_name, 
+  p.airdrops_earned 
+FROM users u
+JOIN profiles p ON u.id = p.user_id
+WHERE u.id = $1;
+`,
+        [user_id]
+      );
 
-    const userName = userRes.rows[0]?.user_name || 'User';
-    const airdrops_earned = userRes.rows[0]?.airdrops_earned || 0;
-    const points = leaderboardRes.rows[0]?.points || 0;
+      const userName = userRes.rows[0]?.user_name || 'User';
+      const airdrops_earned = userRes.rows[0]?.airdrops_earned || 0;
+      const points = leaderboardRes.rows[0]?.points || 0;
 
-    // 4. Fetch weekly task title
-    const taskTitleRes = await client.query(
-      `SELECT task_title FROM weekly_tasks WHERE id = $1`,
-      [weekly_task_id]
-    );
-    const taskTitle = taskTitleRes.rows[0]?.task_title || 'Weekly Task';
+      // 4. Fetch weekly task title
+      const taskTitleRes = await client.query(
+        `SELECT task_title FROM weekly_tasks WHERE id = $1`,
+        [weekly_task_id]
+      );
+      const taskTitle = taskTitleRes.rows[0]?.task_title || 'Weekly Task';
 
-    // 5. Send notification
-    await createUserNotification({
-      user_id: user_id,
-      type: 'task',
-      title: `You earned 10 points!`,
-      message: `Great job on completing a sub-task in "${taskTitle}". Keep going, ${userName}!`,
-      target_url: `/dashboard/user/weeklytask/${weekly_task_id}`,
-      points_earned: 10,
-    });
+      // 5. Send notification
+      await createUserNotification({
+        user_id: user_id,
+        type: 'task',
+        title: `You earned 10 points!`,
+        message: `Great job on completing a sub-task in "${taskTitle}". Keep going, ${userName}!`,
+        target_url: `/dashboard/user/weeklytask/${weekly_task_id}`,
+        points_earned: 10,
+      });
 
-    await client.query('COMMIT');
+      await client.query('COMMIT');
 
-    return res.status(200).json({
-      success: true,
-      message: 'Task marked as completed and points awarded',
-      data: { points, airdrops_earned },
-    });
-  } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('❌ Error in userTaskCheckList:', error);
-    return res.status(500).json({ success: false, message: 'Failed to update task checklist' });
-  } finally {
-    client.release();
+      return res.status(200).json({
+        success: true,
+        message: 'Task marked as completed and points awarded',
+        data: { points, airdrops_earned },
+      });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      console.error('❌ Error in userTaskCheckList:', error);
+      return res
+        .status(500)
+        .json({ success: false, message: 'Failed to update task checklist' });
+    } finally {
+      client.release();
+    }
   }
-}
-
 
   static async getUserTaskStatus(req, res) {
     const user_id = req.user.userId; // from auth middleware

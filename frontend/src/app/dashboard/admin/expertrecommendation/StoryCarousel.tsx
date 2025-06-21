@@ -30,7 +30,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
   const [progress, setProgress] = useState(0);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const currentStory = selectedStory?.stories[currentIndex];
+  const currentStory = selectedStory?.stories?.[currentIndex];
 
   useEffect(() => {
     if (!selectedStory || !isPlaying) return;
@@ -38,7 +38,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
     intervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          const isLast = currentIndex >= selectedStory.stories.length - 1;
+          const isLast = currentIndex >= selectedStory?.stories?.length - 1;
 
           if (isLast) {
             closeStory();
@@ -213,7 +213,7 @@ const StoryCarousel: React.FC<StoryCarouselProps> = ({
         <DialogTitle></DialogTitle>
         <DialogContent className="bg-[#2a2a2a] max-w-md p-0 border-0 ">
           {selectedStory &&
-            (selectedStory.stories.length === 0 ? (
+            (selectedStory?.stories?.length === 0 ? (
               <div className="p-6 text-center text-white flex justify-center gap-5 flex-col h-[400px] items-center py-[10%]">
                 <History size={50} />
                 <p className="text-white mb-4 w-8/12 font-semibold">

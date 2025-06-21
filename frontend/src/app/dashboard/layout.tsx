@@ -43,10 +43,10 @@ export default function DashboardLayout({
     if (!isAuthenticated || role !== 'user' || !user?.id) return;
 
     const today = new Date().toISOString().split('T')[0];
-    const localKey = `streak-${user.id}-date`;
-    const lastLoggedDate = localStorage.getItem(localKey);
+      const lastLoginDate = profile?.last_login?.split('T')[0]; // get date part only
 
-    if (lastLoggedDate !== today) {
+
+    if (lastLoginDate !== today) {
       axios
         .post(
           'http://localhost:8080/api/streak/v1/daily-login',
@@ -73,7 +73,6 @@ export default function DashboardLayout({
             })
           );
 
-          localStorage.setItem(localKey, today);
           setLoginData({ streakCount, totalLogins, todayPoints });
           setShowStreakModal(true);
 

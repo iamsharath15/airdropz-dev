@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, CalendarOff } from 'lucide-react';
 import WeeklyTaskTemplate from '@/components/shared/dashboard/weeklyTaskTemplate';
 import Link from 'next/link';
-import { uploadImageToS3 } from '@/lib/uploadToS3';
+// import { uploadImageToS3 } from '@/lib/uploadToS3';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button';
 import type { TaskData } from '@/types';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '@/store/authSlice';
+// import { updateUser } from '@/store/authSlice';
+import { setProfile } from '@/store/profileSlice';
 
 export default function TaskDetail() {
   const { weeklyTaskId } = useParams();
@@ -22,46 +23,45 @@ export default function TaskDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
-  const [animating, setAnimating] = useState(false);
   const dispatch = useDispatch();
 
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/${weeklyTaskId}/with-user-progress`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       setTaskData(response.data.data);
-    } catch (err: any) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        console.error('Axios error:', err.response?.data || err.message);
+      } else {
+        console.error('Unexpected error:', err);
+      }
       setError('Failed to load task data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [weeklyTaskId]);
 
   useEffect(() => {
-    if (weeklyTaskId) {
-      fetchTask();
-    }
-  }, [weeklyTaskId]);
+    if (weeklyTaskId) fetchTask();
+  }, [weeklyTaskId, fetchTask]);
 
   const handleFileUpload = async (file: File, subTaskId: string) => {
     try {
       setUploadingTaskId(subTaskId);
 
       // Upload to S3
-      const image_url = await uploadImageToS3(file, `sub_tasks/${subTaskId}`);
-      console.log(image_url);
+      // const image_url = await uploadImageToS3(file, `sub_tasks/${subTaskId}`);
+      // console.log(image_url);
 
       // Send to backend
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/weeklytask/v1/upload-subtask-image/${taskData?.id}`,
         {
           sub_task_id: subTaskId,
-          image_url,
+          image_url: '',
         },
         {
           withCredentials: true,
@@ -70,16 +70,16 @@ export default function TaskDetail() {
 
       if (response.data.success) {
         toast.success('Task marked as completed!');
-          const updated = response.data.data; // assuming { airdrops_earned, points, ... }
+        const updated = response.data.data; // assuming { airdrops_earned, points, ... }
 
-      if (updated?.airdrops_earned !== undefined) {
-        dispatch(
-          updateUser({
-            airdrops_earned: updated.airdrops_earned,
-            airdrops_remaining: updated.airdrops_earned, // if same logic
-          })
-        );
-      }
+        if (updated?.airdrops_earned !== undefined) {
+          dispatch(
+            setProfile({
+              airdrops_earned: updated.airdrops_earned,
+              airdrops_remaining: updated.airdrops_earned, // if same logic
+            })
+          );
+        }
         await fetchTask();
       } else {
         toast.error('Failed to complete task.');
@@ -136,11 +136,7 @@ export default function TaskDetail() {
           Back to Weekly Task
         </Link>
 
-        <motion.div
-          whileTap={{ scale: 1.3 }}
-          animate={animating ? { scale: [1, 1.3, 1] } : {}}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div whileTap={{ scale: 1.3 }} transition={{ duration: 0.3 }}>
           <ConfirmDialog
             title="Remove this task ?"
             description="This will remove the task from My Tasks."

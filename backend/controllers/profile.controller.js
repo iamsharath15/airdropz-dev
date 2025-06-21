@@ -23,7 +23,8 @@ class ProfileController {
         p.weekly_reports,
         p.task_reminders,
         p.mode,
-        p.language
+        p.language,
+        p.last_login
       FROM users u
       LEFT JOIN profiles p ON u.id = p.user_id
       WHERE u.id = $1`,

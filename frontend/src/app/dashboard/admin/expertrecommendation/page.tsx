@@ -14,6 +14,7 @@ import { uploadImageToS3 } from '@/lib/uploadToS3';
 import Image from 'next/image';
 import ExpertSectionHeader from '@/components/shared/dashboard/ExpertSectionHeader';
 import type { Story } from '@/types';
+import { useRouter } from 'next/navigation';
 
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/expertStories/v1`;
 
@@ -23,6 +24,7 @@ const Index = () => {
   const [open, setOpen] = useState(false);
   const [coverName, setCoverName] = useState('');
   const [coverFile, setCoverFile] = useState<File | null>(null);
+const router = useRouter();
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -72,6 +74,7 @@ const Index = () => {
       setCoverName('');
       setCoverFile(null);
       setStories((prev) => [...prev, res.data]);
+      router.refresh();
     } catch (error) {
       console.error('Create cover error', error);
       toast.error('Failed to create cover.');

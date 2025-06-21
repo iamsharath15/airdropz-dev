@@ -90,9 +90,9 @@ const Leaderboard = () => {
                     className="w-6 h-6 rounded-full"
                   />
                 ) : (
-<div className="w-6 h-6 bg-[#8373EE] rounded-full text-white flex items-center justify-center text-black text-sm font-semibold">
-  {user.user_name?.[0]?.toUpperCase()}
-</div>
+                  <div className="w-6 h-6 bg-[#8373EE] rounded-full text-white flex items-center justify-center text-sm font-semibold">
+                    {user.user_name?.[0]?.toUpperCase()}
+                  </div>
                 )}
                 <span className="text-white">{user.user_name}</span>
               </div>

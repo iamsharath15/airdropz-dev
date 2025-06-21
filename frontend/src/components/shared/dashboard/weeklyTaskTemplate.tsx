@@ -242,7 +242,7 @@ const WeeklyTaskTemplate = ({
                     )}
 
                     <h4 className="text-white text-sm mb-3">File submission</h4>
-                    {task.completed && task.sub_task_image ? (
+                    {task.completed  ? (
                       <div className="relative mb-4 w-full items-center overflow-hidden h-40 bg-[#8373EE]/60 p-4 rounded-lg text-white flex flex-col gap-2 justify-center text-center">
                         <p className="text-lg font-bold">
                           {' '}
