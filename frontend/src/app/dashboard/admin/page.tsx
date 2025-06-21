@@ -8,9 +8,10 @@ import type { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { useRoleRedirect } from '@/lib/useRoleRedirect';
 import axios from 'axios';
-import { BarChart2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 import { TaskSection } from '@/components/shared/TaskSection';
 import type { Airdrop } from '@/types';
+import SectionCard from '@/components/shared/SectionCard';
 
 const Dashboard: React.FC = () => {
   useRoleRedirect('admin');
@@ -80,8 +81,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-black">
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6">
+      <div className="flex flex-col overflow-y-auto w-full">
+        <div className="p-2">
           <WelcomeCard
             name={userName}
             stats={[
@@ -91,37 +92,24 @@ const Dashboard: React.FC = () => {
             ]}
             color="#8373EE"
           />
-          {loading ? (
-            <div className=""></div>
+          {airdrops.length === 0 ? (
+            <SectionCard
+              title="Top Airdrops"
+              message="No airdrops found."
+            />
           ) : (
             <AirdropsSection
               airdrops={airdrops}
               title="Top Liked Airdrops"
               emptyMessage="No airdrops found."
             />
-          )}{' '}
-          <div className="mb-12">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-white">Top Weekly Task</h2>
-              <div className="flex gap-2">
-                <button
-                  className="text-white/80 hover:text-[#8373EE] cursor-pointer "
-                  aria-label="Scroll Left"
-                >
-                  <ChevronLeft />
-                </button>
-                <button
-                  className="text-white/80 hover:text-[#8373EE] cursor-pointer"
-                  aria-label="Scroll Right"
-                >
-                  <ChevronRight />
-                </button>
-              </div>
-            </div>
+          )}
 
+          {weeklyTasks.length === 0 ? (
+            <SectionCard title="Top Task" message="No task found" />
+          ) : (
             <TaskSection tasks={weeklyTasks} />
-          </div>
-          {/* <TasksSection /> */}
+          )}
         </div>
       </div>
       <div className=" fixed bottom-4 right-4 z-50 flex flex-col gap-3">

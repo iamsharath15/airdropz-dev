@@ -127,10 +127,11 @@ class WeeklyTaskController {
               jsonb_build_object(
                 'user_id', u.id,
                 'user_name', u.user_name,
-                'profile_image', u.profile_image
+                'profile_image', p.profile_image
               ) AS u_data
             FROM user_tasks ut2
             JOIN users u ON u.id = ut2.user_id
+            JOIN profiles p ON p.user_id = ut2.user_id
             WHERE ut2.weekly_task_id = wt.id
             LIMIT 5
           ) sub
@@ -140,7 +141,7 @@ class WeeklyTaskController {
       LEFT JOIN tasks t ON t.weekly_task_id = wt.id
       LEFT JOIN sub_tasks st ON st.weekly_task_id = wt.id
       LEFT JOIN user_tasks ut ON ut.weekly_task_id = wt.id
-
+      
       GROUP BY wt.id
       ORDER BY wt.created_at DESC;
     `);
@@ -588,7 +589,7 @@ static async userTaskCheckList(req, res) {
           json_agg(DISTINCT jsonb_build_object(
             'user_id', u.id,
             'user_name', u.user_name,
-            'profile_image', u.profile_image
+            'profile_image', p.profile_image
           )) FILTER (WHERE u.id IS NOT NULL),
           '[]'
         ) AS user_images
@@ -596,6 +597,7 @@ static async userTaskCheckList(req, res) {
       FROM user_tasks ut
       JOIN weekly_tasks wt ON wt.id = ut.weekly_task_id
       JOIN users u ON u.id = ut.user_id
+      JOIN profiles p ON p.user_id = ut.user_id
       GROUP BY wt.id
       ORDER BY wt.start_time DESC;
       `

@@ -5,7 +5,7 @@ import axios from 'axios';
 import AirdropCard from '@/components/shared/AirdropCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, LayoutGrid, Filter } from 'lucide-react';
+import { Search, LayoutGrid, Filter, ChevronDownIcon } from 'lucide-react';
 import AirdropFormModal from '@/components/shared/admin/AirdropFormModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store';
@@ -14,6 +14,14 @@ import {
   setSelectedCategory,
   setSelectedType,
 } from '@/store/airdropsSlice';
+import SectionCard from '@/components/shared/SectionCard';
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+} from '@/components/ui/select';
 
 const AirdropsListing = () => {
   const dispatch = useDispatch();
@@ -79,105 +87,100 @@ const AirdropsListing = () => {
           <AirdropFormModal />
 
           {/* Category Filter */}
-          
-          <Dropdown
-            label={selectedCategory}
-            icon={<LayoutGrid size={18} />}
-            options={categories}
-            activeOption={selectedCategory}
-            show={showCategoryDropdown}
-            toggleShow={() => setShowCategoryDropdown((prev) => !prev)}
-            onSelect={(category) => {
+
+          <Select
+            value={selectedCategory}
+            onValueChange={(category) => {
               dispatch(setSelectedCategory(category));
               setShowCategoryDropdown(false);
             }}
-          />
+          >
+            <SelectTrigger
+              hideIcon
+              className="w-auto text-sm  cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="h-4 w-4 text-white group-hover:text-black transition-colors" />
 
+                <span className="hidden md:inline">
+                  <SelectValue placeholder="Category" />
+                </span>
+
+                <ChevronDownIcon className="hidden md:inline h-4 w-4 text-white group-hover:text-black transition-colors" />
+              </div>
+            </SelectTrigger>
+
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category === 'All' ? 'Category' : category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {/* Type Filter */}
-          <Dropdown
-            label={`Sort By: ${selectedType}`}
-            icon={<Filter size={18} />}
-            options={['All', 'Free', 'Paid']}
-            activeOption={selectedType}
-            show={showSortDropdown}
-            toggleShow={() => setShowSortDropdown((prev) => !prev)}
-            onSelect={(type) => {
+
+          <Select
+            value={selectedType}
+            onValueChange={(type) => {
               dispatch(setSelectedType(type as 'All' | 'Free' | 'Paid'));
               setShowSortDropdown(false);
             }}
-          />
+          >
+            <SelectTrigger
+              hideIcon
+              className="w-auto text-sm  cursor-pointer group bg-transparent text-white hover:bg-white hover:text-black transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="h-4 w-4 text-white group-hover:text-black transition-colors" />
+
+                <span className="hidden md:inline">
+                  <SelectValue placeholder="Type" />
+                </span>
+
+                <ChevronDownIcon className="hidden md:inline h-4 w-4 text-white group-hover:text-black transition-colors" />
+              </div>
+            </SelectTrigger>
+
+            <SelectContent>
+              {['All', 'Free', 'Paid'].map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category === 'All' ? 'Category' : category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Listing */}
-      <h2 className="text-2xl font-bold mb-6 px-[2%]">Top Airdropz</h2>
-      <div className="flex flex-wrap">
-        {filteredAirdrops.map((airdrop) => (
-          <AirdropCard
-            key={airdrop.id}
-            airdrop={{
-              id: airdrop.id,
-              title: airdrop.title,
-              category: airdrop.category ?? 'Unknown',
-              preview_image_url: airdrop.preview_image_url ?? '',
-              type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
-            }}
-          />
-        ))}
+        {filteredAirdrops.length === 0 ? (
+          <SectionCard title="New Airdrops" message="No airdrops found." />
+        ) : (
+            <div className="mb-6 md:mb-8 ">
+      <div className="flex justify-between items-center mb-4 ">
+        <h2 className="md:text-xl tetx-lg font-bold text-white">
+          Top Weekly Task
+        </h2>
+ 
       </div>
+      <div className="flex flex-wrap  w-full">
+                {filteredAirdrops.map((airdrop) => (
+                  <AirdropCard
+                    key={airdrop.id}
+                    airdrop={{
+                      id: airdrop.id,
+                      title: airdrop.title,
+                      category: airdrop.category ?? 'Unknown',
+                      preview_image_url: airdrop.preview_image_url ?? '',
+                      type: airdrop.type === 'Paid' ? 'Paid' : 'Free',
+                    }}
+                  />
+                ))}
+                   </div>
+    </div>
+        )}
     </div>
   );
 };
-
-// -------------------- Dropdown Component --------------------
-const Dropdown = ({
-  label,
-  icon,
-  options,
-  activeOption,
-  show,
-  toggleShow,
-  onSelect,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  options: string[];
-  activeOption: string;
-  show: boolean;
-  toggleShow: () => void;
-  onSelect: (option: string) => void;
-}) => (
-  <div className="relative">
-    <Button
-      variant="outline"
-      className="gap-2 text-white border-white bg-black cursor-pointer"
-      onClick={toggleShow}
-    >
-      {icon}
-      {label}
-    </Button>
-
-    {show && (
-      <div className="absolute space-y-2 right-0 mt-2 z-10 bg-black border border-white rounded-md shadow-md p-2 min-w-[120px]">
-        {options.map((option) => {
-          const isActive = activeOption === option;
-          return (
-            <div
-              key={option}
-              onClick={() => onSelect(option)}
-              className={`px-4 py-2 cursor-pointer rounded-lg transition-colors duration-150 ${
-                isActive
-                  ? 'bg-[#8373EE] text-white font-semibold'
-                  : 'text-white hover:bg-white hover:text-black'
-              }`}
-            >
-              {option}
-            </div>
-          );
-        })}
-      </div>
-    )}
-  </div>
-);
 
 export default AirdropsListing;

@@ -19,6 +19,8 @@ export default function Login() {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [redirecting, setRedirecting] = useState(false);
+
 
   const loginMutation = useMutation<{ data: LoginResponse }, AxiosError>({
     mutationFn: async () => {
@@ -32,13 +34,14 @@ export default function Login() {
     onSuccess: ({ data }) => {
       dispatch(setCredentials({ user: data }));
       toast.success('Logged in successfully!');
-
-      if (data.is_new_user === true) {
-        router.push('/onboarding');
-      } else if (data.role === 'admin') {
-        router.push('/dashboard/admin');
-      } else {
-        router.push('/dashboard/user');
+      if (!data?.role) return;
+      setRedirecting(true);
+      if (data.role === 'admin') return router.push('/dashboard/admin');
+      if (data.role === 'user') {
+        const destination = data.is_new_user
+          ? '/onboarding'
+          : '/dashboard/user';
+        return router.push(destination);
       }
     },
 
@@ -51,9 +54,12 @@ export default function Login() {
 
       if (message === 'Email not verified.') {
         try {
-          await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/v1/resend-otp`, {
-            email,
-          });
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/v1/resend-otp`,
+            {
+              email,
+            }
+          );
           router.push(`/verify-email?email=${email}`);
           toast.success('OTP resent. Please verify your email.');
         } catch (resendError: unknown) {
@@ -69,7 +75,16 @@ export default function Login() {
     loginMutation.mutate();
   };
   const isLogin = loginMutation.status === 'pending';
-
+if (redirecting) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-[#8373EE] text-white">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent mx-auto" />
+          <p className="text-sm">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <Toaster position="top-right" richColors />

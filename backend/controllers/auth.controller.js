@@ -9,6 +9,8 @@ import { generateTokenAndSetCookie } from '../utils/generateTokenAndSetCookie.js
 //   sendVerificationEmail,
 //   sendWelcomeEmail,
 // } from '../utils/emailService/email.js';
+ import {   sendPasswordResetEmail,
+} from '../utils/emailService/email.js';
 import { generateVerificationToken } from '../utils/generateVerificationToken.js';
 import { generateReferralCode } from '../utils/generateReferralCode.js';
 import { createUserNotification } from '../services/notificationService.js';
@@ -290,7 +292,7 @@ class UserController {
       );
 
       const resetURL = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-      // await sendPasswordResetEmail(email, resetURL);
+      await sendPasswordResetEmail(email, resetURL);
 
       return sendSuccess(
         res,

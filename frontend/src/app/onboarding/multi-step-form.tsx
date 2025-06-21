@@ -124,7 +124,7 @@ export function MultiStepForm({ steps, onComplete }: MultiStepFormProps) {
           {currentStep === steps.length - 1 && (
             <Button
               onClick={goToNextStep}
-              className="bg-[#8373EE] hover:bg-[#6e59a5] text-white px-8 cursor-pointer hover:text-white"
+              className="bg-[#8373EE] hover:bg-[#8373EE]/80 text-white px-8 cursor-pointer hover:text-white"
             >
               Complete
             </Button>

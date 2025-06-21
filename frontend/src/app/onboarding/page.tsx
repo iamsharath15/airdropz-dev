@@ -13,16 +13,19 @@ const Page = () => {
   useEffect(() => {
     if (!user) {
       router.push('/');
-    } else if (user.is_verified) {
-      if (user.role === 'admin') {
-        router.push('/dashboard/admin');
-      } else {
-        router.push('/dashboard/user');
-      }
+      return;
+    }
+
+    if (user.role === 'user' && user.is_new_user === false) {
+      router.push('/dashboard/user');
+      return;
+    }
+
+    if (user.role === 'admin') {
+      router.push('/dashboard/admin');
     }
   }, [user, router]);
 
-  // Prevent rendering until user is authenticated
   if (!user) return <div className="text-white p-4">Loading...</div>;
 
   return (

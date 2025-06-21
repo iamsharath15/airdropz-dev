@@ -25,6 +25,7 @@ import { logout } from '@/app/(auth)/logout/page';
 import Image from 'next/image';
 import axios from 'axios';
 import type { NavbarProps } from '@/types';
+import { clearProfile } from '@/store/profileSlice';
 
 
 const pageTitles: Record<string, Record<string, string>> = {
@@ -98,6 +99,7 @@ export function Navbar({ toggleSidebar, role }: NavbarProps) {
       localStorage.removeItem(localKey);
     }
     dispatch(logoutAction());
+    dispatch(clearProfile())
     await logout();
     router.push('/');
   };
